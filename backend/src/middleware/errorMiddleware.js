@@ -9,6 +9,10 @@ function tratarErro(err, req, res, next) {
     return res.status(409).json({ error: 'Registro duplicado' });
   }
 
+  if (err.message === 'Origem não permitida pelo CORS') {
+    return res.status(403).json({ error: err.message });
+  }
+
   res.status(500).json({ error: 'Erro interno do servidor' });
 }
 

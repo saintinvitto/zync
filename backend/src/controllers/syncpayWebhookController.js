@@ -3,13 +3,6 @@ const planoModel = require('../models/planoModel');
 const asyncHandler = require('../utils/asyncHandler');
 
 async function receber(req, res) {
-  const tokenEsperado = process.env.SYNCPAY_WEBHOOK_TOKEN;
-  const authHeader = req.headers.authorization || '';
-
-  if (tokenEsperado && authHeader !== `Bearer ${tokenEsperado}`) {
-    return res.status(401).json({ error: 'Token inválido' });
-  }
-
   const dados = req.body && req.body.data;
   if (!dados || !dados.id) {
     return res.status(400).json({ error: 'Payload inválido' });
