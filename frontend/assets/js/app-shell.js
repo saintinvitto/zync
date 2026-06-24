@@ -81,16 +81,12 @@ function renderUsuario() {
 
 document.getElementById('logout-btn').addEventListener('click', () => Auth.logout());
 
-/* ---------- LOGO COMO LINK PRA HOME ---------- */
+/* ---------- LOGO COMO LINK PRA HOME (só o texto "Zync" é clicável) ---------- */
 (function tornarLogoClicavel() {
   const logo = document.querySelector('.sidebar-logo');
-  if (!logo || logo.tagName === 'A') return;
+  if (!logo || logo.querySelector('.sidebar-logo-link')) return;
 
-  const link = document.createElement('a');
-  link.href = '../../index.html';
-  link.className = logo.className;
-  link.innerHTML = `<span class="logo-mark"></span>${logo.innerHTML}`;
-  logo.replaceWith(link);
+  logo.innerHTML = `<span class="logo-mark"></span><a href="../../index.html" class="sidebar-logo-link">${logo.innerHTML}</a>`;
 })();
 
 /* ---------- BUSCA NA SIDEBAR ---------- */
