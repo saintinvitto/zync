@@ -13,6 +13,10 @@ const leadTagRoutes = require('./leadTagRoutes');
 const agendamentoRoutes = require('./agendamentoRoutes');
 const leadAgendamentoRoutes = require('./leadAgendamentoRoutes');
 const logRoutes = require('./logRoutes');
+const notificacaoRoutes = require('./notificacaoRoutes');
+const planoRoutes = require('./planoRoutes');
+const assinaturaRoutes = require('./assinaturaRoutes');
+const syncpayWebhookRoutes = require('./syncpayWebhookRoutes');
 
 router.get('/health', (req, res) => {
   res.json({ status: 'ok' });
@@ -30,5 +34,9 @@ router.use('/leads/:leadId/tags', leadTagRoutes);
 router.use('/agendamentos', agendamentoRoutes);
 router.use('/leads/:leadId/agendamentos', leadAgendamentoRoutes);
 router.use('/logs', logRoutes);
+router.use('/notificacoes', notificacaoRoutes);
+router.use('/planos', planoRoutes);
+router.use('/assinaturas', assinaturaRoutes);
+router.use('/webhooks/syncpay', syncpayWebhookRoutes);
 
 module.exports = router;

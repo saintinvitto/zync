@@ -1,6 +1,7 @@
 const agendamentoModel = require('../models/agendamentoModel');
 const leadModel = require('../models/leadModel');
 const logModel = require('../models/logModel');
+const notificacaoModel = require('../models/notificacaoModel');
 const asyncHandler = require('../utils/asyncHandler');
 const validators = require('../utils/validators');
 
@@ -51,6 +52,13 @@ async function criar(req, res) {
     leadId: lead.id,
     acao: 'agendamento_criado',
     detalhes: { data_hora: agendamento.data_hora, servico: agendamento.servico },
+  });
+
+  await notificacaoModel.criar({
+    usuarioId: req.usuario.id,
+    leadId: lead.id,
+    tipo: 'agendamento_criado',
+    mensagem: `Novo agendamento para ${lead.nome}`,
   });
 
   res.status(201).json(agendamento);

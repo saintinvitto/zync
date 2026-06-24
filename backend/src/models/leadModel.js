@@ -2,15 +2,43 @@ const db = require('../config/db');
 
 const CAMPOS_ATUALIZAVEIS = ['nome', 'servico', 'origem', 'telefone', 'status', 'valor'];
 
-async function listarPorUsuario(usuarioId, { tagId, page, limit } = {}) {
+async function listarPorUsuario(usuarioId, { tagId, busca, status, origem, valorMin, valorMax, page, limit } = {}) {
   const joinClause = tagId ? 'INNER JOIN lead_tags lt ON lt.lead_id = l.id' : '';
-  let whereClause = 'l.usuario_id = ?';
+  const condicoes = ['l.usuario_id = ?'];
   const params = [usuarioId];
 
   if (tagId) {
-    whereClause += ' AND lt.tag_id = ?';
+    condicoes.push('lt.tag_id = ?');
     params.push(tagId);
   }
+
+  if (busca) {
+    condicoes.push('(l.nome LIKE ? OR l.telefone LIKE ? OR l.servico LIKE ?)');
+    const termo = `%${busca}%`;
+    params.push(termo, termo, termo);
+  }
+
+  if (status) {
+    condicoes.push('l.status = ?');
+    params.push(status);
+  }
+
+  if (origem) {
+    condicoes.push('l.origem = ?');
+    params.push(origem);
+  }
+
+  if (valorMin !== undefined) {
+    condicoes.push('l.valor >= ?');
+    params.push(valorMin);
+  }
+
+  if (valorMax !== undefined) {
+    condicoes.push('l.valor <= ?');
+    params.push(valorMax);
+  }
+
+  const whereClause = condicoes.join(' AND ');
 
   if (page === undefined && limit === undefined) {
     const [rows] = await db.query(

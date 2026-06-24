@@ -1,5 +1,6 @@
 const leadModel = require('../models/leadModel');
 const logModel = require('../models/logModel');
+const notificacaoModel = require('../models/notificacaoModel');
 const asyncHandler = require('../utils/asyncHandler');
 const validators = require('../utils/validators');
 const { paraCsv } = require('../utils/csv');
@@ -18,9 +19,37 @@ function validarStatusEValor(dados) {
   return null;
 }
 
+function validarFiltros(query) {
+  if (query.status !== undefined && !validators.STATUS_LEAD.includes(query.status)) {
+    return `status deve ser um de: ${validators.STATUS_LEAD.join(', ')}`;
+  }
+
+  if (query.valorMin !== undefined && !validators.valorPositivo(query.valorMin)) {
+    return 'valorMin deve ser um número positivo';
+  }
+
+  if (query.valorMax !== undefined && !validators.valorPositivo(query.valorMax)) {
+    return 'valorMax deve ser um número positivo';
+  }
+
+  return null;
+}
+
 async function listar(req, res) {
-  const { tagId, page, limit } = req.query;
-  const leads = await leadModel.listarPorUsuario(req.usuario.id, { tagId, page, limit });
+  const erro = validarFiltros(req.query);
+  if (erro) return res.status(400).json({ error: erro });
+
+  const { tagId, busca, status, origem, valorMin, valorMax, page, limit } = req.query;
+  const leads = await leadModel.listarPorUsuario(req.usuario.id, {
+    tagId,
+    busca,
+    status,
+    origem,
+    valorMin,
+    valorMax,
+    page,
+    limit,
+  });
   res.json(leads);
 }
 
@@ -30,7 +59,18 @@ async function inbox(req, res) {
 }
 
 async function exportarCsv(req, res) {
-  const leads = await leadModel.listarPorUsuario(req.usuario.id, { tagId: req.query.tagId });
+  const erro = validarFiltros(req.query);
+  if (erro) return res.status(400).json({ error: erro });
+
+  const { tagId, busca, status, origem, valorMin, valorMax } = req.query;
+  const leads = await leadModel.listarPorUsuario(req.usuario.id, {
+    tagId,
+    busca,
+    status,
+    origem,
+    valorMin,
+    valorMax,
+  });
   const csv = paraCsv(leads, COLUNAS_EXPORT);
 
   res.setHeader('Content-Type', 'text/csv; charset=utf-8');
@@ -58,6 +98,13 @@ async function criar(req, res) {
     leadId: lead.id,
     acao: 'lead_criado',
     detalhes: { nome: lead.nome },
+  });
+
+  await notificacaoModel.criar({
+    usuarioId: req.usuario.id,
+    leadId: lead.id,
+    tipo: 'lead_criado',
+    mensagem: `Novo lead: ${lead.nome}`,
   });
 
   res.status(201).json(lead);

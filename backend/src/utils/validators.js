@@ -21,11 +21,29 @@ function valorPositivo(valor) {
   return !isNaN(numero) && numero >= 0;
 }
 
+function cpfValido(cpf) {
+  if (typeof cpf !== 'string') return false;
+  const digitos = cpf.replace(/\D/g, '');
+  if (digitos.length !== 11 || /^(\d)\1{10}$/.test(digitos)) return false;
+
+  const calcularDigito = (tamanho) => {
+    let soma = 0;
+    for (let i = 0; i < tamanho; i++) {
+      soma += parseInt(digitos[i], 10) * (tamanho + 1 - i);
+    }
+    const resto = (soma * 10) % 11;
+    return resto === 10 ? 0 : resto;
+  };
+
+  return calcularDigito(9) === parseInt(digitos[9], 10) && calcularDigito(10) === parseInt(digitos[10], 10);
+}
+
 module.exports = {
   emailValido,
   senhaValida,
   dataValida,
   valorPositivo,
+  cpfValido,
   STATUS_LEAD,
   STATUS_AGENDAMENTO,
   ENVIADO_POR,
