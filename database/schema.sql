@@ -6,7 +6,9 @@ CREATE TABLE IF NOT EXISTS usuarios (
   nome VARCHAR(120) NOT NULL,
   email VARCHAR(160) NOT NULL UNIQUE,
   senha_hash VARCHAR(255) NOT NULL,
-  criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+  criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  reset_token_hash VARCHAR(64) NULL,
+  reset_token_expira DATETIME NULL
 );
 
 CREATE TABLE IF NOT EXISTS leads (
@@ -19,6 +21,7 @@ CREATE TABLE IF NOT EXISTS leads (
   status ENUM('novo', 'em_contato', 'proposta_enviada', 'fechado') DEFAULT 'novo',
   valor DECIMAL(10,2),
   criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  fechado_em DATETIME NULL,
   FOREIGN KEY (usuario_id) REFERENCES usuarios(id),
   UNIQUE KEY idx_leads_usuario_telefone (usuario_id, telefone),
   KEY idx_leads_usuario_criado (usuario_id, criado_em)
@@ -30,7 +33,7 @@ CREATE TABLE IF NOT EXISTS mensagens (
   conteudo TEXT NOT NULL,
   enviado_por ENUM('ia', 'humano', 'cliente') NOT NULL,
   criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  FOREIGN KEY (lead_id) REFERENCES leads(id),
+  FOREIGN KEY (lead_id) REFERENCES leads(id) ON DELETE CASCADE,
   KEY idx_mensagens_lead_criado (lead_id, criado_em)
 );
 
@@ -47,8 +50,8 @@ CREATE TABLE IF NOT EXISTS lead_tags (
   lead_id INT NOT NULL,
   tag_id INT NOT NULL,
   PRIMARY KEY (lead_id, tag_id),
-  FOREIGN KEY (lead_id) REFERENCES leads(id),
-  FOREIGN KEY (tag_id) REFERENCES tags(id)
+  FOREIGN KEY (lead_id) REFERENCES leads(id) ON DELETE CASCADE,
+  FOREIGN KEY (tag_id) REFERENCES tags(id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS agendamentos (
@@ -60,7 +63,7 @@ CREATE TABLE IF NOT EXISTS agendamentos (
   status ENUM('agendado', 'confirmado', 'cancelado', 'concluido') DEFAULT 'agendado',
   criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (usuario_id) REFERENCES usuarios(id),
-  FOREIGN KEY (lead_id) REFERENCES leads(id),
+  FOREIGN KEY (lead_id) REFERENCES leads(id) ON DELETE CASCADE,
   KEY idx_agendamentos_usuario_data (usuario_id, data_hora)
 );
 
@@ -72,7 +75,7 @@ CREATE TABLE IF NOT EXISTS logs_atividade (
   detalhes JSON,
   criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (usuario_id) REFERENCES usuarios(id),
-  FOREIGN KEY (lead_id) REFERENCES leads(id),
+  FOREIGN KEY (lead_id) REFERENCES leads(id) ON DELETE SET NULL,
   KEY idx_logs_usuario_criado (usuario_id, criado_em)
 );
 
@@ -85,7 +88,7 @@ CREATE TABLE IF NOT EXISTS notificacoes (
   lida BOOLEAN NOT NULL DEFAULT FALSE,
   criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (usuario_id) REFERENCES usuarios(id),
-  FOREIGN KEY (lead_id) REFERENCES leads(id),
+  FOREIGN KEY (lead_id) REFERENCES leads(id) ON DELETE CASCADE,
   KEY idx_notificacoes_usuario_lida_criado (usuario_id, lida, criado_em)
 );
 
