@@ -24,7 +24,8 @@ CREATE TABLE IF NOT EXISTS leads (
   criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   fechado_em DATETIME NULL,
   FOREIGN KEY (usuario_id) REFERENCES usuarios(id),
-  UNIQUE KEY idx_leads_usuario_telefone (usuario_id, telefone)
+  UNIQUE KEY idx_leads_usuario_telefone (usuario_id, telefone),
+  KEY idx_leads_usuario_criado (usuario_id, criado_em)
 );
 
 CREATE TABLE IF NOT EXISTS mensagens (
@@ -33,7 +34,8 @@ CREATE TABLE IF NOT EXISTS mensagens (
   conteudo TEXT NOT NULL,
   enviado_por ENUM('ia', 'humano', 'cliente') NOT NULL,
   criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  FOREIGN KEY (lead_id) REFERENCES leads(id) ON DELETE CASCADE
+  FOREIGN KEY (lead_id) REFERENCES leads(id) ON DELETE CASCADE,
+  KEY idx_mensagens_lead_criado (lead_id, criado_em)
 );
 
 CREATE TABLE IF NOT EXISTS tags (
@@ -62,7 +64,8 @@ CREATE TABLE IF NOT EXISTS agendamentos (
   status ENUM('agendado', 'confirmado', 'cancelado', 'concluido') DEFAULT 'agendado',
   criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (usuario_id) REFERENCES usuarios(id),
-  FOREIGN KEY (lead_id) REFERENCES leads(id) ON DELETE CASCADE
+  FOREIGN KEY (lead_id) REFERENCES leads(id) ON DELETE CASCADE,
+  KEY idx_agendamentos_usuario_data (usuario_id, data_hora)
 );
 
 CREATE TABLE IF NOT EXISTS logs_atividade (
@@ -73,7 +76,8 @@ CREATE TABLE IF NOT EXISTS logs_atividade (
   detalhes JSON,
   criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (usuario_id) REFERENCES usuarios(id),
-  FOREIGN KEY (lead_id) REFERENCES leads(id) ON DELETE SET NULL
+  FOREIGN KEY (lead_id) REFERENCES leads(id) ON DELETE SET NULL,
+  KEY idx_logs_usuario_criado (usuario_id, criado_em)
 );
 
 CREATE TABLE IF NOT EXISTS notificacoes (
@@ -85,7 +89,8 @@ CREATE TABLE IF NOT EXISTS notificacoes (
   lida BOOLEAN NOT NULL DEFAULT FALSE,
   criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (usuario_id) REFERENCES usuarios(id),
-  FOREIGN KEY (lead_id) REFERENCES leads(id) ON DELETE CASCADE
+  FOREIGN KEY (lead_id) REFERENCES leads(id) ON DELETE CASCADE,
+  KEY idx_notificacoes_usuario_lida_criado (usuario_id, lida, criado_em)
 );
 
 CREATE TABLE IF NOT EXISTS planos (
@@ -109,5 +114,6 @@ CREATE TABLE IF NOT EXISTS assinaturas (
   criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   atualizado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   FOREIGN KEY (usuario_id) REFERENCES usuarios(id),
-  FOREIGN KEY (plano_id) REFERENCES planos(id)
+  FOREIGN KEY (plano_id) REFERENCES planos(id),
+  UNIQUE KEY idx_assinaturas_syncpay_identifier (syncpay_identifier)
 );
