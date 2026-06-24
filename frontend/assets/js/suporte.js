@@ -11,7 +11,7 @@ async function carregarHistorico() {
     }
 
     container.innerHTML = itens.map((m) => `
-      <div class="agenda-row">
+      <div class="agenda-row anim-entrada">
         <div class="agenda-info">
           <div class="agenda-lead">${escapeHtml(m.mensagem)}</div>
           <div class="agenda-servico">

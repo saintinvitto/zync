@@ -8,6 +8,20 @@ function iniciais(nome) {
   return nome.split(' ').filter(Boolean).slice(0, 2).map((p) => p[0].toUpperCase()).join('');
 }
 
+function animateNumber(el, valorFinal, { duracao = 700, formatar = (n) => Math.round(n) } = {}) {
+  const valorInicial = 0;
+  const inicio = performance.now();
+
+  function passo(agora) {
+    const progresso = Math.min(1, (agora - inicio) / duracao);
+    const valorAtual = valorInicial + (valorFinal - valorInicial) * (1 - Math.pow(1 - progresso, 3));
+    el.textContent = formatar(valorAtual);
+    if (progresso < 1) requestAnimationFrame(passo);
+  }
+
+  requestAnimationFrame(passo);
+}
+
 function formatDataHoraCurta(iso) {
   return new Date(iso).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
 }
@@ -74,6 +88,29 @@ document.getElementById('logout-btn').addEventListener('click', () => Auth.logou
   link.className = logo.className;
   link.innerHTML = logo.innerHTML;
   logo.replaceWith(link);
+})();
+
+/* ---------- BUSCA NA SIDEBAR ---------- */
+(function injetarBusca() {
+  const sidebar = document.querySelector('.app-sidebar');
+  const nav = document.querySelector('.sidebar-nav');
+  if (!sidebar || !nav || document.getElementById('sidebar-search-input')) return;
+
+  const wrap = document.createElement('div');
+  wrap.className = 'sidebar-search';
+  wrap.innerHTML = `
+    <span class="sidebar-search-icon">🔍</span>
+    <input type="text" id="sidebar-search-input" placeholder="Buscar no menu...">
+  `;
+  sidebar.insertBefore(wrap, nav);
+
+  document.getElementById('sidebar-search-input').addEventListener('input', (e) => {
+    const termo = e.target.value.trim().toLowerCase();
+    nav.querySelectorAll('.sidebar-item').forEach((item) => {
+      const texto = item.textContent.trim().toLowerCase();
+      item.classList.toggle('nav-hidden', termo.length > 0 && !texto.includes(termo));
+    });
+  });
 })();
 
 /* ---------- NOTIFICAÇÕES ---------- */

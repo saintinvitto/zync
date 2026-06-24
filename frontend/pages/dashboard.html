@@ -48,6 +48,7 @@
       <div class="stat-card">
         <div class="stat-card-top">
           <div class="stat-icon">🆕</div>
+          <span class="stat-badge hidden" id="badge-leads-hoje"></span>
         </div>
         <div class="stat-label">Leads hoje</div>
         <div class="stat-num" id="stat-leads-hoje"><span class="skeleton" style="width:40px;height:1.8rem;"></span></div>
@@ -95,24 +96,27 @@
     </div>
 
     <section class="analytics-grid">
-      <div class="chart-card">
-        <div class="chart-card-header"><div class="chart-title">Leads por origem</div></div>
-        <div class="barlist" id="chart-origem"><div class="empty-state" style="padding:1.5rem;"><span class="spinner"></span></div></div>
-      </div>
-
-      <div class="chart-card">
-        <div class="chart-card-header"><div class="chart-title">Funil de conversão</div></div>
-        <div class="barlist" id="chart-funil"><div class="empty-state" style="padding:1.5rem;"><span class="spinner"></span></div></div>
-      </div>
-
-      <div class="chart-card">
+      <div class="chart-card chart-card-featured">
         <div class="chart-card-header">
           <div>
-            <div class="chart-title">Faturamento (últimos 30 dias)</div>
-            <div class="chart-sub" id="faturamento-sub">—</div>
+            <div class="chart-eyebrow">Faturamento</div>
+            <div class="chart-big-num" id="faturamento-total">R$0,00</div>
+            <div class="chart-sub" id="faturamento-sub">últimos 30 dias</div>
           </div>
         </div>
-        <svg id="faturamento-chart" class="sparkline" viewBox="0 0 560 120" preserveAspectRatio="none"></svg>
+        <svg id="faturamento-chart" class="sparkline-lg" viewBox="0 0 560 160" preserveAspectRatio="none"></svg>
+      </div>
+
+      <div class="analytics-side">
+        <div class="chart-card">
+          <div class="chart-card-header"><div class="chart-title">Leads por origem</div></div>
+          <div class="barlist" id="chart-origem"><div class="empty-state" style="padding:1.5rem;"><span class="spinner"></span></div></div>
+        </div>
+
+        <div class="chart-card">
+          <div class="chart-card-header"><div class="chart-title">Funil de conversão</div></div>
+          <div class="barlist" id="chart-funil"><div class="empty-state" style="padding:1.5rem;"><span class="spinner"></span></div></div>
+        </div>
       </div>
     </section>
 

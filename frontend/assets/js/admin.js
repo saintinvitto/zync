@@ -48,7 +48,7 @@ async function carregarUsuarios() {
     }
 
     lista.innerHTML = usuarios.map((u) => `
-      <div class="agenda-row" data-id="${u.id}">
+      <div class="agenda-row anim-entrada" data-id="${u.id}">
         <div class="agenda-info">
           <div class="agenda-lead">${escapeHtml(u.nome)} ${u.is_admin ? '<span class="k-tag">admin</span>' : ''}</div>
           <div class="agenda-servico">${escapeHtml(u.email)} · cliente desde ${formatData(u.criado_em)}</div>
@@ -96,7 +96,7 @@ async function carregarPlanos() {
     lista.innerHTML = planosCache.map((p) => {
       const sufixo = p.intervalo_dias === 30 ? '/mês' : `/${p.intervalo_dias} dias`;
       return `
-        <div class="agenda-row" data-id="${p.id}">
+        <div class="agenda-row anim-entrada" data-id="${p.id}">
           <div class="agenda-info">
             <div class="agenda-lead">${escapeHtml(p.nome)}</div>
             <div class="agenda-servico">${formatBRL(p.preco)}${sufixo}</div>
@@ -187,7 +187,7 @@ async function carregarSuporte() {
     }
 
     lista.innerHTML = itens.map((m) => `
-      <div class="agenda-row" data-id="${m.id}">
+      <div class="agenda-row anim-entrada" data-id="${m.id}">
         <div class="agenda-info">
           <div class="agenda-lead">${escapeHtml(m.usuario_nome)} <span class="agenda-servico">(${escapeHtml(m.usuario_email)})</span></div>
           <div class="agenda-servico">${escapeHtml(m.mensagem)}</div>

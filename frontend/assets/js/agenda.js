@@ -65,7 +65,7 @@ function renderItemAgenda(a) {
   const nomeLead = leadsMap.get(a.lead_id) || `Lead #${a.lead_id}`;
 
   return `
-    <div class="agenda-row" data-id="${a.id}">
+    <div class="agenda-row anim-entrada" data-id="${a.id}">
       <div class="agenda-date">${data}<div class="agenda-date-sub">${hora}</div></div>
       <div class="agenda-info">
         <div class="agenda-lead">${escapeHtml(nomeLead)}</div>

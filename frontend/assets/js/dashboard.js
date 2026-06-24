@@ -43,10 +43,10 @@ function formatHora(iso) {
 async function loadDashboard() {
   try {
     const data = await Api.dashboard();
-    document.getElementById('stat-leads-hoje').textContent = data.leadsHoje;
-    document.getElementById('stat-conversoes').textContent = data.conversoes;
-    document.getElementById('stat-mensagens').textContent = data.mensagensEnviadas;
-    document.getElementById('stat-ia').textContent = `${data.taxaRespostaIA}%`;
+    animateNumber(document.getElementById('stat-leads-hoje'), data.leadsHoje);
+    animateNumber(document.getElementById('stat-conversoes'), data.conversoes);
+    animateNumber(document.getElementById('stat-mensagens'), data.mensagensEnviadas);
+    animateNumber(document.getElementById('stat-ia'), data.taxaRespostaIA, { formatar: (n) => `${Math.round(n)}%` });
   } catch (err) {
     showToast(err.message, 'error');
   }
@@ -217,6 +217,19 @@ function renderSparkline() {
   const total = contagem.reduce((a, b) => a + b, 0);
   document.getElementById('chart-sub').textContent = `${total} leads novos nos últimos ${dias} dias`;
   document.getElementById('sparkline-labels').innerHTML = `<span>${dias - 1} dias atrás</span><span>Hoje</span>`;
+
+  atualizarBadgeLeadsHoje(contagem[dias - 1], contagem[dias - 2]);
+}
+
+function atualizarBadgeLeadsHoje(contagemHoje, contagemOntem) {
+  const badge = document.getElementById('badge-leads-hoje');
+  if (contagemOntem === 0) {
+    badge.classList.add('hidden');
+    return;
+  }
+  const variacao = Math.round(((contagemHoje - contagemOntem) / contagemOntem) * 100);
+  badge.textContent = `${variacao >= 0 ? '↑' : '↓'} ${Math.abs(variacao)}%`;
+  badge.className = `stat-badge ${variacao >= 0 ? 'up' : 'down'}`;
 }
 
 function renderKanban() {
@@ -254,7 +267,7 @@ function renderKanban() {
 
 function criarLeadCard(lead) {
   const card = document.createElement('div');
-  card.className = 'lead-card';
+  card.className = 'lead-card anim-entrada';
   card.draggable = true;
   card.dataset.id = lead.id;
 
@@ -895,7 +908,7 @@ function renderFaturamento(dados) {
   });
 
   const max = Math.max(1, ...valores);
-  const w = 560, h = 120, pad = 6;
+  const w = 560, h = 160, pad = 8;
   const stepX = w / (dias - 1);
   const pontos = valores.map((v, i) => [i * stepX, h - pad - (v / max) * (h - pad * 2)]);
 
@@ -905,16 +918,20 @@ function renderFaturamento(dados) {
   document.getElementById('faturamento-chart').innerHTML = `
     <defs>
       <linearGradient id="fatFill" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0%" stop-color="#34D399" stop-opacity="0.35"/>
-        <stop offset="100%" stop-color="#34D399" stop-opacity="0"/>
+        <stop offset="0%" stop-color="#EC4899" stop-opacity="0.4"/>
+        <stop offset="100%" stop-color="#7C3AED" stop-opacity="0"/>
+      </linearGradient>
+      <linearGradient id="fatStroke" x1="0" y1="0" x2="1" y2="0">
+        <stop offset="0%" stop-color="#7C3AED"/>
+        <stop offset="100%" stop-color="#EC4899"/>
       </linearGradient>
     </defs>
     <path d="${areaPath}" fill="url(#fatFill)" stroke="none"></path>
-    <path d="${linePath}" fill="none" stroke="#34D399" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"></path>
+    <path d="${linePath}" fill="none" stroke="url(#fatStroke)" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"></path>
   `;
 
   const total = valores.reduce((a, b) => a + b, 0);
-  document.getElementById('faturamento-sub').textContent = `${formatMoeda(total) || 'R$ 0,00'} faturados`;
+  document.getElementById('faturamento-total').textContent = formatMoeda(total) || 'R$0,00';
 }
 
 /* ---------- INIT ---------- */
