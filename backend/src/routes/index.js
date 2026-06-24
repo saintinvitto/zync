@@ -12,6 +12,7 @@ const tagRoutes = require('./tagRoutes');
 const leadTagRoutes = require('./leadTagRoutes');
 const agendamentoRoutes = require('./agendamentoRoutes');
 const leadAgendamentoRoutes = require('./leadAgendamentoRoutes');
+const logRoutes = require('./logRoutes');
 
 router.get('/health', (req, res) => {
   res.json({ status: 'ok' });
@@ -28,5 +29,6 @@ router.use('/tags', tagRoutes);
 router.use('/leads/:leadId/tags', leadTagRoutes);
 router.use('/agendamentos', agendamentoRoutes);
 router.use('/leads/:leadId/agendamentos', leadAgendamentoRoutes);
+router.use('/logs', logRoutes);
 
 module.exports = router;

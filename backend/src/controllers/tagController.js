@@ -1,5 +1,6 @@
 const tagModel = require('../models/tagModel');
 const leadModel = require('../models/leadModel');
+const logModel = require('../models/logModel');
 const asyncHandler = require('../utils/asyncHandler');
 
 async function listar(req, res) {
@@ -42,6 +43,14 @@ async function associarAoLead(req, res) {
   if (!tag) return res.status(404).json({ error: 'Tag não encontrada' });
 
   await tagModel.associarLead(req.params.leadId, tagId);
+
+  await logModel.registrar({
+    usuarioId: req.usuario.id,
+    leadId: lead.id,
+    acao: 'tag_associada',
+    detalhes: { tagId: tag.id, nome: tag.nome },
+  });
+
   res.status(201).json({ ok: true });
 }
 
@@ -50,6 +59,14 @@ async function desassociarDoLead(req, res) {
   if (!lead) return res.status(404).json({ error: 'Lead não encontrado' });
 
   await tagModel.desassociarLead(req.params.leadId, req.params.tagId);
+
+  await logModel.registrar({
+    usuarioId: req.usuario.id,
+    leadId: lead.id,
+    acao: 'tag_removida',
+    detalhes: { tagId: req.params.tagId },
+  });
+
   res.status(204).send();
 }
 

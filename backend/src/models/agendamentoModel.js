@@ -4,7 +4,7 @@ const CAMPOS_ATUALIZAVEIS = ['servico', 'data_hora', 'status'];
 
 async function listarPorUsuario(usuarioId) {
   const [rows] = await db.query(
-    'SELECT * FROM agendamentos WHERE usuario_id = ? ORDER BY data_hora ASC',
+    'SELECT * FROM agendamentos WHERE usuario_id = ? ORDER BY data_hora ASC, id ASC',
     [usuarioId]
   );
   return rows;
@@ -12,7 +12,7 @@ async function listarPorUsuario(usuarioId) {
 
 async function listarPorLead(leadId, usuarioId) {
   const [rows] = await db.query(
-    'SELECT * FROM agendamentos WHERE lead_id = ? AND usuario_id = ? ORDER BY data_hora ASC',
+    'SELECT * FROM agendamentos WHERE lead_id = ? AND usuario_id = ? ORDER BY data_hora ASC, id ASC',
     [leadId, usuarioId]
   );
   return rows;

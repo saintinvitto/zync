@@ -7,7 +7,8 @@ async function listar(req, res) {
   const lead = await leadModel.buscarPorId(req.params.leadId, req.usuario.id);
   if (!lead) return res.status(404).json({ error: 'Lead não encontrado' });
 
-  const mensagens = await mensagemModel.listarPorLead(req.params.leadId);
+  const { page, limit } = req.query;
+  const mensagens = await mensagemModel.listarPorLead(req.params.leadId, { page, limit });
   res.json(mensagens);
 }
 

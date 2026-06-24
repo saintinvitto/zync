@@ -1,5 +1,6 @@
 const agendamentoModel = require('../models/agendamentoModel');
 const leadModel = require('../models/leadModel');
+const logModel = require('../models/logModel');
 const asyncHandler = require('../utils/asyncHandler');
 const validators = require('../utils/validators');
 
@@ -45,6 +46,13 @@ async function criar(req, res) {
     data_hora,
   });
 
+  await logModel.registrar({
+    usuarioId: req.usuario.id,
+    leadId: lead.id,
+    acao: 'agendamento_criado',
+    detalhes: { data_hora: agendamento.data_hora, servico: agendamento.servico },
+  });
+
   res.status(201).json(agendamento);
 }
 
@@ -56,6 +64,16 @@ async function atualizar(req, res) {
   if (erro) return res.status(400).json({ error: erro });
 
   const atualizado = await agendamentoModel.atualizar(req.params.id, req.usuario.id, req.body);
+
+  if (req.body.status !== undefined && req.body.status !== agendamento.status) {
+    await logModel.registrar({
+      usuarioId: req.usuario.id,
+      leadId: agendamento.lead_id,
+      acao: 'agendamento_status_alterado',
+      detalhes: { de: agendamento.status, para: req.body.status },
+    });
+  }
+
   res.json(atualizado);
 }
 

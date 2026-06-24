@@ -2,23 +2,46 @@ const db = require('../config/db');
 
 const CAMPOS_ATUALIZAVEIS = ['nome', 'servico', 'origem', 'telefone', 'status', 'valor'];
 
-async function listarPorUsuario(usuarioId, tagId) {
+async function listarPorUsuario(usuarioId, { tagId, page, limit } = {}) {
+  const joinClause = tagId ? 'INNER JOIN lead_tags lt ON lt.lead_id = l.id' : '';
+  let whereClause = 'l.usuario_id = ?';
+  const params = [usuarioId];
+
   if (tagId) {
+    whereClause += ' AND lt.tag_id = ?';
+    params.push(tagId);
+  }
+
+  if (page === undefined && limit === undefined) {
     const [rows] = await db.query(
-      `SELECT l.* FROM leads l
-       INNER JOIN lead_tags lt ON lt.lead_id = l.id
-       WHERE l.usuario_id = ? AND lt.tag_id = ?
-       ORDER BY l.criado_em DESC`,
-      [usuarioId, tagId]
+      `SELECT l.* FROM leads l ${joinClause} WHERE ${whereClause} ORDER BY l.criado_em DESC, l.id DESC`,
+      params
     );
     return rows;
   }
 
+  const paginaNum = Math.max(1, parseInt(page, 10) || 1);
+  const limiteNum = Math.min(100, Math.max(1, parseInt(limit, 10) || 20));
+  const offset = (paginaNum - 1) * limiteNum;
+
   const [rows] = await db.query(
-    'SELECT * FROM leads WHERE usuario_id = ? ORDER BY criado_em DESC',
-    [usuarioId]
+    `SELECT l.* FROM leads l ${joinClause} WHERE ${whereClause} ORDER BY l.criado_em DESC, l.id DESC LIMIT ? OFFSET ?`,
+    [...params, limiteNum, offset]
   );
-  return rows;
+
+  const [totalRows] = await db.query(
+    `SELECT COUNT(*) AS total FROM leads l ${joinClause} WHERE ${whereClause}`,
+    params
+  );
+  const total = totalRows[0].total;
+
+  return {
+    dados: rows,
+    pagina: paginaNum,
+    limite: limiteNum,
+    total,
+    totalPaginas: Math.ceil(total / limiteNum),
+  };
 }
 
 async function listarInbox(usuarioId) {
@@ -27,11 +50,11 @@ async function listarInbox(usuarioId) {
      FROM leads l
      LEFT JOIN (
        SELECT lead_id, conteudo, enviado_por, criado_em,
-              ROW_NUMBER() OVER (PARTITION BY lead_id ORDER BY criado_em DESC) AS rn
+              ROW_NUMBER() OVER (PARTITION BY lead_id ORDER BY criado_em DESC, id DESC) AS rn
        FROM mensagens
      ) m ON m.lead_id = l.id AND m.rn = 1
      WHERE l.usuario_id = ?
-     ORDER BY COALESCE(m.criado_em, l.criado_em) DESC`,
+     ORDER BY COALESCE(m.criado_em, l.criado_em) DESC, l.id DESC`,
     [usuarioId]
   );
   return rows;

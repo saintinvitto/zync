@@ -1,4 +1,5 @@
 const leadModel = require('../models/leadModel');
+const logModel = require('../models/logModel');
 const asyncHandler = require('../utils/asyncHandler');
 const validators = require('../utils/validators');
 const { paraCsv } = require('../utils/csv');
@@ -18,7 +19,8 @@ function validarStatusEValor(dados) {
 }
 
 async function listar(req, res) {
-  const leads = await leadModel.listarPorUsuario(req.usuario.id, req.query.tagId);
+  const { tagId, page, limit } = req.query;
+  const leads = await leadModel.listarPorUsuario(req.usuario.id, { tagId, page, limit });
   res.json(leads);
 }
 
@@ -28,7 +30,7 @@ async function inbox(req, res) {
 }
 
 async function exportarCsv(req, res) {
-  const leads = await leadModel.listarPorUsuario(req.usuario.id, req.query.tagId);
+  const leads = await leadModel.listarPorUsuario(req.usuario.id, { tagId: req.query.tagId });
   const csv = paraCsv(leads, COLUNAS_EXPORT);
 
   res.setHeader('Content-Type', 'text/csv; charset=utf-8');
@@ -50,6 +52,14 @@ async function criar(req, res) {
   if (erro) return res.status(400).json({ error: erro });
 
   const lead = await leadModel.criar({ usuarioId: req.usuario.id, nome, servico, origem, telefone, status, valor });
+
+  await logModel.registrar({
+    usuarioId: req.usuario.id,
+    leadId: lead.id,
+    acao: 'lead_criado',
+    detalhes: { nome: lead.nome },
+  });
+
   res.status(201).json(lead);
 }
 
@@ -61,6 +71,16 @@ async function atualizar(req, res) {
   if (erro) return res.status(400).json({ error: erro });
 
   const atualizado = await leadModel.atualizar(req.params.id, req.usuario.id, req.body);
+
+  if (req.body.status !== undefined && req.body.status !== lead.status) {
+    await logModel.registrar({
+      usuarioId: req.usuario.id,
+      leadId: lead.id,
+      acao: 'lead_status_alterado',
+      detalhes: { de: lead.status, para: req.body.status },
+    });
+  }
+
   res.json(atualizado);
 }
 
