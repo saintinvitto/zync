@@ -10,15 +10,15 @@
 
 <div class="app-shell">
   <aside class="app-sidebar">
-    <div class="sidebar-logo">Zy<span>nc</span></div>
+    <div class="sidebar-logo"><span>Zync</span></div>
 
     <nav class="sidebar-nav">
-      <a href="#stats" class="sidebar-item active" data-nav="stats">📊 Visão geral</a>
-      <a href="#kanban" class="sidebar-item" data-nav="kanban">👥 Leads</a>
-      <a href="agenda.html" class="sidebar-item">📅 Agenda</a>
-      <a href="perfil.html" class="sidebar-item">👤 Perfil</a>
-      <a href="../../index.html#contato" class="sidebar-item">💬 Suporte</a>
-      <a href="../../index.html" class="sidebar-item">🌐 Site</a>
+      <a href="#stats" class="sidebar-item active" data-nav="stats" data-icon="dashboard"> Visão geral</a>
+      <a href="#analises" class="sidebar-item" data-nav="analises" data-icon="trendingUp"> Análises</a>
+      <a href="#kanban" class="sidebar-item" data-nav="kanban" data-icon="users"> Leads</a>
+      <a href="agenda.html" class="sidebar-item" data-icon="calendar"> Agenda</a>
+      <a href="perfil.html" class="sidebar-item" data-icon="user"> Perfil</a>
+      <a href="suporte.html" class="sidebar-item" data-icon="messageCircle"> Suporte</a>
     </nav>
 
     <div class="sidebar-user">
@@ -27,19 +27,19 @@
         <div class="sidebar-user-name" id="user-name">—</div>
         <div class="sidebar-user-email" id="user-email">—</div>
       </div>
-      <button class="sidebar-logout" id="logout-btn" title="Sair">⏻</button>
+      <button class="sidebar-logout" id="logout-btn" title="Sair" data-icon="logOut"></button>
     </div>
   </aside>
 
   <main class="app-main">
     <div class="app-topbar">
       <div>
-        <div class="app-title" id="stats">Dashboard</div>
+        <div class="app-title" id="stats">Bem-vindo de volta<span id="topbar-nome"></span></div>
         <div class="app-title-sub">Acompanhe seus leads e conversões em tempo real.</div>
       </div>
       <div style="display:flex; gap:0.7rem;">
-        <button class="btn btn-secondary" id="open-cmdk">🔎 Buscar (Ctrl+K)</button>
-        <button class="btn btn-secondary" id="open-tags">🏷️ Tags</button>
+        <button class="btn btn-secondary" id="open-cmdk" data-icon="search"> Buscar (Ctrl+K)</button>
+        <button class="btn btn-secondary" id="open-tags" data-icon="tag"> Tags</button>
         <button class="btn btn-primary" id="open-new-lead">+ Novo lead</button>
       </div>
     </div>
@@ -47,35 +47,47 @@
     <section class="stats-grid" id="stats-grid">
       <div class="stat-card">
         <div class="stat-card-top">
-          <div class="stat-icon">🆕</div>
+          <div class="stat-icon" data-icon="sparkles"></div>
+          <div class="stat-label">Leads hoje</div>
+          <button class="stat-kebab" aria-label="Mais opções" type="button" data-icon="moreHorizontal"></button>
         </div>
-        <div class="stat-label">Leads hoje</div>
-        <div class="stat-num" id="stat-leads-hoje"><span class="skeleton" style="width:40px;height:1.8rem;"></span></div>
+        <div class="stat-num-row">
+          <div class="stat-num" id="stat-leads-hoje"><span class="skeleton" style="width:40px;height:1.8rem;"></span></div>
+          <span class="stat-badge hidden" id="badge-leads-hoje"></span>
+        </div>
       </div>
 
       <div class="stat-card">
         <div class="stat-card-top">
-          <div class="stat-icon">✅</div>
+          <div class="stat-icon" data-icon="checkCircle"></div>
+          <div class="stat-label">Conversões</div>
+          <button class="stat-kebab" aria-label="Mais opções" type="button" data-icon="moreHorizontal"></button>
         </div>
-        <div class="stat-label">Conversões</div>
-        <div class="stat-num" id="stat-conversoes"><span class="skeleton" style="width:40px;height:1.8rem;"></span></div>
+        <div class="stat-num-row">
+          <div class="stat-num" id="stat-conversoes"><span class="skeleton" style="width:40px;height:1.8rem;"></span></div>
+        </div>
       </div>
 
       <div class="stat-card">
         <div class="stat-card-top">
-          <div class="stat-icon">💬</div>
+          <div class="stat-icon" data-icon="messageCircle"></div>
+          <div class="stat-label">Msgs enviadas</div>
+          <button class="stat-kebab" aria-label="Mais opções" type="button" data-icon="moreHorizontal"></button>
         </div>
-        <div class="stat-label">Msgs enviadas</div>
-        <div class="stat-num" id="stat-mensagens"><span class="skeleton" style="width:40px;height:1.8rem;"></span></div>
+        <div class="stat-num-row">
+          <div class="stat-num" id="stat-mensagens"><span class="skeleton" style="width:40px;height:1.8rem;"></span></div>
+        </div>
       </div>
 
       <div class="stat-card">
         <div class="stat-card-top">
-          <div class="stat-icon">🤖</div>
+          <div class="stat-icon" data-icon="bot"></div>
+          <div class="stat-label">Resp. IA</div>
+          <button class="stat-kebab" aria-label="Mais opções" type="button" data-icon="moreHorizontal"></button>
         </div>
-        <div class="stat-label">Resp. IA</div>
-        <div class="stat-num" id="stat-ia"><span class="skeleton" style="width:40px;height:1.8rem;"></span></div>
-        <div class="stat-sub">Taxa de resolução</div>
+        <div class="stat-num-row">
+          <div class="stat-num" id="stat-ia"><span class="skeleton" style="width:40px;height:1.8rem;"></span></div>
+        </div>
       </div>
     </section>
 
@@ -90,16 +102,53 @@
       <div class="sparkline-labels" id="sparkline-labels"></div>
     </section>
 
+    <div class="kanban-header" id="analises">
+      <div class="app-title" style="font-size:1.15rem;">Análises</div>
+    </div>
+
+    <section class="analytics-grid">
+      <div class="chart-card chart-card-featured">
+        <div class="chart-card-header chart-card-header-row">
+          <div>
+            <div class="chart-eyebrow">Faturamento</div>
+            <div class="chart-big-num" id="faturamento-total">R$0,00</div>
+            <div class="chart-sub" id="faturamento-sub">últimos 30 dias</div>
+          </div>
+          <select id="faturamento-periodo" class="chart-period-select" aria-label="Período do gráfico">
+            <option value="14">Últimos 14 dias</option>
+            <option value="30" selected>Últimos 30 dias</option>
+            <option value="90">Últimos 90 dias</option>
+          </select>
+        </div>
+        <div class="chart-canvas-wrap">
+          <svg id="faturamento-chart" class="sparkline-lg" viewBox="0 0 560 160" preserveAspectRatio="none"></svg>
+          <div class="chart-tooltip hidden" id="faturamento-tooltip"></div>
+        </div>
+      </div>
+
+      <div class="analytics-side">
+        <div class="chart-card">
+          <div class="chart-card-header"><div class="chart-title">Leads por origem</div></div>
+          <div class="barlist" id="chart-origem"><div class="empty-state" style="padding:1.5rem;"><span class="spinner"></span></div></div>
+        </div>
+
+        <div class="chart-card">
+          <div class="chart-card-header"><div class="chart-title">Funil de conversão</div></div>
+          <div class="barlist" id="chart-funil"><div class="empty-state" style="padding:1.5rem;"><span class="spinner"></span></div></div>
+        </div>
+      </div>
+    </section>
+
     <div class="kanban-header" id="kanban">
       <div class="app-title" style="font-size:1.15rem;">Funil de leads</div>
       <div style="display:flex; gap:0.6rem;">
-        <button class="btn btn-ghost btn-sm" id="export-csv">⬇ Exportar CSV</button>
-        <button class="btn btn-ghost btn-sm" id="refresh-leads">↻ Atualizar</button>
+        <button class="btn btn-ghost btn-sm" id="export-csv" data-icon="download"> Exportar CSV</button>
+        <button class="btn btn-ghost btn-sm" id="refresh-leads" data-icon="refreshCw"> Atualizar</button>
       </div>
     </div>
 
     <div class="kanban-filters">
-      <input type="text" id="kanban-search" placeholder="🔍 Buscar por nome, telefone, serviço…" aria-label="Buscar leads">
+      <input type="text" id="kanban-search" placeholder="Buscar por nome, telefone, serviço…" aria-label="Buscar leads">
       <select id="kanban-filter-origem" aria-label="Filtrar por origem">
         <option value="">Todas as origens</option>
       </select>
@@ -122,7 +171,7 @@
         <div class="kanban-col-body" data-col="proposta_enviada"></div>
       </div>
       <div class="kanban-col" data-status="fechado">
-        <div class="kanban-col-header"><span class="k-dot" style="background:#34D399"></span>Fechado ✓<span class="kanban-col-count" data-count="fechado">0</span></div>
+        <div class="kanban-col-header"><span class="k-dot" style="background:#34D399"></span>Fechado<span class="kanban-col-count" data-count="fechado">0</span></div>
         <div class="kanban-col-body" data-col="fechado"></div>
       </div>
     </section>
@@ -134,7 +183,7 @@
   <div class="modal-box">
     <div class="modal-header">
       <div class="modal-title">Novo lead</div>
-      <button class="modal-close" data-close-modal aria-label="Fechar">✕</button>
+      <button class="modal-close" data-close-modal aria-label="Fechar" data-icon="x"></button>
     </div>
 
     <form id="new-lead-form" novalidate>
@@ -188,7 +237,7 @@
   <div class="modal-box">
     <div class="modal-header">
       <div class="modal-title">Gerenciar tags</div>
-      <button class="modal-close" data-close-modal aria-label="Fechar">✕</button>
+      <button class="modal-close" data-close-modal aria-label="Fechar" data-icon="x"></button>
     </div>
 
     <div class="tag-manage-list" id="tag-manage-list"></div>
@@ -209,7 +258,7 @@
         <div class="panel-lead-name" id="panel-nome">—</div>
         <div class="panel-lead-meta" id="panel-meta">—</div>
       </div>
-      <button class="panel-close" id="panel-close" aria-label="Fechar painel">✕</button>
+      <button class="panel-close" id="panel-close" aria-label="Fechar painel" data-icon="x"></button>
     </div>
     <div class="panel-status-row">
       <select id="panel-status">
@@ -229,7 +278,7 @@
 
     <div class="panel-agenda">
       <div class="panel-agenda-header">
-        <span>📅 Agendamentos</span>
+        <span data-icon="calendar"> Agendamentos</span>
         <button type="button" class="btn btn-ghost btn-sm" id="panel-agenda-toggle">+ Agendar</button>
       </div>
       <div class="panel-agenda-list" id="panel-agenda-list"></div>
@@ -246,7 +295,7 @@
 
   <div class="panel-body" id="panel-messages">
     <div class="empty-state" style="padding:2rem 1rem;">
-      <div class="empty-state-icon">💬</div>
+      <div class="empty-state-icon" data-icon="messageCircle" data-icon-size="36"></div>
       <div>Nenhuma mensagem ainda</div>
     </div>
   </div>
@@ -258,7 +307,7 @@
     </div>
     <div class="panel-input-row">
       <textarea id="panel-input" rows="2" placeholder="Digite uma mensagem…"></textarea>
-      <button class="btn btn-primary" id="panel-send" style="align-self:flex-end;" aria-label="Enviar mensagem">➤</button>
+      <button class="btn btn-primary" id="panel-send" style="align-self:flex-end;" aria-label="Enviar mensagem" data-icon="send"></button>
     </div>
   </div>
 </aside>
@@ -271,6 +320,7 @@
 </div>
 
 <script src="../assets/js/api.js"></script>
+<script src="../assets/js/icons.js"></script>
 <script src="../assets/js/app-shell.js"></script>
 <script src="../assets/js/dashboard.js"></script>
 

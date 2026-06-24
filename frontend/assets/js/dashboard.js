@@ -8,9 +8,9 @@ const STATUS_LABELS = {
 };
 
 const SENDER_LABELS = {
-  cliente: '👤 Cliente',
-  humano: '🧑‍💼 Você',
-  ia: '🤖 IA',
+  cliente: `${icon('user', 12)} Cliente`,
+  humano: `${icon('user', 12)} Você`,
+  ia: `${icon('bot', 12)} IA`,
 };
 
 let leadsCache = [];
@@ -43,10 +43,10 @@ function formatHora(iso) {
 async function loadDashboard() {
   try {
     const data = await Api.dashboard();
-    document.getElementById('stat-leads-hoje').textContent = data.leadsHoje;
-    document.getElementById('stat-conversoes').textContent = data.conversoes;
-    document.getElementById('stat-mensagens').textContent = data.mensagensEnviadas;
-    document.getElementById('stat-ia').textContent = `${data.taxaRespostaIA}%`;
+    animateNumber(document.getElementById('stat-leads-hoje'), data.leadsHoje);
+    animateNumber(document.getElementById('stat-conversoes'), data.conversoes);
+    animateNumber(document.getElementById('stat-mensagens'), data.mensagensEnviadas);
+    animateNumber(document.getElementById('stat-ia'), data.taxaRespostaIA, { formatar: (n) => `${Math.round(n)}%` });
   } catch (err) {
     showToast(err.message, 'error');
   }
@@ -143,7 +143,7 @@ function renderTagManageList() {
   }
 
   list.innerHTML = tagsCache.map((t) => `
-    <span class="tag-chip">${escapeHtml(t.nome)} <button type="button" class="tag-chip-remove" data-tag-id="${t.id}" aria-label="Excluir tag ${escapeHtml(t.nome)}">✕</button></span>
+    <span class="tag-chip">${escapeHtml(t.nome)} <button type="button" class="tag-chip-remove" data-tag-id="${t.id}" aria-label="Excluir tag ${escapeHtml(t.nome)}">${icon('x', 12)}</button></span>
   `).join('');
 
   list.querySelectorAll('.tag-chip-remove').forEach((btn) => {
@@ -217,6 +217,19 @@ function renderSparkline() {
   const total = contagem.reduce((a, b) => a + b, 0);
   document.getElementById('chart-sub').textContent = `${total} leads novos nos últimos ${dias} dias`;
   document.getElementById('sparkline-labels').innerHTML = `<span>${dias - 1} dias atrás</span><span>Hoje</span>`;
+
+  atualizarBadgeLeadsHoje(contagem[dias - 1], contagem[dias - 2]);
+}
+
+function atualizarBadgeLeadsHoje(contagemHoje, contagemOntem) {
+  const badge = document.getElementById('badge-leads-hoje');
+  if (contagemOntem === 0) {
+    badge.classList.add('hidden');
+    return;
+  }
+  const variacao = Math.round(((contagemHoje - contagemOntem) / contagemOntem) * 100);
+  badge.textContent = `${variacao >= 0 ? '↑' : '↓'} ${Math.abs(variacao)}%`;
+  badge.className = `stat-badge ${variacao >= 0 ? 'up' : 'down'}`;
 }
 
 function renderKanban() {
@@ -254,7 +267,7 @@ function renderKanban() {
 
 function criarLeadCard(lead) {
   const card = document.createElement('div');
-  card.className = 'lead-card';
+  card.className = 'lead-card anim-entrada';
   card.draggable = true;
   card.dataset.id = lead.id;
 
@@ -548,7 +561,7 @@ function renderTimeline(leadId, mensagens) {
   body.innerHTML = '';
 
   if (itens.length === 0) {
-    body.innerHTML = '<div class="empty-state" style="padding:2rem 1rem;"><div class="empty-state-icon">💬</div><div>Nenhuma atividade ainda</div></div>';
+    body.innerHTML = `<div class="empty-state" style="padding:2rem 1rem;"><div class="empty-state-icon">${icon('messageCircle', 36)}</div><div>Nenhuma atividade ainda</div></div>`;
     return;
   }
 
@@ -611,7 +624,7 @@ async function carregarTagsDoLead(leadId) {
 function renderPanelTags() {
   const lista = document.getElementById('panel-tags');
   lista.innerHTML = panelTagsCache.map((t) => `
-    <span class="tag-chip">${escapeHtml(t.nome)} <button type="button" class="tag-chip-remove" data-tag-id="${t.id}" aria-label="Remover tag ${escapeHtml(t.nome)}">✕</button></span>
+    <span class="tag-chip">${escapeHtml(t.nome)} <button type="button" class="tag-chip-remove" data-tag-id="${t.id}" aria-label="Remover tag ${escapeHtml(t.nome)}">${icon('x', 12)}</button></span>
   `).join('');
 
   lista.querySelectorAll('.tag-chip-remove').forEach((btn) => {
@@ -720,14 +733,14 @@ async function enviarMensagem() {
 /* ---------- COMMAND PALETTE (Ctrl+K) ---------- */
 function getCmdkAcoes() {
   return [
-    { icon: '📊', label: 'Ir para Visão geral', hint: 'Ação', run: () => document.getElementById('stats').scrollIntoView({ behavior: 'smooth' }) },
-    { icon: '👥', label: 'Ir para Leads (kanban)', hint: 'Ação', run: () => document.getElementById('kanban').scrollIntoView({ behavior: 'smooth' }) },
-    { icon: '➕', label: 'Criar novo lead', hint: 'Ação', run: () => abrirModal() },
-    { icon: '🏷️', label: 'Gerenciar tags', hint: 'Ação', run: () => abrirTagModal() },
-    { icon: '📅', label: 'Ir para Agenda', hint: 'Ação', run: () => { window.location.href = 'agenda.html'; } },
-    { icon: '👤', label: 'Ir para Perfil', hint: 'Ação', run: () => { window.location.href = 'perfil.html'; } },
-    { icon: '↻', label: 'Atualizar dados', hint: 'Ação', run: () => { loadLeads(); loadDashboard(); } },
-    { icon: '⏻', label: 'Sair da conta', hint: 'Ação', run: () => Auth.logout() },
+    { icon: icon('dashboard', 16), label: 'Ir para Visão geral', hint: 'Ação', run: () => document.getElementById('stats').scrollIntoView({ behavior: 'smooth' }) },
+    { icon: icon('users', 16), label: 'Ir para Leads (kanban)', hint: 'Ação', run: () => document.getElementById('kanban').scrollIntoView({ behavior: 'smooth' }) },
+    { icon: icon('plus', 16), label: 'Criar novo lead', hint: 'Ação', run: () => abrirModal() },
+    { icon: icon('tag', 16), label: 'Gerenciar tags', hint: 'Ação', run: () => abrirTagModal() },
+    { icon: icon('calendar', 16), label: 'Ir para Agenda', hint: 'Ação', run: () => { window.location.href = 'agenda.html'; } },
+    { icon: icon('user', 16), label: 'Ir para Perfil', hint: 'Ação', run: () => { window.location.href = 'perfil.html'; } },
+    { icon: icon('refreshCw', 16), label: 'Atualizar dados', hint: 'Ação', run: () => { loadLeads(); loadDashboard(); } },
+    { icon: icon('logOut', 16), label: 'Sair da conta', hint: 'Ação', run: () => Auth.logout() },
   ];
 }
 
@@ -750,7 +763,7 @@ function renderCmdkResultados(termo) {
 
   cmdkItems = [
     ...acoes,
-    ...leadsResultado.map((l) => ({ icon: '🧑', label: l.nome, hint: STATUS_LABELS[l.status], run: () => abrirPainel(l.id) })),
+    ...leadsResultado.map((l) => ({ icon: icon('user', 16), label: l.nome, hint: STATUS_LABELS[l.status], run: () => abrirPainel(l.id) })),
   ];
   cmdkIndex = 0;
 
@@ -826,7 +839,158 @@ document.querySelectorAll('.sidebar-item[data-nav]').forEach((item) => {
   });
 });
 
+/* ---------- ANÁLISES ---------- */
+const STATUS_FUNIL_ORDEM = ['novo', 'em_contato', 'proposta_enviada', 'fechado'];
+let faturamentoPontos = [];
+
+async function carregarAnalises() {
+  try {
+    const [origem, funil] = await Promise.all([
+      Api.relatorios.leadsPorOrigem(),
+      Api.relatorios.funilConversao(),
+    ]);
+    renderOrigem(origem);
+    renderFunil(funil);
+    await carregarFaturamento();
+  } catch (err) {
+    showToast(err.message, 'error');
+  }
+}
+
+async function carregarFaturamento() {
+  const dias = Number(document.getElementById('faturamento-periodo').value);
+  try {
+    const dados = await Api.relatorios.faturamento({ agrupamento: 'dia' });
+    renderFaturamento(dados, dias);
+  } catch (err) {
+    showToast(err.message, 'error');
+  }
+}
+
+document.getElementById('faturamento-periodo').addEventListener('change', () => {
+  document.getElementById('faturamento-sub').textContent = `últimos ${document.getElementById('faturamento-periodo').value} dias`;
+  carregarFaturamento();
+});
+
+function renderOrigem(dados) {
+  const container = document.getElementById('chart-origem');
+
+  if (dados.length === 0) {
+    container.innerHTML = '<div class="empty-state" style="padding:1.5rem;">Sem leads ainda</div>';
+    return;
+  }
+
+  const max = Math.max(...dados.map((d) => d.total));
+  container.innerHTML = dados.map((d) => `
+    <div class="barlist-row">
+      <div class="barlist-top"><span>${escapeHtml(d.origem)}</span><strong>${d.total}</strong></div>
+      <div class="barlist-track"><div class="barlist-fill" style="width:${(d.total / max) * 100}%"></div></div>
+    </div>
+  `).join('');
+}
+
+function renderFunil(dados) {
+  const container = document.getElementById('chart-funil');
+  const { porStatus, totalGeral, taxaConversao } = dados;
+
+  if (!totalGeral) {
+    container.innerHTML = '<div class="empty-state" style="padding:1.5rem;">Sem leads ainda</div>';
+    return;
+  }
+
+  container.innerHTML = STATUS_FUNIL_ORDEM.map((status) => {
+    const total = porStatus[status] || 0;
+    return `
+      <div class="barlist-row">
+        <div class="barlist-top"><span>${STATUS_LABELS[status]}</span><strong>${total}</strong></div>
+        <div class="barlist-track"><div class="barlist-fill" style="width:${(total / totalGeral) * 100}%"></div></div>
+      </div>
+    `;
+  }).join('') + `<div class="funil-resumo">${taxaConversao}% dos leads chegam a fechar</div>`;
+}
+
+function renderFaturamento(dados, dias) {
+  const hoje = new Date();
+  hoje.setHours(0, 0, 0, 0);
+  const valores = new Array(dias).fill(0);
+  const datas = new Array(dias).fill(null).map((_, i) => {
+    const d = new Date(hoje);
+    d.setDate(d.getDate() - (dias - 1 - i));
+    return d;
+  });
+
+  dados.forEach((d) => {
+    const data = new Date(d.periodo);
+    data.setHours(0, 0, 0, 0);
+    const diff = Math.round((hoje - data) / 86400000);
+    if (diff >= 0 && diff < dias) valores[dias - 1 - diff] = Number(d.total);
+  });
+
+  const max = Math.max(1, ...valores);
+  const w = 560, h = 160, pad = 8;
+  const stepX = w / (dias - 1);
+  const pontos = valores.map((v, i) => [i * stepX, h - pad - (v / max) * (h - pad * 2)]);
+  faturamentoPontos = pontos.map((p, i) => ({ x: p[0], y: p[1], valor: valores[i], data: datas[i] }));
+
+  const linePath = pontos.map((p, i) => `${i === 0 ? 'M' : 'L'}${p[0].toFixed(1)},${p[1].toFixed(1)}`).join(' ');
+  const areaPath = `${linePath} L${w},${h} L0,${h} Z`;
+
+  document.getElementById('faturamento-chart').innerHTML = `
+    <defs>
+      <linearGradient id="fatFill" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#EC4899" stop-opacity="0.4"/>
+        <stop offset="100%" stop-color="#7C3AED" stop-opacity="0"/>
+      </linearGradient>
+      <linearGradient id="fatStroke" x1="0" y1="0" x2="1" y2="0">
+        <stop offset="0%" stop-color="#7C3AED"/>
+        <stop offset="100%" stop-color="#EC4899"/>
+      </linearGradient>
+    </defs>
+    <path d="${areaPath}" fill="url(#fatFill)" stroke="none"></path>
+    <path d="${linePath}" fill="none" stroke="url(#fatStroke)" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"></path>
+    <circle id="faturamento-marker" cx="0" cy="0" r="4" fill="#fff" stroke="#EC4899" stroke-width="2" class="hidden"></circle>
+  `;
+
+  const total = valores.reduce((a, b) => a + b, 0);
+  document.getElementById('faturamento-total').textContent = formatMoeda(total) || 'R$0,00';
+}
+
+const faturamentoSvg = document.getElementById('faturamento-chart');
+const faturamentoTooltip = document.getElementById('faturamento-tooltip');
+
+faturamentoSvg.addEventListener('mousemove', (e) => {
+  if (faturamentoPontos.length === 0) return;
+
+  const rect = faturamentoSvg.getBoundingClientRect();
+  const xRelativo = ((e.clientX - rect.left) / rect.width) * 560;
+  let maisProximo = faturamentoPontos[0];
+  for (const p of faturamentoPontos) {
+    if (Math.abs(p.x - xRelativo) < Math.abs(maisProximo.x - xRelativo)) maisProximo = p;
+  }
+
+  const marker = document.getElementById('faturamento-marker');
+  if (marker) {
+    marker.setAttribute('cx', maisProximo.x);
+    marker.setAttribute('cy', maisProximo.y);
+    marker.classList.remove('hidden');
+  }
+
+  faturamentoTooltip.innerHTML = `
+    <div class="chart-tooltip-valor">${formatMoeda(maisProximo.valor) || 'R$0,00'}</div>
+    <div class="chart-tooltip-data">${maisProximo.data.toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' })}</div>
+  `;
+  faturamentoTooltip.style.left = `${(maisProximo.x / 560) * 100}%`;
+  faturamentoTooltip.classList.remove('hidden');
+});
+
+faturamentoSvg.addEventListener('mouseleave', () => {
+  faturamentoTooltip.classList.add('hidden');
+  const marker = document.getElementById('faturamento-marker');
+  if (marker) marker.classList.add('hidden');
+});
+
 /* ---------- INIT ---------- */
 loadDashboard();
 loadLeads();
 loadTags();
+carregarAnalises();

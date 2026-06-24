@@ -15,7 +15,9 @@ async function create({ nome, email, senha_hash }) {
 
 async function buscarPorId(id) {
   const { rows } = await db.query(
-    'SELECT id, nome, email, criado_em, is_admin FROM usuarios WHERE id = $1',
+    `SELECT id, nome, email, criado_em, is_admin,
+            foto_url, idade, cpf, instagram, facebook, telefone
+     FROM usuarios WHERE id = $1`,
     [id]
   );
   return rows[0];
@@ -26,12 +28,17 @@ async function buscarPorIdComSenha(id) {
   return rows[0];
 }
 
+const CAMPOS_ATUALIZAVEIS = [
+  'nome', 'email', 'senha_hash',
+  'foto_url', 'idade', 'cpf', 'instagram', 'facebook', 'telefone',
+];
+
 async function atualizar(id, dados) {
   const campos = [];
   const valores = [];
   let i = 1;
 
-  for (const campo of ['nome', 'email', 'senha_hash']) {
+  for (const campo of CAMPOS_ATUALIZAVEIS) {
     if (dados[campo] !== undefined) {
       campos.push(`${campo} = $${i++}`);
       valores.push(dados[campo]);

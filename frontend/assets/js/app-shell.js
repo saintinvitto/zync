@@ -8,12 +8,64 @@ function iniciais(nome) {
   return nome.split(' ').filter(Boolean).slice(0, 2).map((p) => p[0].toUpperCase()).join('');
 }
 
+function animateNumber(el, valorFinal, { duracao = 700, formatar = (n) => Math.round(n) } = {}) {
+  const valorInicial = 0;
+  const inicio = performance.now();
+
+  function passo(agora) {
+    const progresso = Math.min(1, (agora - inicio) / duracao);
+    const valorAtual = valorInicial + (valorFinal - valorInicial) * (1 - Math.pow(1 - progresso, 3));
+    el.textContent = formatar(valorAtual);
+    if (progresso < 1) requestAnimationFrame(passo);
+  }
+
+  requestAnimationFrame(passo);
+}
+
+function formatDataHoraCurta(iso) {
+  return new Date(iso).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
+}
+
+function apenasDigitos(s) {
+  return s.replace(/\D/g, '');
+}
+
+function mascararCpf(valor) {
+  return apenasDigitos(valor)
+    .slice(0, 11)
+    .replace(/(\d{3})(\d)/, '$1.$2')
+    .replace(/(\d{3})(\d)/, '$1.$2')
+    .replace(/(\d{3})(\d{1,2})$/, '$1-$2');
+}
+
+function mascararTelefone(valor) {
+  const d = apenasDigitos(valor).slice(0, 11);
+  if (d.length <= 10) return d.replace(/(\d{2})(\d{4})(\d{0,4})/, '($1) $2-$3').trim().replace(/-$/, '');
+  return d.replace(/(\d{2})(\d{5})(\d{0,4})/, '($1) $2-$3').trim().replace(/-$/, '');
+}
+
+const NOTIF_ICONES = {
+  lead_criado: icon('sparkles', 16),
+  mensagem_recebida: icon('messageCircle', 16),
+  agendamento_criado: icon('calendar', 16),
+};
+
 function renderUsuario() {
   const usuario = Auth.getUsuario();
   if (!usuario) return;
-  document.getElementById('user-avatar').textContent = iniciais(usuario.nome);
+
+  const avatar = document.getElementById('user-avatar');
+  if (usuario.foto_url) {
+    avatar.innerHTML = `<img src="${escapeHtml(usuario.foto_url)}" alt="" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">`;
+  } else {
+    avatar.textContent = iniciais(usuario.nome);
+  }
+
   document.getElementById('user-name').textContent = usuario.nome;
   document.getElementById('user-email').textContent = usuario.email;
+
+  const topbarNome = document.getElementById('topbar-nome');
+  if (topbarNome) topbarNome.textContent = `, ${usuario.nome.split(' ')[0]}`;
 
   const ehPaginaAdmin = window.location.pathname.endsWith('admin.html');
   const nav = document.querySelector('.sidebar-nav');
@@ -22,11 +74,142 @@ function renderUsuario() {
     link.href = 'admin.html';
     link.className = 'sidebar-item';
     link.dataset.adminLink = 'true';
-    link.textContent = '🛠️ Admin do SaaS';
+    link.innerHTML = `${icon('settings', 18)} Admin do SaaS`;
     nav.appendChild(link);
   }
 }
 
 document.getElementById('logout-btn').addEventListener('click', () => Auth.logout());
+
+/* ---------- LOGO COMO LINK PRA HOME (só o texto "Zync" é clicável) ---------- */
+(function tornarLogoClicavel() {
+  const logo = document.querySelector('.sidebar-logo');
+  if (!logo || logo.querySelector('.sidebar-logo-link')) return;
+
+  logo.innerHTML = `<span class="logo-mark"></span><a href="../../index.html" class="sidebar-logo-link">${logo.innerHTML}</a>`;
+})();
+
+/* ---------- BUSCA NA SIDEBAR ---------- */
+(function injetarBusca() {
+  const sidebar = document.querySelector('.app-sidebar');
+  const nav = document.querySelector('.sidebar-nav');
+  if (!sidebar || !nav || document.getElementById('sidebar-search-input')) return;
+
+  const wrap = document.createElement('div');
+  wrap.className = 'sidebar-search';
+  wrap.innerHTML = `
+    <span class="sidebar-search-icon">${icon('search', 14)}</span>
+    <input type="text" id="sidebar-search-input" placeholder="Buscar no menu...">
+  `;
+  sidebar.insertBefore(wrap, nav);
+
+  document.getElementById('sidebar-search-input').addEventListener('input', (e) => {
+    const termo = e.target.value.trim().toLowerCase();
+    nav.querySelectorAll('.sidebar-item').forEach((item) => {
+      const texto = item.textContent.trim().toLowerCase();
+      item.classList.toggle('nav-hidden', termo.length > 0 && !texto.includes(termo));
+    });
+  });
+})();
+
+/* ---------- NOTIFICAÇÕES ---------- */
+(function injetarNotificacoes() {
+  const sidebar = document.querySelector('.app-sidebar');
+  const nav = document.querySelector('.sidebar-nav');
+  if (!sidebar || !nav || document.getElementById('notif-bell')) return;
+
+  const wrap = document.createElement('div');
+  wrap.className = 'notif-wrap';
+  wrap.innerHTML = `
+    <button class="notif-bell" id="notif-bell" aria-label="Notificações" type="button">
+      ${icon('bell', 18)}<span class="notif-badge hidden" id="notif-badge">0</span>
+    </button>
+    <div class="notif-dropdown hidden" id="notif-dropdown">
+      <div class="notif-dropdown-header">
+        <span>Notificações</span>
+        <button type="button" id="notif-marcar-todas" class="btn btn-ghost btn-sm">Marcar todas como lidas</button>
+      </div>
+      <div class="notif-list" id="notif-list"><div class="empty-state" style="padding:1.5rem;"><span class="spinner"></span></div></div>
+    </div>
+  `;
+  sidebar.insertBefore(wrap, nav);
+
+  const bell = document.getElementById('notif-bell');
+  const dropdown = document.getElementById('notif-dropdown');
+
+  async function carregarContagem() {
+    try {
+      const { naoLidas } = await Api.notificacoes.contagem();
+      const badge = document.getElementById('notif-badge');
+      if (naoLidas > 0) {
+        badge.textContent = naoLidas > 99 ? '99+' : naoLidas;
+        badge.classList.remove('hidden');
+      } else {
+        badge.classList.add('hidden');
+      }
+    } catch {
+      /* silencioso -- não derruba a página por causa do sininho */
+    }
+  }
+
+  async function carregarLista() {
+    const lista = document.getElementById('notif-list');
+    try {
+      const notificacoes = await Api.notificacoes.listar({ limit: 20 });
+
+      if (notificacoes.length === 0) {
+        lista.innerHTML = '<div class="empty-state" style="padding:1.5rem;">Nenhuma notificação ainda</div>';
+        return;
+      }
+
+      lista.innerHTML = notificacoes.map((n) => `
+        <div class="notif-item ${n.lida ? '' : 'nao-lida'}" data-id="${n.id}">
+          <span class="notif-item-icon">${NOTIF_ICONES[n.tipo] || icon('bell', 16)}</span>
+          <div class="notif-item-body">
+            <div class="notif-item-msg">${escapeHtml(n.mensagem)}</div>
+            <div class="notif-item-data">${formatDataHoraCurta(n.criado_em)}</div>
+          </div>
+        </div>
+      `).join('');
+
+      lista.querySelectorAll('.notif-item.nao-lida').forEach((el) => {
+        el.addEventListener('click', async () => {
+          try {
+            await Api.notificacoes.marcarLida(el.dataset.id);
+            el.classList.remove('nao-lida');
+            carregarContagem();
+          } catch {
+            /* ignora */
+          }
+        });
+      });
+    } catch (err) {
+      lista.innerHTML = `<div class="empty-state" style="padding:1.5rem;">${escapeHtml(err.message)}</div>`;
+    }
+  }
+
+  bell.addEventListener('click', (e) => {
+    e.stopPropagation();
+    dropdown.classList.toggle('hidden');
+    if (!dropdown.classList.contains('hidden')) carregarLista();
+  });
+
+  document.addEventListener('click', (e) => {
+    if (!wrap.contains(e.target)) dropdown.classList.add('hidden');
+  });
+
+  document.getElementById('notif-marcar-todas').addEventListener('click', async () => {
+    try {
+      await Api.notificacoes.marcarTodasLidas();
+      carregarContagem();
+      carregarLista();
+    } catch (err) {
+      showToast(err.message, 'error');
+    }
+  });
+
+  carregarContagem();
+  setInterval(carregarContagem, 30000);
+})();
 
 renderUsuario();

@@ -10,15 +10,15 @@
 
 <div class="app-shell">
   <aside class="app-sidebar">
-    <div class="sidebar-logo">Zy<span>nc</span></div>
+    <div class="sidebar-logo"><span>Zync</span></div>
 
     <nav class="sidebar-nav">
-      <a href="dashboard.html#stats" class="sidebar-item">📊 Visão geral</a>
-      <a href="dashboard.html#kanban" class="sidebar-item">👥 Leads</a>
-      <a href="agenda.html" class="sidebar-item active">📅 Agenda</a>
-      <a href="perfil.html" class="sidebar-item">👤 Perfil</a>
-      <a href="../../index.html#contato" class="sidebar-item">💬 Suporte</a>
-      <a href="../../index.html" class="sidebar-item">🌐 Site</a>
+      <a href="dashboard.html#stats" class="sidebar-item" data-icon="dashboard"> Visão geral</a>
+      <a href="dashboard.html#analises" class="sidebar-item" data-icon="trendingUp"> Análises</a>
+      <a href="dashboard.html#kanban" class="sidebar-item" data-icon="users"> Leads</a>
+      <a href="agenda.html" class="sidebar-item active" data-icon="calendar"> Agenda</a>
+      <a href="perfil.html" class="sidebar-item" data-icon="user"> Perfil</a>
+      <a href="suporte.html" class="sidebar-item" data-icon="messageCircle"> Suporte</a>
     </nav>
 
     <div class="sidebar-user">
@@ -27,7 +27,7 @@
         <div class="sidebar-user-name" id="user-name">—</div>
         <div class="sidebar-user-email" id="user-email">—</div>
       </div>
-      <button class="sidebar-logout" id="logout-btn" title="Sair">⏻</button>
+      <button class="sidebar-logout" id="logout-btn" title="Sair" data-icon="logOut"></button>
     </div>
   </aside>
 
@@ -42,7 +42,7 @@
 
     <div class="agenda-list" id="agenda-list">
       <div class="empty-state">
-        <div class="empty-state-icon">📅</div>
+        <div class="empty-state-icon" data-icon="calendar" data-icon-size="36"></div>
         <div><span class="spinner"></span></div>
       </div>
     </div>
@@ -54,7 +54,7 @@
   <div class="modal-box">
     <div class="modal-header">
       <div class="modal-title">Novo agendamento</div>
-      <button class="modal-close" data-close-modal aria-label="Fechar">✕</button>
+      <button class="modal-close" data-close-modal aria-label="Fechar" data-icon="x"></button>
     </div>
 
     <form id="new-agendamento-form" novalidate>
@@ -84,6 +84,7 @@
 </div>
 
 <script src="../assets/js/api.js"></script>
+<script src="../assets/js/icons.js"></script>
 <script src="../assets/js/app-shell.js"></script>
 <script src="../assets/js/agenda.js"></script>
 

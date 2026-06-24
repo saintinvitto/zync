@@ -6,12 +6,6 @@ const API_BASE = (() => {
   return 'https://zync-backend-production.up.railway.app/api';
 })();
 
-const ADMIN_EMAILS = [
-  'andre23mats@gmail.com',
-  'pedrohenriquesilvadeoliveira8@gmail.com',
-  'herosbritocandido.cg@gmail.com',
-];
-
 const Auth = {
   getToken() {
     return localStorage.getItem('zync_token');
@@ -33,7 +27,7 @@ const Auth = {
   },
   isAdmin() {
     const usuario = this.getUsuario();
-    return !!usuario && ADMIN_EMAILS.includes(usuario.email.toLowerCase());
+    return !!usuario && !!usuario.is_admin;
   },
   destinoPosLogin() {
     return this.isAdmin() ? 'admin.html' : 'dashboard.html';
@@ -104,9 +98,50 @@ const Api = {
   auth: {
     me: () => apiRequest('/auth/me'),
     atualizarMe: (dados) => apiRequest('/auth/me', { method: 'PUT', body: dados }),
+    esqueciSenha: (email) => apiRequest('/auth/esqueci-senha', { method: 'POST', body: { email }, auth: false }),
+    redefinirSenha: (token, novaSenha) => apiRequest('/auth/redefinir-senha', { method: 'POST', body: { token, novaSenha }, auth: false }),
+  },
+
+  admin: {
+    metricas: () => apiRequest('/admin/metricas'),
+    usuarios: () => apiRequest('/admin/usuarios'),
+    definirAdmin: (id, isAdmin) => apiRequest(`/admin/usuarios/${id}/admin`, { method: 'PATCH', body: { isAdmin } }),
+    planos: {
+      listar: () => apiRequest('/admin/planos'),
+      criar: (dados) => apiRequest('/admin/planos', { method: 'POST', body: dados }),
+      atualizar: (id, dados) => apiRequest(`/admin/planos/${id}`, { method: 'PUT', body: dados }),
+    },
+    suporte: {
+      listar: () => apiRequest('/admin/suporte'),
+      marcarRespondida: (id) => apiRequest(`/admin/suporte/${id}/respondida`, { method: 'PATCH' }),
+    },
   },
 
   dashboard: () => apiRequest('/dashboard'),
+
+  relatorios: {
+    leadsPorOrigem: () => apiRequest('/relatorios/leads-por-origem'),
+    funilConversao: () => apiRequest('/relatorios/funil-conversao'),
+    faturamento: (params = {}) => {
+      const qs = new URLSearchParams(params).toString();
+      return apiRequest(`/relatorios/faturamento${qs ? `?${qs}` : ''}`);
+    },
+  },
+
+  notificacoes: {
+    listar: (params = {}) => {
+      const qs = new URLSearchParams(params).toString();
+      return apiRequest(`/notificacoes${qs ? `?${qs}` : ''}`);
+    },
+    contagem: () => apiRequest('/notificacoes/contagem'),
+    marcarLida: (id) => apiRequest(`/notificacoes/${id}/lida`, { method: 'PATCH' }),
+    marcarTodasLidas: () => apiRequest('/notificacoes/lida-todas', { method: 'PATCH' }),
+  },
+
+  suporte: {
+    listar: () => apiRequest('/suporte'),
+    criar: (mensagem, videoUrl) => apiRequest('/suporte', { method: 'POST', body: { mensagem, videoUrl } }),
+  },
 
   leads: {
     listar: (tagId) => apiRequest(tagId ? `/leads?tagId=${encodeURIComponent(tagId)}` : '/leads'),

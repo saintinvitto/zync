@@ -10,15 +10,15 @@
 
 <div class="app-shell">
   <aside class="app-sidebar">
-    <div class="sidebar-logo">Zy<span>nc</span></div>
+    <div class="sidebar-logo"><span>Zync</span></div>
 
     <nav class="sidebar-nav">
-      <a href="dashboard.html#stats" class="sidebar-item">📊 Visão geral</a>
-      <a href="dashboard.html#kanban" class="sidebar-item">👥 Leads</a>
-      <a href="agenda.html" class="sidebar-item">📅 Agenda</a>
-      <a href="perfil.html" class="sidebar-item active">👤 Perfil</a>
-      <a href="../../index.html#contato" class="sidebar-item">💬 Suporte</a>
-      <a href="../../index.html" class="sidebar-item">🌐 Site</a>
+      <a href="dashboard.html#stats" class="sidebar-item" data-icon="dashboard"> Visão geral</a>
+      <a href="dashboard.html#analises" class="sidebar-item" data-icon="trendingUp"> Análises</a>
+      <a href="dashboard.html#kanban" class="sidebar-item" data-icon="users"> Leads</a>
+      <a href="agenda.html" class="sidebar-item" data-icon="calendar"> Agenda</a>
+      <a href="perfil.html" class="sidebar-item active" data-icon="user"> Perfil</a>
+      <a href="suporte.html" class="sidebar-item" data-icon="messageCircle"> Suporte</a>
     </nav>
 
     <div class="sidebar-user">
@@ -27,7 +27,7 @@
         <div class="sidebar-user-name" id="user-name">—</div>
         <div class="sidebar-user-email" id="user-email">—</div>
       </div>
-      <button class="sidebar-logout" id="logout-btn" title="Sair">⏻</button>
+      <button class="sidebar-logout" id="logout-btn" title="Sair" data-icon="logOut"></button>
     </div>
   </aside>
 
@@ -39,21 +39,69 @@
       </div>
     </div>
 
-    <section class="chart-card" style="max-width: 480px;">
+    <section class="chart-card" style="max-width: 560px;">
       <div class="chart-card-header">
         <div class="chart-title">Informações da conta</div>
       </div>
       <form id="form-perfil" novalidate>
-        <div class="field">
-          <label for="perfil-nome">Nome</label>
-          <input type="text" id="perfil-nome" required>
-        </div>
-        <div class="field">
-          <label for="perfil-email">E-mail</label>
-          <input type="email" id="perfil-email" required>
+        <div class="field-row">
+          <div class="field">
+            <label for="perfil-nome">Nome</label>
+            <input type="text" id="perfil-nome" required>
+          </div>
+          <div class="field">
+            <label for="perfil-email">E-mail</label>
+            <input type="email" id="perfil-email" required>
+          </div>
         </div>
         <button type="submit" class="btn btn-primary" id="perfil-submit">
           <span id="perfil-submit-label">Salvar alterações</span>
+        </button>
+      </form>
+    </section>
+
+    <section class="chart-card" style="max-width: 560px;">
+      <div class="chart-card-header">
+        <div class="chart-title">Informações pessoais</div>
+      </div>
+      <form id="form-pessoal" novalidate>
+        <div class="field">
+          <label>Foto de perfil</label>
+          <div class="foto-upload-row">
+            <div class="foto-preview" id="foto-preview">--</div>
+            <div class="foto-upload-actions">
+              <button type="button" class="btn btn-secondary btn-sm" id="foto-escolher" data-icon="camera"> Escolher foto</button>
+              <button type="button" class="btn btn-ghost btn-sm hidden" id="foto-remover" data-icon="x"> Remover foto</button>
+              <input type="file" id="foto-input" accept="image/*" class="hidden">
+            </div>
+          </div>
+        </div>
+        <div class="field-row">
+          <div class="field">
+            <label for="perfil-idade">Idade</label>
+            <input type="number" id="perfil-idade" min="0" max="130">
+          </div>
+          <div class="field">
+            <label for="perfil-cpf">CPF</label>
+            <input type="text" id="perfil-cpf" inputmode="numeric" placeholder="000.000.000-00" maxlength="14">
+          </div>
+        </div>
+        <div class="field">
+          <label for="perfil-telefone">Telefone</label>
+          <input type="text" id="perfil-telefone" inputmode="numeric" placeholder="(11) 99999-9999" maxlength="15">
+        </div>
+        <div class="field-row">
+          <div class="field">
+            <label for="perfil-instagram">Instagram</label>
+            <input type="text" id="perfil-instagram" placeholder="@seuusuario">
+          </div>
+          <div class="field">
+            <label for="perfil-facebook">Facebook</label>
+            <input type="text" id="perfil-facebook" placeholder="facebook.com/seuusuario">
+          </div>
+        </div>
+        <button type="submit" class="btn btn-primary" id="pessoal-submit">
+          <span id="pessoal-submit-label">Salvar informações</span>
         </button>
       </form>
     </section>
@@ -83,7 +131,33 @@
   </main>
 </div>
 
+<!-- Modal: ajustar foto de perfil -->
+<div class="modal-overlay" id="foto-crop-modal">
+  <div class="modal-box" style="max-width: 380px;">
+    <div class="modal-header">
+      <div class="modal-title">Ajustar foto</div>
+      <button class="modal-close" data-close-modal aria-label="Fechar" data-icon="x"></button>
+    </div>
+
+    <div class="crop-viewport" id="crop-viewport">
+      <img id="crop-img" alt="" draggable="false">
+    </div>
+
+    <div class="crop-zoom-row">
+      <span style="font-size:0.75rem; color:var(--cinza);">Zoom</span>
+      <input type="range" id="crop-zoom" min="1" max="3" step="0.01" value="1">
+    </div>
+    <p class="crop-hint">Arraste a foto para posicionar dentro do círculo.</p>
+
+    <div class="modal-actions">
+      <button type="button" class="btn btn-secondary" data-close-modal>Cancelar</button>
+      <button type="button" class="btn btn-primary" id="crop-confirmar">Usar esta foto</button>
+    </div>
+  </div>
+</div>
+
 <script src="../assets/js/api.js"></script>
+<script src="../assets/js/icons.js"></script>
 <script src="../assets/js/app-shell.js"></script>
 <script src="../assets/js/perfil.js"></script>
 
