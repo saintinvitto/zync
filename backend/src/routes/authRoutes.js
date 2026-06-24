@@ -6,6 +6,8 @@ const authController = require('../controllers/authController');
 
 router.post('/register', authLimiter, authController.register);
 router.post('/login', authLimiter, authController.login);
+router.post('/esqueci-senha', authLimiter, authController.esqueciSenha);
+router.post('/redefinir-senha', authLimiter, authController.redefinirSenha);
 router.get('/me', autenticar, authController.me);
 router.put('/me', autenticar, authController.atualizarMe);
 

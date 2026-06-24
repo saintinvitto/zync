@@ -6,7 +6,9 @@ CREATE TABLE IF NOT EXISTS usuarios (
   nome VARCHAR(120) NOT NULL,
   email VARCHAR(160) NOT NULL UNIQUE,
   senha_hash VARCHAR(255) NOT NULL,
-  criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+  criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  reset_token_hash VARCHAR(64) NULL,
+  reset_token_expira DATETIME NULL
 );
 
 CREATE TABLE IF NOT EXISTS leads (
@@ -30,7 +32,7 @@ CREATE TABLE IF NOT EXISTS mensagens (
   conteudo TEXT NOT NULL,
   enviado_por ENUM('ia', 'humano', 'cliente') NOT NULL,
   criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  FOREIGN KEY (lead_id) REFERENCES leads(id)
+  FOREIGN KEY (lead_id) REFERENCES leads(id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS tags (
@@ -46,8 +48,8 @@ CREATE TABLE IF NOT EXISTS lead_tags (
   lead_id INT NOT NULL,
   tag_id INT NOT NULL,
   PRIMARY KEY (lead_id, tag_id),
-  FOREIGN KEY (lead_id) REFERENCES leads(id),
-  FOREIGN KEY (tag_id) REFERENCES tags(id)
+  FOREIGN KEY (lead_id) REFERENCES leads(id) ON DELETE CASCADE,
+  FOREIGN KEY (tag_id) REFERENCES tags(id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS agendamentos (
@@ -59,7 +61,7 @@ CREATE TABLE IF NOT EXISTS agendamentos (
   status ENUM('agendado', 'confirmado', 'cancelado', 'concluido') DEFAULT 'agendado',
   criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (usuario_id) REFERENCES usuarios(id),
-  FOREIGN KEY (lead_id) REFERENCES leads(id)
+  FOREIGN KEY (lead_id) REFERENCES leads(id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS logs_atividade (
@@ -70,7 +72,7 @@ CREATE TABLE IF NOT EXISTS logs_atividade (
   detalhes JSON,
   criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (usuario_id) REFERENCES usuarios(id),
-  FOREIGN KEY (lead_id) REFERENCES leads(id)
+  FOREIGN KEY (lead_id) REFERENCES leads(id) ON DELETE SET NULL
 );
 
 CREATE TABLE IF NOT EXISTS notificacoes (
@@ -82,7 +84,7 @@ CREATE TABLE IF NOT EXISTS notificacoes (
   lida BOOLEAN NOT NULL DEFAULT FALSE,
   criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (usuario_id) REFERENCES usuarios(id),
-  FOREIGN KEY (lead_id) REFERENCES leads(id)
+  FOREIGN KEY (lead_id) REFERENCES leads(id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS planos (

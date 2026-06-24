@@ -12,6 +12,14 @@ npm run dev
 
 A API sobe em `http://localhost:3001`.
 
+## Testes
+
+```
+npm test
+```
+
+Usa Jest + Supertest contra um banco MySQL separado (`zync_test`), criado e destruído automaticamente a partir do `database/schema.sql` a cada execução — não toca no banco de desenvolvimento. Usa as mesmas credenciais (`DB_HOST`/`DB_USER`/`DB_PASSWORD`) do `.env`, só troca o nome do banco.
+
 ## Rotas
 
 | Rota | Auth | Descrição |

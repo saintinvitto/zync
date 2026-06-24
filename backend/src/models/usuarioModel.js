@@ -41,4 +41,35 @@ async function atualizar(id, dados) {
   return buscarPorId(id);
 }
 
-module.exports = { findByEmail, create, buscarPorId, buscarPorIdComSenha, atualizar };
+async function definirTokenReset(id, tokenHash, expiraEm) {
+  await db.query(
+    'UPDATE usuarios SET reset_token_hash = ?, reset_token_expira = ? WHERE id = ?',
+    [tokenHash, expiraEm, id]
+  );
+}
+
+async function buscarPorTokenResetValido(tokenHash) {
+  const [rows] = await db.query(
+    'SELECT * FROM usuarios WHERE reset_token_hash = ? AND reset_token_expira > NOW()',
+    [tokenHash]
+  );
+  return rows[0];
+}
+
+async function limparTokenReset(id) {
+  await db.query(
+    'UPDATE usuarios SET reset_token_hash = NULL, reset_token_expira = NULL WHERE id = ?',
+    [id]
+  );
+}
+
+module.exports = {
+  findByEmail,
+  create,
+  buscarPorId,
+  buscarPorIdComSenha,
+  atualizar,
+  definirTokenReset,
+  buscarPorTokenResetValido,
+  limparTokenReset,
+};

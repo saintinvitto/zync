@@ -1,6 +1,8 @@
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const crypto = require('crypto');
 const usuarioModel = require('../models/usuarioModel');
+const emailService = require('../services/emailService');
 const asyncHandler = require('../utils/asyncHandler');
 const validators = require('../utils/validators');
 
@@ -104,9 +106,59 @@ async function atualizarMe(req, res) {
   res.json(usuario);
 }
 
+async function esqueciSenha(req, res) {
+  const { email } = req.body;
+  if (!email) return res.status(400).json({ error: 'email é obrigatório' });
+
+  const usuario = await usuarioModel.findByEmail(email);
+
+  if (usuario) {
+    const token = crypto.randomBytes(32).toString('hex');
+    const tokenHash = crypto.createHash('sha256').update(token).digest('hex');
+    const expiraEm = new Date(Date.now() + 60 * 60 * 1000);
+
+    await usuarioModel.definirTokenReset(usuario.id, tokenHash, expiraEm);
+
+    const linkReset = `${process.env.FRONTEND_URL || ''}/pages/redefinir-senha.html?token=${token}`;
+    emailService.enviarEmail(
+      usuario.email,
+      'Redefinição de senha - Zync',
+      `Clique no link para redefinir sua senha (válido por 1 hora): ${linkReset}`
+    );
+  }
+
+  res.json({ mensagem: 'Se o e-mail existir, enviamos instruções de redefinição de senha.' });
+}
+
+async function redefinirSenha(req, res) {
+  const { token, novaSenha } = req.body;
+  if (!token || !novaSenha) {
+    return res.status(400).json({ error: 'token e novaSenha são obrigatórios' });
+  }
+
+  if (!validators.senhaValida(novaSenha)) {
+    return res.status(400).json({ error: 'senha deve ter pelo menos 6 caracteres' });
+  }
+
+  const tokenHash = crypto.createHash('sha256').update(token).digest('hex');
+  const usuario = await usuarioModel.buscarPorTokenResetValido(tokenHash);
+
+  if (!usuario) {
+    return res.status(400).json({ error: 'Token inválido ou expirado' });
+  }
+
+  const senha_hash = await bcrypt.hash(novaSenha, 10);
+  await usuarioModel.atualizar(usuario.id, { senha_hash });
+  await usuarioModel.limparTokenReset(usuario.id);
+
+  res.json({ mensagem: 'Senha redefinida com sucesso' });
+}
+
 module.exports = {
   register: asyncHandler(register),
   login: asyncHandler(login),
   me: asyncHandler(me),
   atualizarMe: asyncHandler(atualizarMe),
+  esqueciSenha: asyncHandler(esqueciSenha),
+  redefinirSenha: asyncHandler(redefinirSenha),
 };

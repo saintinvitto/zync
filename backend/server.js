@@ -1,18 +1,4 @@
-const express = require('express');
-const cors = require('cors');
-require('dotenv').config();
-
-const routes = require('./src/routes');
-const { tratarErro, rotaNaoEncontrada } = require('./src/middleware/errorMiddleware');
-
-const app = express();
-
-app.set('trust proxy', 1);
-app.use(cors());
-app.use(express.json());
-app.use('/api', routes);
-app.use(rotaNaoEncontrada);
-app.use(tratarErro);
+const app = require('./src/app');
 
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
