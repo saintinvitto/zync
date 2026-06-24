@@ -18,6 +18,7 @@ psql "<connection-string-do-supabase>" -f seeds/seed.sql
 - `seeds/` — dados de exemplo para desenvolvimento
 - `zync.dbml` / `zync-er-diagram.pdf` — diagrama ER (dbdiagram.io)
 - `scripts/backup.js` / `scripts/restore.js` — backup manual e restore (ver abaixo)
+- `scripts/setup-staging-schema.js` — cria/atualiza o schema de staging (ver abaixo)
 
 ## Backup
 
@@ -43,3 +44,35 @@ DATABASE_URL="<connection-string>" node scripts/restore.js backups/backup-XXX.js
 `restore.js` **apaga** o conteúdo atual de cada tabela antes de restaurar
 (`TRUNCATE ... CASCADE`) — não rodar contra produção sem certeza do que tá
 fazendo.
+
+## Staging
+
+Em vez de um projeto Supabase separado, staging usa um **schema separado**
+(`zync_staging`) dentro do mesmo projeto Supabase de produção — mesmo padrão
+já usado pelos testes automatizados (schema `zync_test`). Mais simples de
+manter, mas atenção: staging e produção compartilham a mesma cota/projeto
+Supabase.
+
+O backend escolhe o schema pela env var `PG_SCHEMA` (ver
+`backend/src/config/db.js`). Sem ela (e fora de `NODE_ENV=test`), usa o
+schema padrão `public` (produção).
+
+Pra criar/atualizar o schema de staging (idempotente, seguro rodar de novo):
+
+```
+cd database
+npm install
+DATABASE_URL="<mesma connection string do Supabase>" npm run setup-staging
+```
+
+Isso cria o schema `zync_staging` (se não existir), aplica `schema.sql` nele
+e insere planos de exemplo se a tabela estiver vazia.
+
+**Importante:** toda nova migration em `migrations/` precisa ser aplicada
+manualmente nos dois lugares — schema `public` (produção) e `zync_staging`
+— já que `npm run setup-staging` só roda o `schema.sql` (estado final), não
+o histórico de migrations incrementais.
+
+No Railway, o ambiente `staging` (quando criado) deve ter as mesmas
+variáveis do `production`, mas com `PG_SCHEMA=zync_staging` adicionada. Ver
+`backend/README.md` para o passo a passo de criar esse ambiente.

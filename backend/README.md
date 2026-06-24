@@ -36,7 +36,8 @@ Usa Jest + Supertest contra um schema Postgres separado (`zync_test`), criado e 
 
 API hospedada em: **https://zync-backend-production.up.railway.app**
 
-Projeto Railway: `zync-backend` (conta `pdrgranps`). O banco passou a ser o Postgres do Supabase (fora do Railway) — é preciso configurar a variável `DATABASE_URL` no Railway apontando pra connection string do Supabase antes do próximo deploy (o serviço de MySQL antigo do Railway fica obsoleto após a migração).
+Projeto Railway: `zync-backend` (conta `pdrgranps`). O banco é o Postgres do
+Supabase (fora do Railway), via variável `DATABASE_URL`.
 
 O deploy **não é automático** (o serviço não está conectado ao GitHub) — pra subir uma alteração nova:
 
@@ -48,3 +49,24 @@ railway up
 ```
 
 Atenção: a conta está no plano trial (30 dias ou $5 de crédito). Depois disso é preciso assinar um plano pago pra manter os serviços no ar.
+
+### Staging
+
+Staging usa o mesmo projeto Railway e o mesmo Supabase de produção, só que
+num schema separado (`zync_staging` — ver `database/README.md`). Pra criar
+o ambiente staging no Railway (ainda não criado, faz quando for usar):
+
+```
+cd backend
+railway environment create staging --duplicate production
+railway variables --set "PG_SCHEMA=zync_staging" --environment staging
+railway up --environment staging --detach
+```
+
+Isso duplica as variáveis de produção (incluindo a mesma `DATABASE_URL`) e
+soma um serviço rodando 24/7 a mais — consome crédito/horas do Railway além
+da produção. Pra desligar quando não precisar mais:
+
+```
+railway environment delete staging --yes
+```
