@@ -34,7 +34,7 @@
   <main class="app-main">
     <div class="app-topbar">
       <div>
-        <div class="app-title" id="stats">Dashboard</div>
+        <div class="app-title" id="stats">Bem-vindo de volta<span id="topbar-nome"></span></div>
         <div class="app-title-sub">Acompanhe seus leads e conversões em tempo real.</div>
       </div>
       <div style="display:flex; gap:0.7rem;">
@@ -48,35 +48,46 @@
       <div class="stat-card">
         <div class="stat-card-top">
           <div class="stat-icon">🆕</div>
+          <div class="stat-label">Leads hoje</div>
+          <button class="stat-kebab" aria-label="Mais opções" type="button">⋯</button>
+        </div>
+        <div class="stat-num-row">
+          <div class="stat-num" id="stat-leads-hoje"><span class="skeleton" style="width:40px;height:1.8rem;"></span></div>
           <span class="stat-badge hidden" id="badge-leads-hoje"></span>
         </div>
-        <div class="stat-label">Leads hoje</div>
-        <div class="stat-num" id="stat-leads-hoje"><span class="skeleton" style="width:40px;height:1.8rem;"></span></div>
       </div>
 
       <div class="stat-card">
         <div class="stat-card-top">
           <div class="stat-icon">✅</div>
+          <div class="stat-label">Conversões</div>
+          <button class="stat-kebab" aria-label="Mais opções" type="button">⋯</button>
         </div>
-        <div class="stat-label">Conversões</div>
-        <div class="stat-num" id="stat-conversoes"><span class="skeleton" style="width:40px;height:1.8rem;"></span></div>
+        <div class="stat-num-row">
+          <div class="stat-num" id="stat-conversoes"><span class="skeleton" style="width:40px;height:1.8rem;"></span></div>
+        </div>
       </div>
 
       <div class="stat-card">
         <div class="stat-card-top">
           <div class="stat-icon">💬</div>
+          <div class="stat-label">Msgs enviadas</div>
+          <button class="stat-kebab" aria-label="Mais opções" type="button">⋯</button>
         </div>
-        <div class="stat-label">Msgs enviadas</div>
-        <div class="stat-num" id="stat-mensagens"><span class="skeleton" style="width:40px;height:1.8rem;"></span></div>
+        <div class="stat-num-row">
+          <div class="stat-num" id="stat-mensagens"><span class="skeleton" style="width:40px;height:1.8rem;"></span></div>
+        </div>
       </div>
 
       <div class="stat-card">
         <div class="stat-card-top">
           <div class="stat-icon">🤖</div>
+          <div class="stat-label">Resp. IA</div>
+          <button class="stat-kebab" aria-label="Mais opções" type="button">⋯</button>
         </div>
-        <div class="stat-label">Resp. IA</div>
-        <div class="stat-num" id="stat-ia"><span class="skeleton" style="width:40px;height:1.8rem;"></span></div>
-        <div class="stat-sub">Taxa de resolução</div>
+        <div class="stat-num-row">
+          <div class="stat-num" id="stat-ia"><span class="skeleton" style="width:40px;height:1.8rem;"></span></div>
+        </div>
       </div>
     </section>
 
@@ -97,14 +108,22 @@
 
     <section class="analytics-grid">
       <div class="chart-card chart-card-featured">
-        <div class="chart-card-header">
+        <div class="chart-card-header chart-card-header-row">
           <div>
             <div class="chart-eyebrow">Faturamento</div>
             <div class="chart-big-num" id="faturamento-total">R$0,00</div>
             <div class="chart-sub" id="faturamento-sub">últimos 30 dias</div>
           </div>
+          <select id="faturamento-periodo" class="chart-period-select" aria-label="Período do gráfico">
+            <option value="14">📅 Últimos 14 dias</option>
+            <option value="30" selected>📅 Últimos 30 dias</option>
+            <option value="90">📅 Últimos 90 dias</option>
+          </select>
         </div>
-        <svg id="faturamento-chart" class="sparkline-lg" viewBox="0 0 560 160" preserveAspectRatio="none"></svg>
+        <div class="chart-canvas-wrap">
+          <svg id="faturamento-chart" class="sparkline-lg" viewBox="0 0 560 160" preserveAspectRatio="none"></svg>
+          <div class="chart-tooltip hidden" id="faturamento-tooltip"></div>
+        </div>
       </div>
 
       <div class="analytics-side">

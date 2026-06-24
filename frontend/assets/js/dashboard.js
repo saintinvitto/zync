@@ -841,21 +841,36 @@ document.querySelectorAll('.sidebar-item[data-nav]').forEach((item) => {
 
 /* ---------- ANÁLISES ---------- */
 const STATUS_FUNIL_ORDEM = ['novo', 'em_contato', 'proposta_enviada', 'fechado'];
+let faturamentoPontos = [];
 
 async function carregarAnalises() {
   try {
-    const [origem, funil, faturamento] = await Promise.all([
+    const [origem, funil] = await Promise.all([
       Api.relatorios.leadsPorOrigem(),
       Api.relatorios.funilConversao(),
-      Api.relatorios.faturamento({ agrupamento: 'dia' }),
     ]);
     renderOrigem(origem);
     renderFunil(funil);
-    renderFaturamento(faturamento);
+    await carregarFaturamento();
   } catch (err) {
     showToast(err.message, 'error');
   }
 }
+
+async function carregarFaturamento() {
+  const dias = Number(document.getElementById('faturamento-periodo').value);
+  try {
+    const dados = await Api.relatorios.faturamento({ agrupamento: 'dia' });
+    renderFaturamento(dados, dias);
+  } catch (err) {
+    showToast(err.message, 'error');
+  }
+}
+
+document.getElementById('faturamento-periodo').addEventListener('change', () => {
+  document.getElementById('faturamento-sub').textContent = `últimos ${document.getElementById('faturamento-periodo').value} dias`;
+  carregarFaturamento();
+});
 
 function renderOrigem(dados) {
   const container = document.getElementById('chart-origem');
@@ -894,11 +909,15 @@ function renderFunil(dados) {
   }).join('') + `<div class="funil-resumo">${taxaConversao}% dos leads chegam a fechar</div>`;
 }
 
-function renderFaturamento(dados) {
-  const dias = 30;
+function renderFaturamento(dados, dias) {
   const hoje = new Date();
   hoje.setHours(0, 0, 0, 0);
   const valores = new Array(dias).fill(0);
+  const datas = new Array(dias).fill(null).map((_, i) => {
+    const d = new Date(hoje);
+    d.setDate(d.getDate() - (dias - 1 - i));
+    return d;
+  });
 
   dados.forEach((d) => {
     const data = new Date(d.periodo);
@@ -911,6 +930,7 @@ function renderFaturamento(dados) {
   const w = 560, h = 160, pad = 8;
   const stepX = w / (dias - 1);
   const pontos = valores.map((v, i) => [i * stepX, h - pad - (v / max) * (h - pad * 2)]);
+  faturamentoPontos = pontos.map((p, i) => ({ x: p[0], y: p[1], valor: valores[i], data: datas[i] }));
 
   const linePath = pontos.map((p, i) => `${i === 0 ? 'M' : 'L'}${p[0].toFixed(1)},${p[1].toFixed(1)}`).join(' ');
   const areaPath = `${linePath} L${w},${h} L0,${h} Z`;
@@ -928,11 +948,46 @@ function renderFaturamento(dados) {
     </defs>
     <path d="${areaPath}" fill="url(#fatFill)" stroke="none"></path>
     <path d="${linePath}" fill="none" stroke="url(#fatStroke)" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"></path>
+    <circle id="faturamento-marker" cx="0" cy="0" r="4" fill="#fff" stroke="#EC4899" stroke-width="2" class="hidden"></circle>
   `;
 
   const total = valores.reduce((a, b) => a + b, 0);
   document.getElementById('faturamento-total').textContent = formatMoeda(total) || 'R$0,00';
 }
+
+const faturamentoSvg = document.getElementById('faturamento-chart');
+const faturamentoTooltip = document.getElementById('faturamento-tooltip');
+
+faturamentoSvg.addEventListener('mousemove', (e) => {
+  if (faturamentoPontos.length === 0) return;
+
+  const rect = faturamentoSvg.getBoundingClientRect();
+  const xRelativo = ((e.clientX - rect.left) / rect.width) * 560;
+  let maisProximo = faturamentoPontos[0];
+  for (const p of faturamentoPontos) {
+    if (Math.abs(p.x - xRelativo) < Math.abs(maisProximo.x - xRelativo)) maisProximo = p;
+  }
+
+  const marker = document.getElementById('faturamento-marker');
+  if (marker) {
+    marker.setAttribute('cx', maisProximo.x);
+    marker.setAttribute('cy', maisProximo.y);
+    marker.classList.remove('hidden');
+  }
+
+  faturamentoTooltip.innerHTML = `
+    <div class="chart-tooltip-valor">${formatMoeda(maisProximo.valor) || 'R$0,00'}</div>
+    <div class="chart-tooltip-data">${maisProximo.data.toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' })}</div>
+  `;
+  faturamentoTooltip.style.left = `${(maisProximo.x / 560) * 100}%`;
+  faturamentoTooltip.classList.remove('hidden');
+});
+
+faturamentoSvg.addEventListener('mouseleave', () => {
+  faturamentoTooltip.classList.add('hidden');
+  const marker = document.getElementById('faturamento-marker');
+  if (marker) marker.classList.add('hidden');
+});
 
 /* ---------- INIT ---------- */
 loadDashboard();

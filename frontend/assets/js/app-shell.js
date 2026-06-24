@@ -64,6 +64,9 @@ function renderUsuario() {
   document.getElementById('user-name').textContent = usuario.nome;
   document.getElementById('user-email').textContent = usuario.email;
 
+  const topbarNome = document.getElementById('topbar-nome');
+  if (topbarNome) topbarNome.textContent = `, ${usuario.nome.split(' ')[0]}`;
+
   const ehPaginaAdmin = window.location.pathname.endsWith('admin.html');
   const nav = document.querySelector('.sidebar-nav');
   if (Auth.isAdmin() && !ehPaginaAdmin && nav && !nav.querySelector('[data-admin-link]')) {
@@ -86,7 +89,7 @@ document.getElementById('logout-btn').addEventListener('click', () => Auth.logou
   const link = document.createElement('a');
   link.href = '../../index.html';
   link.className = logo.className;
-  link.innerHTML = logo.innerHTML;
+  link.innerHTML = `<span class="logo-mark"></span>${logo.innerHTML}`;
   logo.replaceWith(link);
 })();
 
