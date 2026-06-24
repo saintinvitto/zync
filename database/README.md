@@ -14,7 +14,7 @@ psql "<connection-string-do-supabase>" -f seeds/seed.sql
 ```
 
 - `schema.sql` — estrutura atual das tabelas (sempre o estado final, em sintaxe Postgres)
-- `migrations/` — histórico de como o schema chegou até aqui. As migrations até `014` são da era MySQL e não se aplicam mais; novas migrations a partir de agora devem ser escritas em sintaxe Postgres.
+- `migrations/` — histórico de como o schema chegou até aqui. As migrations até `015` são da era MySQL e não se aplicam mais (a `015` foi escrita antes da migração pra Postgres ser concluída); novas migrations a partir de agora devem ser escritas em sintaxe Postgres.
 - `seeds/` — dados de exemplo para desenvolvimento
 - `zync.dbml` / `zync-er-diagram.pdf` — diagrama ER (dbdiagram.io)
 - `scripts/backup.js` / `scripts/restore.js` — backup manual e restore (ver abaixo)
