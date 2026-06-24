@@ -15,7 +15,7 @@ async function listarPorUsuario(usuarioId, { tagId, busca, status, origem, valor
   if (busca) {
     const termo = `%${busca}%`;
     params.push(termo, termo, termo);
-    condicoes.push(`(l.nome LIKE $${params.length - 2} OR l.telefone LIKE $${params.length - 1} OR l.servico LIKE $${params.length})`);
+    condicoes.push(`(l.nome ILIKE $${params.length - 2} OR l.telefone ILIKE $${params.length - 1} OR l.servico ILIKE $${params.length})`);
   }
 
   if (status) {

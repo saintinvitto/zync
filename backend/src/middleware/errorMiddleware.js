@@ -1,11 +1,11 @@
 function tratarErro(err, req, res, next) {
   console.error(err);
 
-  if (err.code === 'ECONNREFUSED' || err.code === 'PROTOCOL_CONNECTION_LOST') {
+  if (err.code === 'ECONNREFUSED') {
     return res.status(503).json({ error: 'Banco de dados indisponível, tente novamente em breve' });
   }
 
-  if (err.code === 'ER_DUP_ENTRY') {
+  if (err.code === '23505') {
     return res.status(409).json({ error: 'Registro duplicado' });
   }
 

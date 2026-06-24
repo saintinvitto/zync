@@ -7,9 +7,9 @@ CREATE TABLE IF NOT EXISTS usuarios (
   nome VARCHAR(120) NOT NULL,
   email VARCHAR(160) NOT NULL UNIQUE,
   senha_hash VARCHAR(255) NOT NULL,
-  criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  criado_em TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
   reset_token_hash VARCHAR(64) NULL,
-  reset_token_expira TIMESTAMP NULL,
+  reset_token_expira TIMESTAMPTZ NULL,
   is_admin BOOLEAN NOT NULL DEFAULT FALSE,
   foto_url TEXT NULL,
   idade INT NULL,
@@ -17,7 +17,7 @@ CREATE TABLE IF NOT EXISTS usuarios (
   instagram VARCHAR(120) NULL,
   facebook VARCHAR(120) NULL,
   telefone VARCHAR(20) NULL,
-  senha_alterada_em TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+  senha_alterada_em TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE INDEX IF NOT EXISTS idx_usuarios_reset_token ON usuarios (reset_token_hash);
@@ -31,8 +31,8 @@ CREATE TABLE IF NOT EXISTS leads (
   telefone VARCHAR(20),
   status VARCHAR(20) DEFAULT 'novo' CHECK (status IN ('novo', 'em_contato', 'proposta_enviada', 'fechado')),
   valor DECIMAL(10,2),
-  criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  fechado_em TIMESTAMP NULL,
+  criado_em TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+  fechado_em TIMESTAMPTZ NULL,
   CONSTRAINT idx_leads_usuario_telefone UNIQUE (usuario_id, telefone)
 );
 
@@ -44,7 +44,7 @@ CREATE TABLE IF NOT EXISTS mensagens (
   lead_id INT NOT NULL REFERENCES leads(id) ON DELETE CASCADE,
   conteudo TEXT NOT NULL,
   enviado_por VARCHAR(20) NOT NULL CHECK (enviado_por IN ('ia', 'humano', 'cliente')),
-  criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+  criado_em TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE INDEX IF NOT EXISTS idx_mensagens_lead_criado ON mensagens (lead_id, criado_em);
@@ -53,7 +53,7 @@ CREATE TABLE IF NOT EXISTS tags (
   id SERIAL PRIMARY KEY,
   usuario_id INT NOT NULL REFERENCES usuarios(id),
   nome VARCHAR(60) NOT NULL,
-  criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  criado_em TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
   CONSTRAINT idx_tags_usuario_nome UNIQUE (usuario_id, nome)
 );
 
@@ -68,9 +68,9 @@ CREATE TABLE IF NOT EXISTS agendamentos (
   usuario_id INT NOT NULL REFERENCES usuarios(id),
   lead_id INT NOT NULL REFERENCES leads(id) ON DELETE CASCADE,
   servico VARCHAR(120),
-  data_hora TIMESTAMP NOT NULL,
+  data_hora TIMESTAMPTZ NOT NULL,
   status VARCHAR(20) DEFAULT 'agendado' CHECK (status IN ('agendado', 'confirmado', 'cancelado', 'concluido')),
-  criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+  criado_em TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE INDEX IF NOT EXISTS idx_agendamentos_usuario_data ON agendamentos (usuario_id, data_hora);
@@ -81,7 +81,7 @@ CREATE TABLE IF NOT EXISTS logs_atividade (
   lead_id INT REFERENCES leads(id) ON DELETE SET NULL,
   acao VARCHAR(60) NOT NULL,
   detalhes JSONB,
-  criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+  criado_em TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE INDEX IF NOT EXISTS idx_logs_usuario_criado ON logs_atividade (usuario_id, criado_em);
@@ -93,7 +93,7 @@ CREATE TABLE IF NOT EXISTS notificacoes (
   tipo VARCHAR(40) NOT NULL,
   mensagem VARCHAR(255) NOT NULL,
   lida BOOLEAN NOT NULL DEFAULT FALSE,
-  criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+  criado_em TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE INDEX IF NOT EXISTS idx_notificacoes_usuario_lida_criado ON notificacoes (usuario_id, lida, criado_em);
@@ -104,7 +104,7 @@ CREATE TABLE IF NOT EXISTS planos (
   preco DECIMAL(10,2) NOT NULL,
   intervalo_dias INT NOT NULL DEFAULT 30,
   ativo BOOLEAN NOT NULL DEFAULT TRUE,
-  criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+  criado_em TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE IF NOT EXISTS assinaturas (
@@ -115,9 +115,9 @@ CREATE TABLE IF NOT EXISTS assinaturas (
   syncpay_identifier VARCHAR(60),
   pix_code TEXT,
   valor DECIMAL(10,2) NOT NULL,
-  expira_em TIMESTAMP,
-  criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  atualizado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  expira_em TIMESTAMPTZ,
+  criado_em TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+  atualizado_em TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
   CONSTRAINT idx_assinaturas_syncpay_identifier UNIQUE (syncpay_identifier)
 );
 
@@ -143,5 +143,5 @@ CREATE TABLE IF NOT EXISTS mensagens_suporte (
   mensagem TEXT NOT NULL,
   video_url VARCHAR(500),
   respondida BOOLEAN NOT NULL DEFAULT FALSE,
-  criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+  criado_em TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
 );

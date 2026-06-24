@@ -9,7 +9,7 @@ afterAll(async () => {
 
 async function criarAdmin() {
   const usuarioComToken = await criarUsuarioEToken(app, request);
-  await db.query('UPDATE usuarios SET is_admin = 1 WHERE id = ?', [usuarioComToken.usuario.id]);
+  await db.query('UPDATE usuarios SET is_admin = true WHERE id = $1', [usuarioComToken.usuario.id]);
 
   const relogin = await request(app)
     .post('/api/auth/login')
@@ -96,14 +96,14 @@ describe('GET /api/admin/metricas', () => {
 
     const { usuario } = await criarUsuarioEToken(app, request);
 
-    const [planoResult] = await db.query(
-      "INSERT INTO planos (nome, preco, intervalo_dias) VALUES ('Plano Teste MRR', 300, 90)"
+    const { rows: planoRows } = await db.query(
+      "INSERT INTO planos (nome, preco, intervalo_dias) VALUES ('Plano Teste MRR', 300, 90) RETURNING id"
     );
 
     await db.query(
       `INSERT INTO assinaturas (usuario_id, plano_id, status, valor, syncpay_identifier)
-       VALUES (?, ?, 'ativa', 300, ?)`,
-      [usuario.id, planoResult.insertId, `mrr-test-${Date.now()}`]
+       VALUES ($1, $2, 'ativa', 300, $3)`,
+      [usuario.id, planoRows[0].id, `mrr-test-${Date.now()}`]
     );
 
     const depois = await request(app)
@@ -130,7 +130,7 @@ describe('Planos via admin', () => {
       .set('Authorization', `Bearer ${admin.token}`)
       .send({ ativo: false });
     expect(desativar.status).toBe(200);
-    expect(desativar.body.ativo).toBe(0);
+    expect(desativar.body.ativo).toBe(false);
 
     const listarTodos = await request(app)
       .get('/api/admin/planos')
