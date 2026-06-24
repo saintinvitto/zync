@@ -13,10 +13,10 @@
     <div class="sidebar-logo">Zy<span>nc</span></div>
 
     <nav class="sidebar-nav">
-      <a href="admin.html" class="sidebar-item active"> Admin do SaaS</a>
-      <a href="dashboard.html" class="sidebar-item">📋 Minha conta (cliente)</a>
-      <a href="perfil.html" class="sidebar-item">👤 Perfil</a>
-      <a href="suporte.html" class="sidebar-item">💬 Suporte</a>
+      <a href="admin.html" class="sidebar-item active" data-icon="settings"> Admin do SaaS</a>
+      <a href="dashboard.html" class="sidebar-item" data-icon="clipboardList"> Minha conta (cliente)</a>
+      <a href="perfil.html" class="sidebar-item" data-icon="user"> Perfil</a>
+      <a href="suporte.html" class="sidebar-item" data-icon="messageCircle"> Suporte</a>
     </nav>
 
     <div class="sidebar-user">
@@ -25,7 +25,7 @@
         <div class="sidebar-user-name" id="user-name">—</div>
         <div class="sidebar-user-email" id="user-email">—</div>
       </div>
-      <button class="sidebar-logout" id="logout-btn" title="Sair"> Log out</button>
+      <button class="sidebar-logout" id="logout-btn" title="Sair" data-icon="logOut"></button>
     </div>
   </aside>
 
@@ -40,33 +40,33 @@
     <section class="stats-grid">
       <div class="stat-card">
         <div class="stat-card-top">
-          <div class="stat-icon">🏢</div>
+          <div class="stat-icon" data-icon="building"></div>
           <div class="stat-label">Empresas</div>
-          <button class="stat-kebab" aria-label="Mais opções" type="button">⋯</button>
+          <button class="stat-kebab" aria-label="Mais opções" type="button" data-icon="moreHorizontal"></button>
         </div>
         <div class="stat-num-row"><div class="stat-num" id="adm-total-usuarios"><span class="skeleton" style="width:40px;height:1.8rem;"></span></div></div>
       </div>
       <div class="stat-card">
         <div class="stat-card-top">
-          <div class="stat-icon">💰</div>
+          <div class="stat-icon" data-icon="dollarSign"></div>
           <div class="stat-label">MRR</div>
-          <button class="stat-kebab" aria-label="Mais opções" type="button">⋯</button>
+          <button class="stat-kebab" aria-label="Mais opções" type="button" data-icon="moreHorizontal"></button>
         </div>
         <div class="stat-num-row"><div class="stat-num" id="adm-mrr"><span class="skeleton" style="width:60px;height:1.8rem;"></span></div></div>
       </div>
       <div class="stat-card">
         <div class="stat-card-top">
-          <div class="stat-icon">✅</div>
+          <div class="stat-icon" data-icon="checkCircle"></div>
           <div class="stat-label">Assinaturas ativas</div>
-          <button class="stat-kebab" aria-label="Mais opções" type="button">⋯</button>
+          <button class="stat-kebab" aria-label="Mais opções" type="button" data-icon="moreHorizontal"></button>
         </div>
         <div class="stat-num-row"><div class="stat-num" id="adm-ativas"><span class="skeleton" style="width:40px;height:1.8rem;"></span></div></div>
       </div>
       <div class="stat-card">
         <div class="stat-card-top">
-          <div class="stat-icon">⏳</div>
+          <div class="stat-icon" data-icon="clock"></div>
           <div class="stat-label">Pend. / canceladas</div>
-          <button class="stat-kebab" aria-label="Mais opções" type="button">⋯</button>
+          <button class="stat-kebab" aria-label="Mais opções" type="button" data-icon="moreHorizontal"></button>
         </div>
         <div class="stat-num-row"><div class="stat-num" id="adm-pendentes"><span class="skeleton" style="width:40px;height:1.8rem;"></span></div></div>
       </div>
@@ -74,7 +74,7 @@
 
     <div class="kanban-header">
       <div class="app-title" style="font-size:1.15rem;">Empresas cadastradas</div>
-      <button class="btn btn-ghost btn-sm" id="refresh-admin">↻ Atualizar</button>
+      <button class="btn btn-ghost btn-sm" id="refresh-admin" data-icon="refreshCw"> Atualizar</button>
     </div>
     <div class="agenda-list" id="admin-users-list">
       <div class="empty-state"><span class="spinner"></span></div>
@@ -102,7 +102,7 @@
   <div class="modal-box">
     <div class="modal-header">
       <div class="modal-title" id="plano-modal-title">Novo plano</div>
-      <button class="modal-close" data-close-modal aria-label="Fechar">✕</button>
+      <button class="modal-close" data-close-modal aria-label="Fechar" data-icon="x"></button>
     </div>
 
     <form id="plano-form" novalidate>
@@ -138,6 +138,7 @@
 </div>
 
 <script src="../assets/js/api.js"></script>
+<script src="../assets/js/icons.js"></script>
 <script src="../assets/js/app-shell.js"></script>
 <script src="../assets/js/admin.js"></script>
 

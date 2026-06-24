@@ -45,9 +45,9 @@ function mascararTelefone(valor) {
 }
 
 const NOTIF_ICONES = {
-  lead_criado: '🆕',
-  mensagem_recebida: '💬',
-  agendamento_criado: '📅',
+  lead_criado: icon('sparkles', 16),
+  mensagem_recebida: icon('messageCircle', 16),
+  agendamento_criado: icon('calendar', 16),
 };
 
 function renderUsuario() {
@@ -74,7 +74,7 @@ function renderUsuario() {
     link.href = 'admin.html';
     link.className = 'sidebar-item';
     link.dataset.adminLink = 'true';
-    link.textContent = '🛠️ Admin do SaaS';
+    link.innerHTML = `${icon('settings', 18)} Admin do SaaS`;
     nav.appendChild(link);
   }
 }
@@ -102,7 +102,7 @@ document.getElementById('logout-btn').addEventListener('click', () => Auth.logou
   const wrap = document.createElement('div');
   wrap.className = 'sidebar-search';
   wrap.innerHTML = `
-    <span class="sidebar-search-icon">🔍</span>
+    <span class="sidebar-search-icon">${icon('search', 14)}</span>
     <input type="text" id="sidebar-search-input" placeholder="Buscar no menu...">
   `;
   sidebar.insertBefore(wrap, nav);
@@ -126,7 +126,7 @@ document.getElementById('logout-btn').addEventListener('click', () => Auth.logou
   wrap.className = 'notif-wrap';
   wrap.innerHTML = `
     <button class="notif-bell" id="notif-bell" aria-label="Notificações" type="button">
-      🔔<span class="notif-badge hidden" id="notif-badge">0</span>
+      ${icon('bell', 18)}<span class="notif-badge hidden" id="notif-badge">0</span>
     </button>
     <div class="notif-dropdown hidden" id="notif-dropdown">
       <div class="notif-dropdown-header">
@@ -168,7 +168,7 @@ document.getElementById('logout-btn').addEventListener('click', () => Auth.logou
 
       lista.innerHTML = notificacoes.map((n) => `
         <div class="notif-item ${n.lida ? '' : 'nao-lida'}" data-id="${n.id}">
-          <span class="notif-item-icon">${NOTIF_ICONES[n.tipo] || '🔔'}</span>
+          <span class="notif-item-icon">${NOTIF_ICONES[n.tipo] || icon('bell', 16)}</span>
           <div class="notif-item-body">
             <div class="notif-item-msg">${escapeHtml(n.mensagem)}</div>
             <div class="notif-item-data">${formatDataHoraCurta(n.criado_em)}</div>

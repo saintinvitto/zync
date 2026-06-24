@@ -8,9 +8,9 @@ const STATUS_LABELS = {
 };
 
 const SENDER_LABELS = {
-  cliente: '👤 Cliente',
-  humano: '🧑‍💼 Você',
-  ia: '🤖 IA',
+  cliente: `${icon('user', 12)} Cliente`,
+  humano: `${icon('user', 12)} Você`,
+  ia: `${icon('bot', 12)} IA`,
 };
 
 let leadsCache = [];
@@ -143,7 +143,7 @@ function renderTagManageList() {
   }
 
   list.innerHTML = tagsCache.map((t) => `
-    <span class="tag-chip">${escapeHtml(t.nome)} <button type="button" class="tag-chip-remove" data-tag-id="${t.id}" aria-label="Excluir tag ${escapeHtml(t.nome)}">✕</button></span>
+    <span class="tag-chip">${escapeHtml(t.nome)} <button type="button" class="tag-chip-remove" data-tag-id="${t.id}" aria-label="Excluir tag ${escapeHtml(t.nome)}">${icon('x', 12)}</button></span>
   `).join('');
 
   list.querySelectorAll('.tag-chip-remove').forEach((btn) => {
@@ -561,7 +561,7 @@ function renderTimeline(leadId, mensagens) {
   body.innerHTML = '';
 
   if (itens.length === 0) {
-    body.innerHTML = '<div class="empty-state" style="padding:2rem 1rem;"><div class="empty-state-icon">💬</div><div>Nenhuma atividade ainda</div></div>';
+    body.innerHTML = `<div class="empty-state" style="padding:2rem 1rem;"><div class="empty-state-icon">${icon('messageCircle', 36)}</div><div>Nenhuma atividade ainda</div></div>`;
     return;
   }
 
@@ -624,7 +624,7 @@ async function carregarTagsDoLead(leadId) {
 function renderPanelTags() {
   const lista = document.getElementById('panel-tags');
   lista.innerHTML = panelTagsCache.map((t) => `
-    <span class="tag-chip">${escapeHtml(t.nome)} <button type="button" class="tag-chip-remove" data-tag-id="${t.id}" aria-label="Remover tag ${escapeHtml(t.nome)}">✕</button></span>
+    <span class="tag-chip">${escapeHtml(t.nome)} <button type="button" class="tag-chip-remove" data-tag-id="${t.id}" aria-label="Remover tag ${escapeHtml(t.nome)}">${icon('x', 12)}</button></span>
   `).join('');
 
   lista.querySelectorAll('.tag-chip-remove').forEach((btn) => {
@@ -733,14 +733,14 @@ async function enviarMensagem() {
 /* ---------- COMMAND PALETTE (Ctrl+K) ---------- */
 function getCmdkAcoes() {
   return [
-    { icon: '📊', label: 'Ir para Visão geral', hint: 'Ação', run: () => document.getElementById('stats').scrollIntoView({ behavior: 'smooth' }) },
-    { icon: '👥', label: 'Ir para Leads (kanban)', hint: 'Ação', run: () => document.getElementById('kanban').scrollIntoView({ behavior: 'smooth' }) },
-    { icon: '➕', label: 'Criar novo lead', hint: 'Ação', run: () => abrirModal() },
-    { icon: '🏷️', label: 'Gerenciar tags', hint: 'Ação', run: () => abrirTagModal() },
-    { icon: '📅', label: 'Ir para Agenda', hint: 'Ação', run: () => { window.location.href = 'agenda.html'; } },
-    { icon: '👤', label: 'Ir para Perfil', hint: 'Ação', run: () => { window.location.href = 'perfil.html'; } },
-    { icon: '↻', label: 'Atualizar dados', hint: 'Ação', run: () => { loadLeads(); loadDashboard(); } },
-    { icon: '⏻', label: 'Sair da conta', hint: 'Ação', run: () => Auth.logout() },
+    { icon: icon('dashboard', 16), label: 'Ir para Visão geral', hint: 'Ação', run: () => document.getElementById('stats').scrollIntoView({ behavior: 'smooth' }) },
+    { icon: icon('users', 16), label: 'Ir para Leads (kanban)', hint: 'Ação', run: () => document.getElementById('kanban').scrollIntoView({ behavior: 'smooth' }) },
+    { icon: icon('plus', 16), label: 'Criar novo lead', hint: 'Ação', run: () => abrirModal() },
+    { icon: icon('tag', 16), label: 'Gerenciar tags', hint: 'Ação', run: () => abrirTagModal() },
+    { icon: icon('calendar', 16), label: 'Ir para Agenda', hint: 'Ação', run: () => { window.location.href = 'agenda.html'; } },
+    { icon: icon('user', 16), label: 'Ir para Perfil', hint: 'Ação', run: () => { window.location.href = 'perfil.html'; } },
+    { icon: icon('refreshCw', 16), label: 'Atualizar dados', hint: 'Ação', run: () => { loadLeads(); loadDashboard(); } },
+    { icon: icon('logOut', 16), label: 'Sair da conta', hint: 'Ação', run: () => Auth.logout() },
   ];
 }
 
@@ -763,7 +763,7 @@ function renderCmdkResultados(termo) {
 
   cmdkItems = [
     ...acoes,
-    ...leadsResultado.map((l) => ({ icon: '🧑', label: l.nome, hint: STATUS_LABELS[l.status], run: () => abrirPainel(l.id) })),
+    ...leadsResultado.map((l) => ({ icon: icon('user', 16), label: l.nome, hint: STATUS_LABELS[l.status], run: () => abrirPainel(l.id) })),
   ];
   cmdkIndex = 0;
 

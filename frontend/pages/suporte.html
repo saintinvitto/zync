@@ -13,12 +13,12 @@
     <div class="sidebar-logo">Zy<span>nc</span></div>
 
     <nav class="sidebar-nav">
-      <a href="dashboard.html#stats" class="sidebar-item">📊 Visão geral</a>
-      <a href="dashboard.html#analises" class="sidebar-item">📈 Análises</a>
-      <a href="dashboard.html#kanban" class="sidebar-item">👥 Leads</a>
-      <a href="agenda.html" class="sidebar-item">📅 Agenda</a>
-      <a href="perfil.html" class="sidebar-item">👤 Perfil</a>
-      <a href="suporte.html" class="sidebar-item active">💬 Suporte</a>
+      <a href="dashboard.html#stats" class="sidebar-item" data-icon="dashboard"> Visão geral</a>
+      <a href="dashboard.html#analises" class="sidebar-item" data-icon="trendingUp"> Análises</a>
+      <a href="dashboard.html#kanban" class="sidebar-item" data-icon="users"> Leads</a>
+      <a href="agenda.html" class="sidebar-item" data-icon="calendar"> Agenda</a>
+      <a href="perfil.html" class="sidebar-item" data-icon="user"> Perfil</a>
+      <a href="suporte.html" class="sidebar-item active" data-icon="messageCircle"> Suporte</a>
     </nav>
 
     <div class="sidebar-user">
@@ -27,7 +27,7 @@
         <div class="sidebar-user-name" id="user-name">—</div>
         <div class="sidebar-user-email" id="user-email">—</div>
       </div>
-      <button class="sidebar-logout" id="logout-btn" title="Sair">⏻</button>
+      <button class="sidebar-logout" id="logout-btn" title="Sair" data-icon="logOut"></button>
     </div>
   </aside>
 
@@ -41,19 +41,19 @@
 
     <section class="features-grid" style="margin-bottom: 2rem;">
       <div class="feat-card">
-        <div class="feat-icon">📧</div>
+        <div class="feat-icon" data-icon="mail"></div>
         <div class="feat-title">E-mail</div>
         <div class="feat-desc">Resposta em até 1 dia útil.</div>
         <a href="mailto:contato@zync.com.br" class="btn btn-secondary btn-sm" style="display:inline-block; margin-top:1rem;">contato@zync.com.br</a>
       </div>
       <div class="feat-card">
-        <div class="feat-icon">📞</div>
+        <div class="feat-icon" data-icon="phone"></div>
         <div class="feat-title">Telefone</div>
         <div class="feat-desc">Atendimento por voz.</div>
         <span class="k-tag" style="display:inline-block; margin-top:1rem;">Em breve</span>
       </div>
       <div class="feat-card">
-        <div class="feat-icon">💬</div>
+        <div class="feat-icon" data-icon="messageCircle"></div>
         <div class="feat-title">WhatsApp</div>
         <div class="feat-desc">Resposta rápida no celular.</div>
         <span class="k-tag" style="display:inline-block; margin-top:1rem;">Em breve</span>
@@ -93,6 +93,7 @@
 </div>
 
 <script src="../assets/js/api.js"></script>
+<script src="../assets/js/icons.js"></script>
 <script src="../assets/js/app-shell.js"></script>
 <script src="../assets/js/suporte.js"></script>
 

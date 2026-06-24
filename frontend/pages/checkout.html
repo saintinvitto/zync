@@ -18,11 +18,11 @@
       <div class="checkout-logo">Zy<span>nc</span></div>
 
       <div id="summary-teaser">
-        <div class="checkout-plan-badge">✦ Assine o Zync</div>
+        <div class="checkout-plan-badge" data-icon="sparkle" data-icon-size="12"> Assine o Zync</div>
         <ul class="checkout-features">
-          <li><div class="check">✓</div> CRM completo + Kanban</li>
-          <li><div class="check">✓</div> WhatsApp + IA de atendimento</li>
-          <li><div class="check">✓</div> Tags, agenda e relatórios</li>
+          <li><div class="check" data-icon="check" data-icon-size="10"></div> CRM completo + Kanban</li>
+          <li><div class="check" data-icon="check" data-icon-size="10"></div> WhatsApp + IA de atendimento</li>
+          <li><div class="check" data-icon="check" data-icon-size="10"></div> Tags, agenda e relatórios</li>
         </ul>
         <p style="font-size:0.85rem; color:var(--cinza);">Crie sua conta para ver os planos e preços disponíveis.</p>
       </div>
@@ -63,9 +63,9 @@
       <div id="checkout-section" class="hidden">
         <div class="checkout-section-title" style="margin-top:0;">Forma de pagamento</div>
         <div class="checkout-method-tabs">
-          <button type="button" class="method-tab active" data-method="pix">⚡ Pix</button>
-          <button type="button" class="method-tab" data-method="cartao">💳 Cartão</button>
-          <button type="button" class="method-tab" data-method="boleto">🧾 Boleto</button>
+          <button type="button" class="method-tab active" data-method="pix" data-icon="zap"> Pix</button>
+          <button type="button" class="method-tab" data-method="cartao" data-icon="creditCard"> Cartão</button>
+          <button type="button" class="method-tab" data-method="boleto" data-icon="fileText"> Boleto</button>
         </div>
 
         <form id="checkout-form" novalidate>
@@ -83,15 +83,15 @@
               <span id="checkout-submit-label">Gerar Pix e assinar</span>
             </button>
 
-            <div class="checkout-trust">🔒 Cobrança processada via SyncPay · Pix aprovado na hora</div>
+            <div class="checkout-trust" data-icon="lock" data-icon-size="14"> Cobrança processada via SyncPay · Pix aprovado na hora</div>
           </div>
 
           <div class="payment-panel hidden" id="panel-cartao">
-            <div class="pix-box">💳 Pagamento por cartão chega em breve. Por enquanto, use o Pix — é aprovado na hora.</div>
+            <div class="pix-box" data-icon="creditCard"> Pagamento por cartão chega em breve. Por enquanto, use o Pix — é aprovado na hora.</div>
           </div>
 
           <div class="payment-panel hidden" id="panel-boleto">
-            <div class="boleto-box">🧾 Boleto chega em breve. Por enquanto, use o Pix — é aprovado na hora.</div>
+            <div class="boleto-box" data-icon="fileText"> Boleto chega em breve. Por enquanto, use o Pix — é aprovado na hora.</div>
           </div>
         </form>
       </div>
@@ -105,7 +105,7 @@
       </div>
 
       <div class="checkout-success hidden" id="checkout-success">
-        <div class="success-check">✓</div>
+        <div class="success-check" data-icon="check" data-icon-size="28"></div>
         <h2>Assinatura confirmada!</h2>
         <p>Pagamento aprovado. Você já pode acessar todos os recursos do Zync.</p>
         <a href="dashboard.html" class="btn btn-primary">Ir para o dashboard →</a>
@@ -115,6 +115,7 @@
 </div>
 
 <script src="../assets/js/api.js"></script>
+<script src="../assets/js/icons.js"></script>
 <script src="../assets/js/checkout.js"></script>
 
 </body>

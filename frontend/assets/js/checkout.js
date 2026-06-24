@@ -213,7 +213,7 @@ async function verificarPagamento() {
       document.getElementById('checkout-success').classList.remove('hidden');
     } else if (atual.status === 'cancelada') {
       clearInterval(pollHandle);
-      document.getElementById('pix-status').innerHTML = '❌ Pagamento não foi aprovado. <a href="checkout.html">Tentar novamente</a>';
+      document.getElementById('pix-status').innerHTML = `${icon('xCircle', 16)} Pagamento não foi aprovado. <a href="checkout.html">Tentar novamente</a>`;
     }
   } catch {
     /* erro de rede pontual durante o polling, tenta de novo no próximo tick */

@@ -86,15 +86,15 @@ function renderAgenda() {
   const container = document.getElementById('agenda-list');
 
   if (agendamentosCache.length === 0) {
-    container.innerHTML = '<div class="empty-state"><div class="empty-state-icon">📅</div><h3>Nenhum agendamento ainda</h3><div>Crie o primeiro com o botão acima.</div></div>';
+    container.innerHTML = `<div class="empty-state"><div class="empty-state-icon">${icon('calendar', 36)}</div><h3>Nenhum agendamento ainda</h3><div>Crie o primeiro com o botão acima.</div></div>`;
     return;
   }
 
   const grupos = agruparPorPeriodo(agendamentosCache);
   const secoes = [
-    { chave: 'atrasados', titulo: '⚠️ Atrasados' },
-    { chave: 'hoje', titulo: '📍 Hoje' },
-    { chave: 'proximos', titulo: '📅 Próximos' },
+    { chave: 'atrasados', titulo: `${icon('alertTriangle', 14)} Atrasados` },
+    { chave: 'hoje', titulo: `${icon('mapPin', 14)} Hoje` },
+    { chave: 'proximos', titulo: `${icon('calendar', 14)} Próximos` },
   ];
 
   container.innerHTML = secoes

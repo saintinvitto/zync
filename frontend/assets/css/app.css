@@ -35,6 +35,8 @@
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
+.icon { display: inline-block; vertical-align: middle; flex-shrink: 0; }
+
 html { scroll-behavior: smooth; }
 html, body { height: 100%; }
 
@@ -1143,6 +1145,7 @@ a { color: inherit; }
 .agenda-section-title {
   display: flex;
   align-items: center;
+  gap: 0.4rem;
   font-size: 0.78rem;
   font-weight: 700;
   text-transform: uppercase;
@@ -1500,6 +1503,77 @@ a { color: inherit; }
   margin-top: 0.6rem;
   padding-top: 0.6rem;
   border-top: 1px solid var(--borda);
+}
+
+.check {
+  width: 16px;
+  height: 16px;
+  background: var(--roxo-bg);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  color: var(--roxo-claro);
+}
+
+/* ---------- FEATURE CARDS (suporte/contato) ---------- */
+.features-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
+}
+
+.feat-card {
+  background: var(--glass-bg);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-lg);
+  padding: 2rem;
+  transition: border-color 0.3s, box-shadow 0.3s;
+  position: relative;
+  overflow: hidden;
+}
+
+.feat-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--roxo-claro), transparent);
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+.feat-card:hover::before { opacity: 1; }
+.feat-card:hover { border-color: var(--roxo-claro); box-shadow: 0 20px 60px rgba(124,58,237,0.2); }
+
+.feat-icon {
+  width: 44px;
+  height: 44px;
+  background: var(--roxo-bg);
+  border: 1px solid var(--borda);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1.2rem;
+  font-size: 1.2rem;
+  transition: transform 0.35s ease;
+}
+.feat-card:hover .feat-icon { transform: scale(1.12) rotate(-6deg); }
+
+.feat-title {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-bottom: 0.6rem;
+}
+
+.feat-desc { color: var(--cinza); font-size: 0.9rem; line-height: 1.65; }
+
+@media (max-width: 768px) {
+  .features-grid { grid-template-columns: 1fr; }
 }
 
 /* ---------- NOTIFICAÇÕES ---------- */

@@ -43,7 +43,7 @@ async function carregarUsuarios() {
     const usuarios = await Api.admin.usuarios();
 
     if (usuarios.length === 0) {
-      lista.innerHTML = '<div class="empty-state"><div class="empty-state-icon">🏢</div><h3>Nenhuma empresa ainda</h3></div>';
+      lista.innerHTML = `<div class="empty-state"><div class="empty-state-icon">${icon('building', 36)}</div><h3>Nenhuma empresa ainda</h3></div>`;
       return;
     }
 
@@ -182,7 +182,7 @@ async function carregarSuporte() {
     const itens = await Api.admin.suporte.listar();
 
     if (itens.length === 0) {
-      lista.innerHTML = '<div class="empty-state"><div class="empty-state-icon">💬</div><h3>Nenhuma mensagem ainda</h3></div>';
+      lista.innerHTML = `<div class="empty-state"><div class="empty-state-icon">${icon('messageCircle', 36)}</div><h3>Nenhuma mensagem ainda</h3></div>`;
       return;
     }
 
@@ -193,7 +193,7 @@ async function carregarSuporte() {
           <div class="agenda-servico">${escapeHtml(m.mensagem)}</div>
           <div class="agenda-servico">
             ${formatDataHoraCurta(m.criado_em)}
-            ${m.video_url ? ` · <a href="${escapeHtml(m.video_url)}" target="_blank" rel="noopener noreferrer" style="color:var(--roxo-claro);">ver vídeo</a>` : ''}
+            ${m.video_url ? ` · <a href="${escapeHtml(m.video_url)}" target="_blank" rel="noopener noreferrer" style="color:var(--roxo-claro);">${icon('video', 12)} ver vídeo</a>` : ''}
           </div>
         </div>
         <div class="agenda-actions">
