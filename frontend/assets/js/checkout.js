@@ -1,21 +1,13 @@
-const PRECO_MENSAL = 197;
-let ciclo = 'mensal';
+let planosCache = [];
+let planoSelecionadoId = null;
+let pollHandle = null;
 
 function formatBRL(v) {
-  return v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+  return Number(v).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
 }
 
 function apenasDigitos(s) {
   return s.replace(/\D/g, '');
-}
-
-function mascararCartao(valor) {
-  return apenasDigitos(valor).slice(0, 16).replace(/(.{4})/g, '$1 ').trim();
-}
-
-function mascararValidade(valor) {
-  const d = apenasDigitos(valor).slice(0, 4);
-  return d.length > 2 ? `${d.slice(0, 2)}/${d.slice(2)}` : d;
 }
 
 function mascararCpf(valor) {
@@ -26,109 +18,147 @@ function mascararCpf(valor) {
     .replace(/(\d{3})(\d{1,2})$/, '$1-$2');
 }
 
-/* ---------- RESUMO / CICLO DE COBRANÇA ---------- */
-function atualizarResumo() {
-  const subtotalLabel = document.getElementById('co-subtotal');
-  const discountRow = document.getElementById('co-discount-row');
-  const totalLabel = document.getElementById('co-total');
-  const priceLabel = document.getElementById('co-price');
-  const priceSub = document.getElementById('co-price-sub');
-  const submitLabel = document.getElementById('checkout-submit-label');
-
-  if (ciclo === 'mensal') {
-    priceLabel.textContent = formatBRL(PRECO_MENSAL);
-    priceSub.textContent = '/mês';
-    subtotalLabel.textContent = formatBRL(PRECO_MENSAL);
-    discountRow.classList.add('hidden');
-    totalLabel.textContent = `${formatBRL(PRECO_MENSAL)}/mês`;
-    submitLabel.textContent = `Confirmar assinatura — ${formatBRL(PRECO_MENSAL)}/mês`;
-  } else {
-    const subtotalAnual = PRECO_MENSAL * 12;
-    const desconto = subtotalAnual * 0.2;
-    const total = subtotalAnual - desconto;
-
-    priceLabel.textContent = formatBRL(total / 12);
-    priceSub.textContent = '/mês no plano anual';
-    subtotalLabel.textContent = formatBRL(subtotalAnual);
-    document.getElementById('co-discount').textContent = `−${formatBRL(desconto)}`;
-    discountRow.classList.remove('hidden');
-    totalLabel.textContent = `${formatBRL(total)}/ano`;
-    submitLabel.textContent = `Confirmar assinatura — ${formatBRL(total)}/ano`;
-  }
+function mascararTelefone(valor) {
+  const d = apenasDigitos(valor).slice(0, 11);
+  if (d.length <= 10) return d.replace(/(\d{2})(\d{4})(\d{0,4})/, '($1) $2-$3').trim().replace(/-$/, '');
+  return d.replace(/(\d{2})(\d{5})(\d{0,4})/, '($1) $2-$3').trim().replace(/-$/, '');
 }
 
-document.querySelectorAll('#checkout-toggle .toggle-btn').forEach((btn) => {
-  btn.addEventListener('click', () => {
-    document.querySelectorAll('#checkout-toggle .toggle-btn').forEach((b) => b.classList.remove('active'));
-    btn.classList.add('active');
-    ciclo = btn.dataset.ciclo;
-    atualizarResumo();
-  });
-});
+function cpfValido(cpf) {
+  const d = apenasDigitos(cpf);
+  if (d.length !== 11 || /^(\d)\1{10}$/.test(d)) return false;
+
+  const calcularDigito = (tamanho) => {
+    let soma = 0;
+    for (let i = 0; i < tamanho; i++) soma += parseInt(d[i], 10) * (tamanho + 1 - i);
+    const resto = (soma * 10) % 11;
+    return resto === 10 ? 0 : resto;
+  };
+
+  return calcularDigito(9) === parseInt(d[9], 10) && calcularDigito(10) === parseInt(d[10], 10);
+}
+
+document.getElementById('co-cpf').addEventListener('input', (e) => { e.target.value = mascararCpf(e.target.value); });
+document.getElementById('co-telefone').addEventListener('input', (e) => { e.target.value = mascararTelefone(e.target.value); });
 
 /* ---------- ABAS DE PAGAMENTO ---------- */
 document.querySelectorAll('.method-tab').forEach((tab) => {
   tab.addEventListener('click', () => {
     document.querySelectorAll('.method-tab').forEach((t) => t.classList.remove('active'));
     tab.classList.add('active');
-
     document.querySelectorAll('.payment-panel').forEach((p) => p.classList.add('hidden'));
     document.getElementById(`panel-${tab.dataset.method}`).classList.remove('hidden');
   });
 });
 
-/* ---------- PREVIEW DO CARTÃO ---------- */
-const cardNumero = document.getElementById('card-numero');
-const cardNome = document.getElementById('card-nome');
-const cardValidade = document.getElementById('card-validade');
-const cardCvv = document.getElementById('card-cvv');
-const cardPreview = document.getElementById('card-preview');
+/* ---------- PLANOS ---------- */
+async function carregarPlanos() {
+  try {
+    planosCache = await Api.planos.listar();
+    renderPlanos();
+    document.getElementById('summary-teaser').classList.add('hidden');
+    document.getElementById('summary-plans').classList.remove('hidden');
+  } catch (err) {
+    showToast(err.message, 'error');
+  }
+}
 
-cardNumero.addEventListener('input', (e) => {
-  e.target.value = mascararCartao(e.target.value);
-  document.getElementById('cp-number').textContent = e.target.value || '•••• •••• •••• ••••';
-});
+function renderPlanos() {
+  const params = new URLSearchParams(window.location.search);
+  const planoQuery = (params.get('plano') || '').toLowerCase();
+  const preSelecionado = planosCache.find((p) => p.nome.toLowerCase().includes(planoQuery));
+  planoSelecionadoId = (preSelecionado || planosCache[0])?.id ?? null;
 
-cardNome.addEventListener('input', (e) => {
-  document.getElementById('cp-name').textContent = e.target.value.toUpperCase() || 'NOME COMPLETO';
-});
+  const container = document.getElementById('plan-options');
+  container.innerHTML = planosCache.map((p) => `
+    <label class="plan-option">
+      <input type="radio" name="plano" value="${p.id}" ${p.id === planoSelecionadoId ? 'checked' : ''}>
+      <div class="plan-option-body">
+        <div class="plan-option-nome">${p.nome}</div>
+        <div class="plan-option-preco">${formatBRL(p.preco)}<span>${p.intervalo_dias === 30 ? '/mês' : `/${p.intervalo_dias} dias`}</span></div>
+      </div>
+    </label>
+  `).join('');
 
-cardValidade.addEventListener('input', (e) => {
-  e.target.value = mascararValidade(e.target.value);
-  document.getElementById('cp-expiry').textContent = e.target.value || 'MM/AA';
-});
+  container.querySelectorAll('input[name="plano"]').forEach((input) => {
+    input.addEventListener('change', (e) => {
+      planoSelecionadoId = Number(e.target.value);
+      atualizarTotal();
+    });
+  });
 
-cardCvv.addEventListener('input', (e) => {
-  e.target.value = apenasDigitos(e.target.value).slice(0, 4);
-  document.getElementById('cp-cvv').textContent = e.target.value || '•••';
-});
+  atualizarTotal();
+}
 
-cardCvv.addEventListener('focus', () => cardPreview.classList.add('flipped'));
-cardCvv.addEventListener('blur', () => cardPreview.classList.remove('flipped'));
+function atualizarTotal() {
+  const plano = planosCache.find((p) => p.id === planoSelecionadoId);
+  if (!plano) return;
+  const sufixo = plano.intervalo_dias === 30 ? '/mês' : `/${plano.intervalo_dias} dias`;
+  document.getElementById('co-total').textContent = `${formatBRL(plano.preco)}${sufixo}`;
+  document.getElementById('checkout-submit-label').textContent = `Gerar Pix e assinar — ${formatBRL(plano.preco)}`;
+}
 
-document.getElementById('co-cpf').addEventListener('input', (e) => {
-  e.target.value = mascararCpf(e.target.value);
-});
+/* ---------- ETAPA 1: CONTA ---------- */
+async function iniciarEtapaCheckout() {
+  document.getElementById('account-form').classList.add('hidden');
+  document.getElementById('checkout-section').classList.remove('hidden');
+  await carregarPlanos();
+}
 
-/* ---------- CONTA (pular se já estiver logado) ---------- */
 if (Auth.isAuthenticated()) {
-  document.getElementById('checkout-account-fields').classList.add('hidden');
+  iniciarEtapaCheckout();
 }
 
-/* ---------- QUERY PARAMS ---------- */
-const params = new URLSearchParams(window.location.search);
-if (params.get('ciclo') === 'anual') {
-  document.querySelector('#checkout-toggle .toggle-btn[data-ciclo="anual"]').click();
-}
+document.getElementById('account-form').addEventListener('submit', async (e) => {
+  e.preventDefault();
 
-/* ---------- SUBMIT ---------- */
-function simularProcessamentoPagamento() {
-  return new Promise((resolve) => setTimeout(resolve, 1400));
-}
+  const nome = document.getElementById('co-nome').value.trim();
+  const email = document.getElementById('co-email').value.trim();
+  const senha = document.getElementById('co-senha').value;
 
+  if (!nome || !email || senha.length < 6) {
+    showToast('Preencha seus dados corretamente (senha com mínimo 6 caracteres).', 'error');
+    return;
+  }
+
+  const btn = document.getElementById('account-submit');
+  const label = document.getElementById('account-submit-label');
+  btn.disabled = true;
+  label.innerHTML = '<span class="spinner"></span>';
+
+  try {
+    await Api.register(nome, email, senha);
+    const { token, usuario } = await Api.login(email, senha);
+    Auth.setSession(token, usuario);
+    await iniciarEtapaCheckout();
+  } catch (err) {
+    showToast(err.message, 'error');
+    btn.disabled = false;
+    label.textContent = 'Criar conta e continuar';
+  }
+});
+
+/* ---------- ETAPA 2: GERAR PIX ---------- */
 document.getElementById('checkout-form').addEventListener('submit', async (e) => {
   e.preventDefault();
 
+  const cpf = document.getElementById('co-cpf').value;
+  const telefone = document.getElementById('co-telefone').value;
+
+  if (!planoSelecionadoId) {
+    showToast('Escolha um plano antes de continuar', 'error');
+    return;
+  }
+  if (!cpfValido(cpf)) {
+    showToast('CPF inválido', 'error');
+    return;
+  }
+  if (apenasDigitos(telefone).length < 10) {
+    showToast('Telefone inválido', 'error');
+    return;
+  }
+
+  const usuario = Auth.getUsuario();
   const btn = document.getElementById('checkout-submit');
   const label = document.getElementById('checkout-submit-label');
   const labelOriginal = label.textContent;
@@ -136,24 +166,15 @@ document.getElementById('checkout-form').addEventListener('submit', async (e) =>
   label.innerHTML = '<span class="spinner"></span>';
 
   try {
-    if (!Auth.isAuthenticated()) {
-      const nome = document.getElementById('co-nome').value.trim();
-      const email = document.getElementById('co-email').value.trim();
-      const senha = document.getElementById('co-senha').value;
+    const resposta = await Api.assinaturas.checkout({
+      planoId: planoSelecionadoId,
+      nome: usuario.nome,
+      cpf,
+      email: usuario.email,
+      telefone,
+    });
 
-      if (!nome || !email || senha.length < 6) {
-        throw new Error('Preencha seus dados de conta corretamente (senha com mínimo 6 caracteres).');
-      }
-
-      await Api.register(nome, email, senha);
-      const { token, usuario } = await Api.login(email, senha);
-      Auth.setSession(token, usuario);
-    }
-
-    await simularProcessamentoPagamento();
-
-    document.getElementById('checkout-active').classList.add('hidden');
-    document.getElementById('checkout-success').classList.remove('hidden');
+    mostrarPix(resposta);
   } catch (err) {
     showToast(err.message, 'error');
     btn.disabled = false;
@@ -161,4 +182,40 @@ document.getElementById('checkout-form').addEventListener('submit', async (e) =>
   }
 });
 
-atualizarResumo();
+/* ---------- ETAPA 3: PAGAR PIX + AGUARDAR ---------- */
+function mostrarPix(resposta) {
+  document.getElementById('checkout-section').classList.add('hidden');
+  document.getElementById('pix-result').classList.remove('hidden');
+  document.getElementById('pix-amount').textContent = formatBRL(resposta.valor);
+  document.getElementById('pix-code-text').textContent = resposta.pixCode;
+
+  pollHandle = setInterval(verificarPagamento, 4000);
+}
+
+document.getElementById('pix-copy').addEventListener('click', async () => {
+  const codigo = document.getElementById('pix-code-text').textContent;
+  try {
+    await navigator.clipboard.writeText(codigo);
+    showToast('Código Pix copiado', 'success');
+  } catch {
+    showToast('Não foi possível copiar automaticamente — selecione o código manualmente', 'error');
+  }
+});
+
+async function verificarPagamento() {
+  try {
+    const atual = await Api.assinaturas.atual();
+    if (!atual) return;
+
+    if (atual.status === 'ativa') {
+      clearInterval(pollHandle);
+      document.getElementById('pix-result').classList.add('hidden');
+      document.getElementById('checkout-success').classList.remove('hidden');
+    } else if (atual.status === 'cancelada') {
+      clearInterval(pollHandle);
+      document.getElementById('pix-status').innerHTML = '❌ Pagamento não foi aprovado. <a href="checkout.html">Tentar novamente</a>';
+    }
+  } catch {
+    /* erro de rede pontual durante o polling, tenta de novo no próximo tick */
+  }
+}

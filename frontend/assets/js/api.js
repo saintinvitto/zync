@@ -132,6 +132,15 @@ const Api = {
   ia: {
     simular: (leadId, conteudo) => apiRequest(`/leads/${leadId}/ia/responder`, { method: 'POST', body: { conteudo } }),
   },
+
+  planos: {
+    listar: () => apiRequest('/planos'),
+  },
+
+  assinaturas: {
+    checkout: (dados) => apiRequest('/assinaturas/checkout', { method: 'POST', body: dados }),
+    atual: () => apiRequest('/assinaturas/atual'),
+  },
 };
 
 async function downloadComAuth(path, filename) {

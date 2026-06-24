@@ -1105,26 +1105,41 @@ a { color: inherit; }
   margin-bottom: 1rem;
 }
 
-.checkout-price {
-  font-family: 'Space Grotesk', sans-serif;
-  font-size: 2.4rem;
-  font-weight: 700;
-  letter-spacing: -0.03em;
-  line-height: 1;
-  margin-bottom: 1.2rem;
-}
-.checkout-price-sub { font-size: 1rem; font-weight: 400; color: var(--cinza); }
-
-.checkout-toggle {
+.plan-options {
   display: flex;
-  background: var(--preto3);
-  border: 1px solid var(--borda);
-  border-radius: 100px;
-  padding: 4px;
-  margin-bottom: 1.4rem;
+  flex-direction: column;
+  gap: 0.6rem;
+  margin-bottom: 1rem;
 }
-.checkout-toggle .toggle-btn { flex: 1; white-space: nowrap; }
-.badge-economia { color: #A78BFA; font-size: 0.68rem; }
+
+.plan-option {
+  display: block;
+  cursor: pointer;
+}
+.plan-option input { position: absolute; opacity: 0; pointer-events: none; }
+
+.plan-option-body {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid var(--borda);
+  border-radius: 10px;
+  padding: 0.8rem 1rem;
+  transition: all 0.15s var(--ease);
+}
+.plan-option input:checked + .plan-option-body {
+  background: var(--roxo-bg);
+  border-color: var(--roxo-claro);
+}
+
+.plan-option-nome { font-size: 0.9rem; font-weight: 600; }
+.plan-option-preco {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 1rem;
+  font-weight: 700;
+}
+.plan-option-preco span { font-size: 0.75rem; font-weight: 400; color: var(--cinza); }
 
 .checkout-features {
   list-style: none;
@@ -1201,82 +1216,6 @@ a { color: inherit; }
 
 .payment-panel.hidden { display: none; }
 
-/* Cartão 3D */
-.card-preview {
-  width: 100%;
-  max-width: 360px;
-  height: 200px;
-  margin: 0 auto 1.6rem;
-  perspective: 1200px;
-}
-.card-preview-inner {
-  position: relative;
-  width: 100%;
-  height: 100%;
-  transition: transform 0.5s var(--ease);
-  transform-style: preserve-3d;
-}
-.card-preview.flipped .card-preview-inner { transform: rotateY(180deg); }
-
-.card-preview-front, .card-preview-back {
-  position: absolute;
-  inset: 0;
-  border-radius: 16px;
-  backface-visibility: hidden;
-  background: linear-gradient(135deg, #2A1F4D, #151225 60%, #0F0D1A);
-  border: 1px solid var(--glass-border);
-  box-shadow: 0 24px 60px rgba(0,0,0,0.5);
-  padding: 1.4rem 1.6rem;
-  color: var(--branco);
-}
-.card-preview-front::before {
-  content: '';
-  position: absolute;
-  top: -40%; right: -30%;
-  width: 220px; height: 220px;
-  background: radial-gradient(circle, rgba(124,58,237,0.4), transparent 70%);
-  pointer-events: none;
-}
-
-.card-chip {
-  width: 38px; height: 28px;
-  background: linear-gradient(135deg, #A78BFA, #7C3AED);
-  border-radius: 5px;
-  margin-bottom: 1.6rem;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 0.7rem;
-}
-
-.card-number {
-  font-family: 'Space Grotesk', sans-serif;
-  font-size: 1.25rem;
-  letter-spacing: 0.12em;
-  margin-bottom: 1.6rem;
-  white-space: nowrap;
-}
-
-.card-bottom { display: flex; justify-content: space-between; align-items: flex-end; }
-.card-name { font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.04em; opacity: 0.85; max-width: 65%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.card-expiry { font-size: 0.85rem; font-family: 'Space Grotesk', sans-serif; }
-
-.card-preview-back { transform: rotateY(180deg); }
-.card-stripe {
-  position: absolute;
-  top: 1.6rem; left: 0; right: 0;
-  height: 40px;
-  background: #07060E;
-}
-.card-cvv {
-  position: absolute;
-  top: 3.4rem; right: 1.6rem;
-  background: var(--branco);
-  color: var(--preto);
-  font-family: 'Space Grotesk', sans-serif;
-  font-size: 0.85rem;
-  padding: 0.3rem 0.8rem;
-  border-radius: 4px;
-}
-
 .pix-box, .boleto-box {
   border: 1px dashed var(--borda);
   border-radius: 12px;
@@ -1286,6 +1225,39 @@ a { color: inherit; }
   font-size: 0.9rem;
   margin-bottom: 1rem;
 }
+
+.pix-amount {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 2rem;
+  font-weight: 700;
+  text-align: center;
+  margin-bottom: 1.2rem;
+}
+
+.pix-code-box {
+  background: var(--preto3);
+  border: 1px solid var(--borda);
+  border-radius: 10px;
+  padding: 1rem;
+  font-size: 0.75rem;
+  color: var(--cinza);
+  word-break: break-all;
+  margin-bottom: 1rem;
+  max-height: 120px;
+  overflow-y: auto;
+}
+
+.pix-status {
+  text-align: center;
+  font-size: 0.85rem;
+  color: var(--roxo-claro);
+  margin-top: 1.2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+.pix-status a { color: var(--roxo-claro); text-decoration: underline; }
 
 .checkout-trust {
   text-align: center;
