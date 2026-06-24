@@ -110,6 +110,25 @@ const Api = {
   ia: {
     simular: (leadId, conteudo) => apiRequest(`/leads/${leadId}/ia/responder`, { method: 'POST', body: { conteudo } }),
   },
+
+  tags: {
+    listar: () => apiRequest('/tags'),
+    criar: (nome) => apiRequest('/tags', { method: 'POST', body: { nome } }),
+    remover: (id) => apiRequest(`/tags/${id}`, { method: 'DELETE' }),
+  },
+
+  leadTags: {
+    listar: (leadId) => apiRequest(`/leads/${leadId}/tags`),
+    associar: (leadId, tagId) => apiRequest(`/leads/${leadId}/tags`, { method: 'POST', body: { tagId } }),
+    remover: (leadId, tagId) => apiRequest(`/leads/${leadId}/tags/${tagId}`, { method: 'DELETE' }),
+  },
+
+  agendamentos: {
+    listarDoLead: (leadId) => apiRequest(`/leads/${leadId}/agendamentos`),
+    criar: (leadId, dados) => apiRequest(`/leads/${leadId}/agendamentos`, { method: 'POST', body: dados }),
+    atualizar: (id, dados) => apiRequest(`/agendamentos/${id}`, { method: 'PUT', body: dados }),
+    remover: (id) => apiRequest(`/agendamentos/${id}`, { method: 'DELETE' }),
+  },
 };
 
 function showToast(message, type = 'success') {
