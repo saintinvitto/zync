@@ -4,6 +4,7 @@ const helmet = require('helmet');
 require('dotenv').config();
 
 const routes = require('./routes');
+const { apiLimiter } = require('./middleware/rateLimiter');
 const { tratarErro, rotaNaoEncontrada } = require('./middleware/errorMiddleware');
 
 const app = express();
@@ -27,7 +28,7 @@ app.use(
   })
 );
 app.use(express.json({ limit: '3mb' }));
-app.use('/api', routes);
+app.use('/api', apiLimiter, routes);
 app.use(rotaNaoEncontrada);
 app.use(tratarErro);
 
