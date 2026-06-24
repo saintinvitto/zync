@@ -96,11 +96,28 @@ const Api = {
   dashboard: () => apiRequest('/dashboard'),
 
   leads: {
-    listar: () => apiRequest('/leads'),
+    listar: (tagId) => apiRequest(tagId ? `/leads?tagId=${encodeURIComponent(tagId)}` : '/leads'),
     buscar: (id) => apiRequest(`/leads/${id}`),
     criar: (dados) => apiRequest('/leads', { method: 'POST', body: dados }),
     atualizar: (id, dados) => apiRequest(`/leads/${id}`, { method: 'PUT', body: dados }),
     remover: (id) => apiRequest(`/leads/${id}`, { method: 'DELETE' }),
+  },
+
+  tags: {
+    listar: () => apiRequest('/tags'),
+    criar: (nome) => apiRequest('/tags', { method: 'POST', body: { nome } }),
+    remover: (id) => apiRequest(`/tags/${id}`, { method: 'DELETE' }),
+    doLead: (leadId) => apiRequest(`/leads/${leadId}/tags`),
+    associar: (leadId, tagId) => apiRequest(`/leads/${leadId}/tags`, { method: 'POST', body: { tagId } }),
+    desassociar: (leadId, tagId) => apiRequest(`/leads/${leadId}/tags/${tagId}`, { method: 'DELETE' }),
+  },
+
+  agendamentos: {
+    listarTodos: () => apiRequest('/agendamentos'),
+    doLead: (leadId) => apiRequest(`/leads/${leadId}/agendamentos`),
+    criar: (leadId, dados) => apiRequest(`/leads/${leadId}/agendamentos`, { method: 'POST', body: dados }),
+    atualizar: (id, dados) => apiRequest(`/agendamentos/${id}`, { method: 'PUT', body: dados }),
+    remover: (id) => apiRequest(`/agendamentos/${id}`, { method: 'DELETE' }),
   },
 
   mensagens: {

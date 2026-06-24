@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Agenda — Zync</title>
+<link rel="stylesheet" href="../assets/css/app.css">
+</head>
+<body>
+
+<div class="app-shell">
+  <aside class="app-sidebar">
+    <div class="sidebar-logo">Zy<span>nc</span></div>
+
+    <nav class="sidebar-nav">
+      <a href="dashboard.html#stats" class="sidebar-item">📊 Visão geral</a>
+      <a href="dashboard.html#kanban" class="sidebar-item">👥 Leads</a>
+      <a href="agenda.html" class="sidebar-item active">📅 Agenda</a>
+      <a href="perfil.html" class="sidebar-item">👤 Perfil</a>
+      <a href="../index.html" class="sidebar-item">🌐 Site</a>
+    </nav>
+
+    <div class="sidebar-user">
+      <div class="sidebar-avatar" id="user-avatar">--</div>
+      <div class="sidebar-user-info">
+        <div class="sidebar-user-name" id="user-name">—</div>
+        <div class="sidebar-user-email" id="user-email">—</div>
+      </div>
+      <button class="sidebar-logout" id="logout-btn" title="Sair">⏻</button>
+    </div>
+  </aside>
+
+  <main class="app-main">
+    <div class="app-topbar">
+      <div>
+        <div class="app-title">Agenda</div>
+        <div class="app-title-sub">Todos os agendamentos, de todos os leads, em ordem.</div>
+      </div>
+      <button class="btn btn-primary" id="open-new-agendamento">+ Novo agendamento</button>
+    </div>
+
+    <div class="agenda-list" id="agenda-list">
+      <div class="empty-state">
+        <div class="empty-state-icon">📅</div>
+        <div><span class="spinner"></span></div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- Modal: novo agendamento -->
+<div class="modal-overlay" id="agendamento-modal">
+  <div class="modal-box">
+    <div class="modal-header">
+      <div class="modal-title">Novo agendamento</div>
+      <button class="modal-close" data-close-modal aria-label="Fechar">✕</button>
+    </div>
+
+    <form id="new-agendamento-form" novalidate>
+      <div class="field">
+        <label for="ag-lead">Lead *</label>
+        <select id="ag-lead" required>
+          <option value="">Selecione um lead…</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label for="ag-servico">Serviço</label>
+        <input type="text" id="ag-servico" placeholder="Ex: Avaliação inicial">
+      </div>
+
+      <div class="field">
+        <label for="ag-data">Data e hora *</label>
+        <input type="datetime-local" id="ag-data" required>
+      </div>
+
+      <div class="modal-actions">
+        <button type="button" class="btn btn-secondary" data-close-modal>Cancelar</button>
+        <button type="submit" class="btn btn-primary" id="ag-submit"><span id="ag-submit-label">Agendar</span></button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script src="../assets/js/api.js"></script>
+<script src="../assets/js/app-shell.js"></script>
+<script src="../assets/js/agenda.js"></script>
+
+</body>
+</html>

@@ -17,6 +17,9 @@ let leadsCache = [];
 let currentLeadId = null;
 let panelMode = 'humano';
 let leadsFiltro = { termo: '', origem: '' };
+let tagsCache = [];
+let leadsTagFiltro = '';
+let panelTagsCache = [];
 let cmdkItems = [];
 let cmdkIndex = 0;
 
@@ -45,7 +48,7 @@ async function loadDashboard() {
 /* ---------- KANBAN ---------- */
 async function loadLeads() {
   try {
-    leadsCache = await Api.leads.listar();
+    leadsCache = await Api.leads.listar(leadsTagFiltro || undefined);
     popularFiltroOrigem();
     renderKanban();
     renderSparkline();
@@ -82,6 +85,93 @@ document.getElementById('kanban-search').addEventListener('input', (e) => {
 document.getElementById('kanban-filter-origem').addEventListener('change', (e) => {
   leadsFiltro.origem = e.target.value;
   renderKanban();
+});
+
+document.getElementById('kanban-filter-tag').addEventListener('change', (e) => {
+  leadsTagFiltro = e.target.value;
+  loadLeads();
+});
+
+/* ---------- TAGS ---------- */
+async function loadTags() {
+  try {
+    tagsCache = await Api.tags.listar();
+    popularFiltroTag();
+  } catch (err) {
+    showToast(err.message, 'error');
+  }
+}
+
+function popularFiltroTag() {
+  const select = document.getElementById('kanban-filter-tag');
+  const atual = select.value;
+  select.innerHTML = '<option value="">Todas as tags</option>' + tagsCache.map((t) => `<option value="${t.id}">${escapeHtml(t.nome)}</option>`).join('');
+  const aindaExiste = tagsCache.some((t) => String(t.id) === atual);
+  select.value = aindaExiste ? atual : '';
+  if (!aindaExiste) leadsTagFiltro = '';
+}
+
+const tagModal = document.getElementById('tag-modal');
+
+function abrirTagModal() {
+  tagModal.classList.add('visible');
+  renderTagManageList();
+  document.getElementById('nt-nome').focus();
+}
+
+function fecharTagModal() {
+  tagModal.classList.remove('visible');
+  document.getElementById('new-tag-form').reset();
+}
+
+document.getElementById('open-tags').addEventListener('click', abrirTagModal);
+tagModal.querySelectorAll('[data-close-modal]').forEach((el) => el.addEventListener('click', fecharTagModal));
+tagModal.addEventListener('click', (e) => { if (e.target === tagModal) fecharTagModal(); });
+
+function renderTagManageList() {
+  const list = document.getElementById('tag-manage-list');
+  if (tagsCache.length === 0) {
+    list.innerHTML = '<div class="tag-manage-empty">Nenhuma tag ainda. Crie a primeira abaixo.</div>';
+    return;
+  }
+
+  list.innerHTML = tagsCache.map((t) => `
+    <span class="tag-chip">${escapeHtml(t.nome)} <button type="button" class="tag-chip-remove" data-tag-id="${t.id}" aria-label="Excluir tag ${escapeHtml(t.nome)}">✕</button></span>
+  `).join('');
+
+  list.querySelectorAll('.tag-chip-remove').forEach((btn) => {
+    btn.addEventListener('click', async () => {
+      const tagId = btn.dataset.tagId;
+      if (!confirm('Excluir esta tag? Ela será removida de todos os leads.')) return;
+
+      try {
+        await Api.tags.remover(tagId);
+        await loadTags();
+        renderTagManageList();
+        showToast('Tag excluída', 'success');
+        loadLeads();
+      } catch (err) {
+        showToast(err.message, 'error');
+      }
+    });
+  });
+}
+
+document.getElementById('new-tag-form').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const input = document.getElementById('nt-nome');
+  const nome = input.value.trim();
+  if (!nome) return;
+
+  try {
+    await Api.tags.criar(nome);
+    input.value = '';
+    await loadTags();
+    renderTagManageList();
+    showToast('Tag criada', 'success');
+  } catch (err) {
+    showToast(err.message, 'error');
+  }
 });
 
 /* ---------- GRÁFICO (SPARKLINE) ---------- */
@@ -181,12 +271,6 @@ function criarLeadCard(lead) {
   card.addEventListener('dragend', () => card.classList.remove('dragging'));
 
   return card;
-}
-
-function escapeHtml(str) {
-  const div = document.createElement('div');
-  div.textContent = str ?? '';
-  return div.innerHTML;
 }
 
 let dragLeadId = null;
@@ -331,6 +415,7 @@ async function abrirPainel(leadId) {
 
   setModo('humano');
   await carregarMensagens(leadId);
+  await carregarTagsDoLead(leadId);
 }
 
 function fecharPainel() {
@@ -416,6 +501,51 @@ document.getElementById('panel-status').addEventListener('change', async (e) => 
   }
 });
 
+async function carregarTagsDoLead(leadId) {
+  try {
+    panelTagsCache = await Api.tags.doLead(leadId);
+    renderPanelTags();
+  } catch (err) {
+    showToast(err.message, 'error');
+  }
+}
+
+function renderPanelTags() {
+  const lista = document.getElementById('panel-tags');
+  lista.innerHTML = panelTagsCache.map((t) => `
+    <span class="tag-chip">${escapeHtml(t.nome)} <button type="button" class="tag-chip-remove" data-tag-id="${t.id}" aria-label="Remover tag ${escapeHtml(t.nome)}">✕</button></span>
+  `).join('');
+
+  lista.querySelectorAll('.tag-chip-remove').forEach((btn) => {
+    btn.addEventListener('click', async () => {
+      try {
+        await Api.tags.desassociar(currentLeadId, btn.dataset.tagId);
+        await carregarTagsDoLead(currentLeadId);
+        showToast('Tag removida do lead', 'success');
+      } catch (err) {
+        showToast(err.message, 'error');
+      }
+    });
+  });
+
+  const select = document.getElementById('panel-tag-add');
+  const disponiveis = tagsCache.filter((t) => !panelTagsCache.some((pt) => pt.id === t.id));
+  select.innerHTML = '<option value="">+ tag</option>' + disponiveis.map((t) => `<option value="${t.id}">${escapeHtml(t.nome)}</option>`).join('');
+}
+
+document.getElementById('panel-tag-add').addEventListener('change', async (e) => {
+  const tagId = e.target.value;
+  if (!tagId || !currentLeadId) return;
+
+  try {
+    await Api.tags.associar(currentLeadId, tagId);
+    await carregarTagsDoLead(currentLeadId);
+    showToast('Tag adicionada', 'success');
+  } catch (err) {
+    showToast(err.message, 'error');
+  }
+});
+
 document.getElementById('panel-delete').addEventListener('click', async () => {
   if (!currentLeadId) return;
   if (!confirm('Tem certeza que deseja excluir este lead? Essa ação não pode ser desfeita.')) return;
@@ -495,6 +625,9 @@ function getCmdkAcoes() {
     { icon: '📊', label: 'Ir para Visão geral', hint: 'Ação', run: () => document.getElementById('stats').scrollIntoView({ behavior: 'smooth' }) },
     { icon: '👥', label: 'Ir para Leads (kanban)', hint: 'Ação', run: () => document.getElementById('kanban').scrollIntoView({ behavior: 'smooth' }) },
     { icon: '➕', label: 'Criar novo lead', hint: 'Ação', run: () => abrirModal() },
+    { icon: '🏷️', label: 'Gerenciar tags', hint: 'Ação', run: () => abrirTagModal() },
+    { icon: '📅', label: 'Ir para Agenda', hint: 'Ação', run: () => { window.location.href = 'agenda.html'; } },
+    { icon: '👤', label: 'Ir para Perfil', hint: 'Ação', run: () => { window.location.href = 'perfil.html'; } },
     { icon: '↻', label: 'Atualizar dados', hint: 'Ação', run: () => { loadLeads(); loadDashboard(); } },
     { icon: '⏻', label: 'Sair da conta', hint: 'Ação', run: () => Auth.logout() },
   ];
@@ -598,3 +731,4 @@ document.querySelectorAll('.sidebar-item[data-nav]').forEach((item) => {
 /* ---------- INIT ---------- */
 loadDashboard();
 loadLeads();
+loadTags();

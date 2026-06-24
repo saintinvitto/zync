@@ -881,6 +881,106 @@ a { color: inherit; }
 }
 .timeline-status strong { color: var(--roxo-claro); }
 
+/* ---------- TAGS ---------- */
+.tag-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  background: var(--roxo-bg);
+  border: 1px solid var(--borda);
+  color: var(--roxo-claro);
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 0.2rem 0.5rem;
+  border-radius: 100px;
+}
+.tag-chip-remove {
+  background: none;
+  border: none;
+  color: var(--roxo-claro);
+  cursor: pointer;
+  font-size: 0.75rem;
+  line-height: 1;
+  padding: 0;
+  opacity: 0.7;
+}
+.tag-chip-remove:hover { opacity: 1; }
+
+.panel-tags-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-top: 0.8rem;
+}
+.panel-tags { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+.panel-tags-row select {
+  background: var(--preto3);
+  border: 1px solid var(--borda);
+  border-radius: 100px;
+  padding: 0.2rem 0.6rem;
+  font-size: 0.72rem;
+  color: var(--cinza);
+  cursor: pointer;
+}
+
+.tag-manage-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1.2rem;
+  min-height: 32px;
+}
+.tag-manage-empty { color: var(--cinza); font-size: 0.82rem; }
+.tag-manage-form { display: flex; gap: 0.6rem; }
+.tag-manage-form input { flex: 1; }
+
+/* ---------- AGENDA ---------- */
+.badge-agendado { background: rgba(167,139,250,0.15); color: var(--roxo-claro); }
+.badge-confirmado { background: rgba(96,165,250,0.15); color: var(--azul); }
+.badge-cancelado { background: rgba(248,113,113,0.15); color: var(--vermelho); }
+.badge-concluido { background: rgba(52,211,153,0.15); color: var(--verde); }
+
+.agenda-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+}
+
+.agenda-row {
+  background: var(--preto3);
+  border: 1px solid var(--borda);
+  border-radius: var(--radius);
+  padding: 1rem 1.2rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.agenda-date {
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 700;
+  font-size: 0.95rem;
+  min-width: 150px;
+}
+.agenda-date-sub { font-size: 0.72rem; color: var(--cinza); font-weight: 400; }
+
+.agenda-info { flex: 1; min-width: 160px; }
+.agenda-lead { font-weight: 600; font-size: 0.9rem; }
+.agenda-servico { font-size: 0.8rem; color: var(--cinza); }
+
+.agenda-actions { display: flex; align-items: center; gap: 0.6rem; }
+.agenda-actions select {
+  background: var(--preto2);
+  border: 1px solid var(--borda);
+  border-radius: 8px;
+  padding: 0.4rem 0.6rem;
+  font-size: 0.8rem;
+  color: var(--branco);
+  cursor: pointer;
+}
+
 /* ---------- RESPONSIVE ---------- */
 @media (max-width: 1100px) {
   .stats-grid { grid-template-columns: repeat(2, 1fr); }
@@ -909,4 +1009,6 @@ a { color: inherit; }
   .field-row { grid-template-columns: 1fr; }
   .kanban-filters { flex-direction: column; }
   .kanban-filters select { width: 100%; }
+  .agenda-row { flex-direction: column; align-items: flex-start; }
+  .agenda-actions { width: 100%; justify-content: space-between; }
 }
