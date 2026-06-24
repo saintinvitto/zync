@@ -8,7 +8,8 @@ CREATE TABLE IF NOT EXISTS usuarios (
   senha_hash VARCHAR(255) NOT NULL,
   criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   reset_token_hash VARCHAR(64) NULL,
-  reset_token_expira DATETIME NULL
+  reset_token_expira DATETIME NULL,
+  KEY idx_usuarios_reset_token (reset_token_hash)
 );
 
 CREATE TABLE IF NOT EXISTS leads (
@@ -24,7 +25,8 @@ CREATE TABLE IF NOT EXISTS leads (
   fechado_em DATETIME NULL,
   FOREIGN KEY (usuario_id) REFERENCES usuarios(id),
   UNIQUE KEY idx_leads_usuario_telefone (usuario_id, telefone),
-  KEY idx_leads_usuario_criado (usuario_id, criado_em)
+  KEY idx_leads_usuario_criado (usuario_id, criado_em),
+  KEY idx_leads_usuario_status_fechado (usuario_id, status, fechado_em)
 );
 
 CREATE TABLE IF NOT EXISTS mensagens (
