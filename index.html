@@ -20,6 +20,9 @@
     --cinza: rgba(255,255,255,0.55);
     --cinza2: rgba(255,255,255,0.08);
     --borda: rgba(124,58,237,0.2);
+    --glass-bg: rgba(21,18,37,0.45);
+    --glass-bg-strong: rgba(21,18,37,0.55);
+    --glass-border: rgba(124,58,237,0.28);
   }
 
   * { margin:0; padding:0; box-sizing:border-box; }
@@ -42,8 +45,35 @@
       linear-gradient(rgba(124,58,237,0.03) 1px, transparent 1px),
       linear-gradient(90deg, rgba(124,58,237,0.03) 1px, transparent 1px);
     background-size: 48px 48px;
+    background-position: 0 calc(var(--scroll, 0) * 1px);
     pointer-events: none;
     z-index: 0;
+  }
+
+  /* PARTICLES */
+  .particles {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    overflow: hidden;
+    z-index: 0;
+  }
+
+  .particle {
+    position: absolute;
+    bottom: -10px;
+    border-radius: 50%;
+    background: var(--roxo-claro);
+    box-shadow: 0 0 6px var(--roxo-claro), 0 0 12px var(--roxo-glow);
+    opacity: 0;
+    animation: float-up linear infinite;
+  }
+
+  @keyframes float-up {
+    0% { transform: translateY(0) translateX(0); opacity: 0; }
+    10% { opacity: 0.7; }
+    85% { opacity: 0.4; }
+    100% { transform: translateY(-110vh) translateX(var(--drift, 40px)); opacity: 0; }
   }
 
   /* NAV */
@@ -118,6 +148,13 @@
     overflow: hidden;
   }
 
+  .orb-parallax {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
   .hero-orb {
     position: absolute;
     top: 50%;
@@ -141,6 +178,8 @@
     align-items: center;
     gap: 0.5rem;
     background: var(--roxo-bg);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
     border: 1px solid var(--borda);
     border-radius: 100px;
     padding: 0.35rem 1rem;
@@ -284,11 +323,14 @@
   .mockup {
     max-width: 900px;
     margin: 0 auto;
-    background: var(--preto3);
+    background: var(--glass-bg-strong);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
     border: 1px solid var(--borda);
     border-radius: 16px;
     overflow: hidden;
     box-shadow: 0 40px 120px rgba(0,0,0,0.7), 0 0 60px rgba(124,58,237,0.15);
+    will-change: transform;
   }
 
   .mockup-bar {
@@ -493,13 +535,16 @@
   }
 
   .feat-card {
-    background: var(--preto3);
-    border: 1px solid var(--borda);
+    background: var(--glass-bg);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid var(--glass-border);
     border-radius: 14px;
     padding: 2rem;
-    transition: all 0.3s;
+    transition: border-color 0.3s, box-shadow 0.3s;
     position: relative;
     overflow: hidden;
+    will-change: transform;
   }
 
   .feat-card::before {
@@ -516,8 +561,7 @@
 
   .feat-card:hover {
     border-color: var(--roxo-claro);
-    transform: translateY(-4px);
-    box-shadow: 0 20px 60px rgba(124,58,237,0.15);
+    box-shadow: 0 20px 60px rgba(124,58,237,0.2);
   }
 
   .feat-icon {
@@ -531,6 +575,11 @@
     justify-content: center;
     margin-bottom: 1.2rem;
     font-size: 1.2rem;
+    transition: transform 0.35s ease;
+  }
+
+  .feat-card:hover .feat-icon {
+    transform: scale(1.12) rotate(-6deg);
   }
 
   .feat-title {
@@ -556,7 +605,9 @@
 
   .toggle-wrap {
     display: inline-flex;
-    background: var(--preto3);
+    background: var(--glass-bg);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
     border: 1px solid var(--borda);
     border-radius: 100px;
     padding: 4px;
@@ -589,15 +640,25 @@
   }
 
   .price-card {
-    background: var(--preto3);
-    border: 1px solid var(--borda);
+    background: var(--glass-bg);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid var(--glass-border);
     border-radius: 16px;
     padding: 2rem;
-    transition: all 0.3s;
+    transition: border-color 0.3s, box-shadow 0.3s;
+    will-change: transform;
+  }
+
+  .price-card:hover {
+    border-color: var(--roxo-claro);
+    box-shadow: 0 20px 60px rgba(124,58,237,0.18);
   }
 
   .price-card.featured {
-    background: linear-gradient(135deg, rgba(124,58,237,0.15), rgba(91,33,182,0.1));
+    background: linear-gradient(135deg, rgba(124,58,237,0.2), rgba(91,33,182,0.12));
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
     border-color: var(--roxo-claro);
     box-shadow: 0 0 60px rgba(124,58,237,0.2);
     position: relative;
@@ -818,7 +879,7 @@
 </nav>
 
 <section class="hero">
-  <div class="hero-orb"></div>
+  <div class="orb-parallax"><div class="hero-orb"></div></div>
 
   <div class="hero-badge">
     <div class="badge-dot"></div>
@@ -1044,6 +1105,63 @@
   }, { threshold: 0.1 });
 
   document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+  // PARTICLES
+  const particlesEl = document.createElement('div');
+  particlesEl.className = 'particles';
+  document.body.prepend(particlesEl);
+
+  for (let i = 0; i < 36; i++) {
+    const p = document.createElement('div');
+    p.className = 'particle';
+    const size = Math.random() * 3 + 2;
+    p.style.width = `${size}px`;
+    p.style.height = `${size}px`;
+    p.style.left = `${Math.random() * 100}%`;
+    p.style.setProperty('--drift', `${(Math.random() - 0.5) * 140}px`);
+    p.style.animationDuration = `${Math.random() * 14 + 10}s`;
+    p.style.animationDelay = `${Math.random() * -20}s`;
+    particlesEl.appendChild(p);
+  }
+
+  // MOUSE PARALLAX (hero orb)
+  const orbParallax = document.querySelector('.orb-parallax');
+  if (orbParallax) {
+    document.querySelector('.hero').addEventListener('mousemove', (e) => {
+      const x = (e.clientX / window.innerWidth - 0.5) * 50;
+      const y = (e.clientY / window.innerHeight - 0.5) * 50;
+      orbParallax.style.transform = `translate(${x}px, ${y}px)`;
+    });
+  }
+
+  // SCROLL PARALLAX (background grid + mockup depth)
+  const mockupWrap = document.querySelector('.mockup-wrap');
+  window.addEventListener('scroll', () => {
+    document.documentElement.style.setProperty('--scroll', window.scrollY * 0.15);
+    if (mockupWrap) {
+      const rect = mockupWrap.getBoundingClientRect();
+      mockupWrap.style.transform = `translateY(${rect.top * 0.04}px)`;
+    }
+  }, { passive: true });
+
+  // 3D TILT
+  function apply3DTilt(selector, intensity) {
+    document.querySelectorAll(selector).forEach((el) => {
+      el.addEventListener('mousemove', (e) => {
+        const rect = el.getBoundingClientRect();
+        const px = (e.clientX - rect.left) / rect.width - 0.5;
+        const py = (e.clientY - rect.top) / rect.height - 0.5;
+        el.style.transform = `perspective(900px) rotateX(${-py * intensity}deg) rotateY(${px * intensity}deg) translateY(-4px)`;
+      });
+      el.addEventListener('mouseleave', () => {
+        el.style.transform = '';
+      });
+    });
+  }
+
+  apply3DTilt('.feat-card', 8);
+  apply3DTilt('.price-card', 6);
+  apply3DTilt('.mockup', 5);
 </script>
 
 </body>
