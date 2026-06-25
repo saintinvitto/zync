@@ -17,6 +17,7 @@ CREATE TABLE IF NOT EXISTS usuarios (
   instagram VARCHAR(120) NULL,
   facebook VARCHAR(120) NULL,
   telefone VARCHAR(20) NULL,
+  nome_empresa VARCHAR(120) NULL,
   senha_alterada_em TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 

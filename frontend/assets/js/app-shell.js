@@ -67,14 +67,14 @@ function renderUsuario() {
   const topbarNome = document.getElementById('topbar-nome');
   if (topbarNome) topbarNome.textContent = `, ${usuario.nome.split(' ')[0]}`;
 
-  const ehPaginaAdmin = window.location.pathname.endsWith('admin.html');
+  const ehPaginaAdmin = window.location.pathname.split('/').pop().startsWith('admin');
   const nav = document.querySelector('.sidebar-nav');
   if (Auth.isAdmin() && !ehPaginaAdmin && nav && !nav.querySelector('[data-admin-link]')) {
     const link = document.createElement('a');
     link.href = 'admin.html';
     link.className = 'sidebar-item';
     link.dataset.adminLink = 'true';
-    link.innerHTML = `${icon('settings', 18)} Admin do SaaS`;
+    link.innerHTML = `${icon('settings', 18)} <span data-i18n="nav.adminSaas">Admin do SaaS</span>`;
     nav.appendChild(link);
   }
 }
@@ -213,3 +213,4 @@ document.getElementById('logout-btn').addEventListener('click', () => Auth.logou
 })();
 
 renderUsuario();
+Lang.aplicar();

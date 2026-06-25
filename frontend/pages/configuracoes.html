@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<script src="../assets/js/theme.js"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Configurações — Zync</title>
+<link rel="stylesheet" href="../assets/css/app.css">
+</head>
+<body>
+
+<div class="app-shell">
+  <aside class="app-sidebar">
+    <div class="sidebar-logo"><span>Zync</span></div>
+
+    <nav class="sidebar-nav">
+      <a href="dashboard.html#stats" class="sidebar-item" data-icon="dashboard"> <span data-i18n="nav.visaoGeral">Visão geral</span></a>
+      <a href="dashboard.html#analises" class="sidebar-item" data-icon="trendingUp"> <span data-i18n="nav.analises">Análises</span></a>
+      <a href="dashboard.html#kanban" class="sidebar-item" data-icon="users"> <span data-i18n="nav.leads">Leads</span></a>
+      <a href="agenda.html" class="sidebar-item" data-icon="calendar"> <span data-i18n="nav.agenda">Agenda</span></a>
+
+      <div class="sidebar-divider"></div>
+
+      <a href="configuracoes.html" class="sidebar-item active" data-icon="settings"> <span data-i18n="nav.configuracoes">Configurações</span></a>
+      <a href="suporte.html" class="sidebar-item" data-icon="messageCircle"> <span data-i18n="nav.suporte">Suporte</span></a>
+    </nav>
+
+    <div class="sidebar-user">
+      <div class="sidebar-avatar" id="user-avatar">--</div>
+      <div class="sidebar-user-info">
+        <div class="sidebar-user-name" id="user-name">—</div>
+        <div class="sidebar-user-email" id="user-email">—</div>
+      </div>
+      <button class="sidebar-logout" id="logout-btn" title="Sair" data-icon="logOut"></button>
+    </div>
+  </aside>
+
+  <main class="app-main">
+    <div class="app-topbar">
+      <div>
+        <div class="app-title" data-i18n="config.titulo">Configurações</div>
+        <div class="app-title-sub" data-i18n="config.subtitulo">Gerencie sua conta, idioma e tema do site.</div>
+      </div>
+    </div>
+
+    <div class="settings-tabs">
+      <button type="button" class="settings-tab active" data-tab="perfil" data-i18n="config.tabPerfil">Perfil/Usuário</button>
+      <button type="button" class="settings-tab" data-tab="idioma" data-i18n="config.tabIdioma">Idioma</button>
+      <button type="button" class="settings-tab" data-tab="tema" data-i18n="config.tabTema">Tema</button>
+    </div>
+
+    <div class="settings-panel active" data-panel="perfil">
+      <section class="chart-card" style="max-width: 560px;">
+        <div class="chart-card-header">
+          <div class="chart-title">Informações da conta</div>
+        </div>
+        <form id="form-perfil" novalidate>
+          <div class="field-row">
+            <div class="field">
+              <label for="perfil-nome">Nome</label>
+              <input type="text" id="perfil-nome" required>
+            </div>
+            <div class="field">
+              <label for="perfil-email">E-mail</label>
+              <input type="email" id="perfil-email" required>
+            </div>
+          </div>
+          <button type="submit" class="btn btn-primary" id="perfil-submit">
+            <span id="perfil-submit-label">Salvar alterações</span>
+          </button>
+        </form>
+      </section>
+
+      <section class="chart-card" style="max-width: 560px;">
+        <div class="chart-card-header">
+          <div class="chart-title">Informações pessoais</div>
+        </div>
+        <form id="form-pessoal" novalidate>
+          <div class="field">
+            <label>Foto de perfil</label>
+            <div class="foto-upload-row">
+              <div class="foto-preview" id="foto-preview">--</div>
+              <div class="foto-upload-actions">
+                <button type="button" class="btn btn-secondary btn-sm" id="foto-escolher" data-icon="camera"> Escolher foto</button>
+                <button type="button" class="btn btn-ghost btn-sm hidden" id="foto-remover" data-icon="x"> Remover foto</button>
+                <input type="file" id="foto-input" accept="image/*" class="hidden">
+              </div>
+            </div>
+          </div>
+          <div class="field">
+            <label for="perfil-nome-empresa">Nome da empresa</label>
+            <input type="text" id="perfil-nome-empresa" placeholder="Ex: Studio Beleza & Cia">
+          </div>
+          <div class="field-row">
+            <div class="field">
+              <label for="perfil-idade">Idade</label>
+              <input type="number" id="perfil-idade" min="0" max="130">
+            </div>
+            <div class="field">
+              <label for="perfil-cpf">CPF</label>
+              <input type="text" id="perfil-cpf" inputmode="numeric" placeholder="000.000.000-00" maxlength="14">
+            </div>
+          </div>
+          <div class="field">
+            <label for="perfil-telefone">Telefone</label>
+            <input type="text" id="perfil-telefone" inputmode="numeric" placeholder="(11) 99999-9999" maxlength="15">
+          </div>
+          <div class="field-row">
+            <div class="field">
+              <label for="perfil-instagram">Instagram</label>
+              <input type="text" id="perfil-instagram" placeholder="@seuusuario">
+            </div>
+            <div class="field">
+              <label for="perfil-facebook">Facebook</label>
+              <input type="text" id="perfil-facebook" placeholder="facebook.com/seuusuario">
+            </div>
+          </div>
+          <button type="submit" class="btn btn-primary" id="pessoal-submit">
+            <span id="pessoal-submit-label">Salvar informações</span>
+          </button>
+        </form>
+      </section>
+
+      <section class="chart-card" style="max-width: 480px;">
+        <div class="chart-card-header">
+          <div class="chart-title">Alterar senha</div>
+        </div>
+        <form id="form-senha" novalidate>
+          <div class="field">
+            <label for="senha-atual">Senha atual</label>
+            <input type="password" id="senha-atual" required autocomplete="current-password">
+          </div>
+          <div class="field">
+            <label for="senha-nova">Nova senha</label>
+            <input type="password" id="senha-nova" required minlength="8" autocomplete="new-password" placeholder="Mínimo 8 caracteres, com letras e números">
+          </div>
+          <div class="field">
+            <label for="senha-confirmar">Confirmar nova senha</label>
+            <input type="password" id="senha-confirmar" required minlength="8" autocomplete="new-password">
+          </div>
+          <button type="submit" class="btn btn-primary" id="senha-submit">
+            <span id="senha-submit-label">Alterar senha</span>
+          </button>
+        </form>
+      </section>
+
+      <section class="chart-card" style="max-width: 680px;">
+        <div class="chart-card-header">
+          <div class="chart-title">Integrações (Webhooks)</div>
+          <button type="button" class="btn btn-secondary btn-sm" id="integracao-nova" data-icon="plus"> Nova integração</button>
+        </div>
+        <p style="color:var(--cinza); font-size:0.85rem; margin-bottom:1rem; max-width:520px;">
+          Conecte o Zync a outras ferramentas (ERP, automações, planilhas). Sempre
+          que um evento escolhido acontecer na sua conta, o Zync envia um POST
+          assinado pra URL cadastrada.
+        </p>
+        <div class="integracao-list" id="integracoes-list"></div>
+      </section>
+    </div>
+
+    <div class="settings-panel" data-panel="idioma">
+      <section class="chart-card" style="max-width: 480px;">
+        <div class="chart-card-header">
+          <div class="chart-title" data-i18n="config.idiomaTitulo">Idioma do site</div>
+        </div>
+        <p style="color:var(--cinza); font-size:0.85rem; margin-bottom:1rem;" data-i18n="config.idiomaDesc">
+          Escolha o idioma usado na navegação e nas telas de configuração.
+        </p>
+        <div class="field">
+          <label for="config-idioma">Idioma</label>
+          <select id="config-idioma">
+            <option value="pt">Português</option>
+            <option value="en">English</option>
+            <option value="es">Español</option>
+          </select>
+        </div>
+      </section>
+    </div>
+
+    <div class="settings-panel" data-panel="tema">
+      <section class="chart-card" style="max-width: 480px;">
+        <div class="chart-card-header">
+          <div class="chart-title" data-i18n="config.temaTitulo">Tema do site</div>
+        </div>
+        <p style="color:var(--cinza); font-size:0.85rem; margin-bottom:1rem;" data-i18n="config.temaDesc">
+          Escolha entre tema claro, escuro, ou seguir o sistema do seu dispositivo.
+        </p>
+        <div class="theme-options">
+          <button type="button" class="btn btn-secondary" data-tema="claro" data-i18n="config.temaClaro">Claro</button>
+          <button type="button" class="btn btn-secondary" data-tema="escuro" data-i18n="config.temaEscuro">Escuro</button>
+          <button type="button" class="btn btn-secondary" data-tema="sistema" data-i18n="config.temaSistema">Sistema</button>
+        </div>
+      </section>
+    </div>
+  </main>
+</div>
+
+<!-- Modal: nova integração (webhook) -->
+<div class="modal-overlay" id="integracao-modal">
+  <div class="modal-box" style="max-width: 460px;">
+    <div class="modal-header">
+      <div class="modal-title">Nova integração</div>
+      <button class="modal-close" data-close-modal aria-label="Fechar" data-icon="x"></button>
+    </div>
+
+    <form id="form-integracao" novalidate>
+      <div class="field">
+        <label for="integracao-url">URL de destino</label>
+        <input type="url" id="integracao-url" placeholder="https://meu-erp.com/webhook" required>
+      </div>
+      <div class="field">
+        <label>Eventos</label>
+        <div style="display:flex; flex-direction:column; gap:0.5rem; margin-top:0.4rem;">
+          <label style="display:flex; align-items:center; gap:0.5rem; font-weight:400; font-size:0.85rem;">
+            <input type="checkbox" name="integracao-evento" value="lead_criado"> Novo lead
+          </label>
+          <label style="display:flex; align-items:center; gap:0.5rem; font-weight:400; font-size:0.85rem;">
+            <input type="checkbox" name="integracao-evento" value="lead_status_alterado"> Status do lead mudou
+          </label>
+          <label style="display:flex; align-items:center; gap:0.5rem; font-weight:400; font-size:0.85rem;">
+            <input type="checkbox" name="integracao-evento" value="agendamento_criado"> Novo agendamento
+          </label>
+          <label style="display:flex; align-items:center; gap:0.5rem; font-weight:400; font-size:0.85rem;">
+            <input type="checkbox" name="integracao-evento" value="pagamento_aprovado"> Pagamento aprovado
+          </label>
+        </div>
+      </div>
+
+      <div class="modal-actions">
+        <button type="button" class="btn btn-secondary" data-close-modal>Cancelar</button>
+        <button type="submit" class="btn btn-primary" id="integracao-submit">
+          <span id="integracao-submit-label">Criar integração</span>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Modal: ajustar foto de perfil -->
+<div class="modal-overlay" id="foto-crop-modal">
+  <div class="modal-box" style="max-width: 380px;">
+    <div class="modal-header">
+      <div class="modal-title">Ajustar foto</div>
+      <button class="modal-close" data-close-modal aria-label="Fechar" data-icon="x"></button>
+    </div>
+
+    <div class="crop-viewport" id="crop-viewport">
+      <img id="crop-img" alt="" draggable="false">
+    </div>
+
+    <div class="crop-zoom-row">
+      <span style="font-size:0.75rem; color:var(--cinza);">Zoom</span>
+      <input type="range" id="crop-zoom" min="1" max="3" step="0.01" value="1">
+    </div>
+    <p class="crop-hint">Arraste a foto para posicionar dentro do círculo.</p>
+
+    <div class="modal-actions">
+      <button type="button" class="btn btn-secondary" data-close-modal>Cancelar</button>
+      <button type="button" class="btn btn-primary" id="crop-confirmar">Usar esta foto</button>
+    </div>
+  </div>
+</div>
+
+<script src="../assets/js/api.js"></script>
+<script src="../assets/js/icons.js"></script>
+<script src="../assets/js/i18n.js"></script>
+<script src="../assets/js/app-shell.js"></script>
+<script src="../assets/js/configuracoes.js"></script>
+
+</body>
+</html>

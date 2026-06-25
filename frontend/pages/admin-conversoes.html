@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<script src="../assets/js/theme.js"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Conversões — Admin Zync</title>
+<link rel="stylesheet" href="../assets/css/app.css">
+</head>
+<body>
+
+<div class="app-shell">
+  <aside class="app-sidebar">
+    <div class="sidebar-logo"><span>Zync</span></div>
+
+    <nav class="sidebar-nav">
+      <a href="admin.html" class="sidebar-item" data-icon="dashboard"> <span data-i18n="nav.inicio">Início</span></a>
+      <a href="admin-produtos.html" class="sidebar-item" data-icon="tag"> <span data-i18n="nav.produtos">Produtos</span></a>
+      <a href="admin-analises.html" class="sidebar-item" data-icon="trendingUp"> <span data-i18n="nav.analises">Análises</span></a>
+      <a href="admin-clientes.html" class="sidebar-item" data-icon="building"> <span data-i18n="nav.clientes">Clientes</span></a>
+      <a href="admin-afiliados.html" class="sidebar-item" data-icon="link2"> <span data-i18n="nav.afiliados">Afiliados</span></a>
+      <a href="admin-conversoes.html" class="sidebar-item active" data-icon="barChart"> <span data-i18n="nav.conversoes">Conversões</span></a>
+
+      <div class="sidebar-divider"></div>
+
+      <a href="dashboard.html" class="sidebar-item" data-icon="clipboardList"> <span data-i18n="nav.minhaConta">Minha conta (cliente)</span></a>
+      <a href="configuracoes.html" class="sidebar-item" data-icon="settings"> <span data-i18n="nav.configuracoes">Configurações</span></a>
+      <a href="suporte.html" class="sidebar-item" data-icon="messageCircle"> <span data-i18n="nav.suporte">Suporte</span></a>
+    </nav>
+
+    <div class="sidebar-user">
+      <div class="sidebar-avatar" id="user-avatar">--</div>
+      <div class="sidebar-user-info">
+        <div class="sidebar-user-name" id="user-name">—</div>
+        <div class="sidebar-user-email" id="user-email">—</div>
+      </div>
+      <button class="sidebar-logout" id="logout-btn" title="Sair" data-icon="logOut"></button>
+    </div>
+  </aside>
+
+  <main class="app-main">
+    <div class="app-topbar">
+      <div>
+        <div class="app-title">Conversões</div>
+        <div class="app-title-sub">Funil de vendas do Zync como negócio.</div>
+      </div>
+    </div>
+
+    <div class="empty-state" style="padding:3rem 1rem;">
+      <div class="empty-state-icon" data-icon="barChart" data-icon-size="36"></div>
+      <h3>Funil de conversão <span class="k-tag">Em breve</span></h3>
+      <p style="color:var(--cinza); font-size:0.85rem; max-width:420px; margin:0.6rem auto 0;">
+        Aqui vai entrar o funil de conversão do Zync — de cadastro até assinatura
+        paga (e o que causa desistência no meio do caminho). Falta decidir quais
+        etapas exatamente esse funil precisa rastrear antes de implementar.
+      </p>
+    </div>
+  </main>
+</div>
+
+<script src="../assets/js/api.js"></script>
+<script src="../assets/js/icons.js"></script>
+<script src="../assets/js/i18n.js"></script>
+<script src="../assets/js/app-shell.js"></script>
+<script src="../assets/js/admin-conversoes.js"></script>
+
+</body>
+</html>

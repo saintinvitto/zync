@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
+<script src="../assets/js/theme.js"></script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Suporte — Zync</title>
@@ -13,12 +14,15 @@
     <div class="sidebar-logo"><span>Zync</span></div>
 
     <nav class="sidebar-nav">
-      <a href="dashboard.html#stats" class="sidebar-item" data-icon="dashboard"> Visão geral</a>
-      <a href="dashboard.html#analises" class="sidebar-item" data-icon="trendingUp"> Análises</a>
-      <a href="dashboard.html#kanban" class="sidebar-item" data-icon="users"> Leads</a>
-      <a href="agenda.html" class="sidebar-item" data-icon="calendar"> Agenda</a>
-      <a href="perfil.html" class="sidebar-item" data-icon="user"> Perfil</a>
-      <a href="suporte.html" class="sidebar-item active" data-icon="messageCircle"> Suporte</a>
+      <a href="dashboard.html#stats" class="sidebar-item" data-icon="dashboard"> <span data-i18n="nav.visaoGeral">Visão geral</span></a>
+      <a href="dashboard.html#analises" class="sidebar-item" data-icon="trendingUp"> <span data-i18n="nav.analises">Análises</span></a>
+      <a href="dashboard.html#kanban" class="sidebar-item" data-icon="users"> <span data-i18n="nav.leads">Leads</span></a>
+      <a href="agenda.html" class="sidebar-item" data-icon="calendar"> <span data-i18n="nav.agenda">Agenda</span></a>
+
+      <div class="sidebar-divider"></div>
+
+      <a href="configuracoes.html" class="sidebar-item" data-icon="settings"> <span data-i18n="nav.configuracoes">Configurações</span></a>
+      <a href="suporte.html" class="sidebar-item active" data-icon="messageCircle"> <span data-i18n="nav.suporte">Suporte</span></a>
     </nav>
 
     <div class="sidebar-user">
@@ -94,6 +98,7 @@
 
 <script src="../assets/js/api.js"></script>
 <script src="../assets/js/icons.js"></script>
+<script src="../assets/js/i18n.js"></script>
 <script src="../assets/js/app-shell.js"></script>
 <script src="../assets/js/suporte.js"></script>
 

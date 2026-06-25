@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<script src="../assets/js/theme.js"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Produtos — Admin Zync</title>
+<link rel="stylesheet" href="../assets/css/app.css">
+</head>
+<body>
+
+<div class="app-shell">
+  <aside class="app-sidebar">
+    <div class="sidebar-logo"><span>Zync</span></div>
+
+    <nav class="sidebar-nav">
+      <a href="admin.html" class="sidebar-item" data-icon="dashboard"> <span data-i18n="nav.inicio">Início</span></a>
+      <a href="admin-produtos.html" class="sidebar-item active" data-icon="tag"> <span data-i18n="nav.produtos">Produtos</span></a>
+      <a href="admin-analises.html" class="sidebar-item" data-icon="trendingUp"> <span data-i18n="nav.analises">Análises</span></a>
+      <a href="admin-clientes.html" class="sidebar-item" data-icon="building"> <span data-i18n="nav.clientes">Clientes</span></a>
+      <a href="admin-afiliados.html" class="sidebar-item" data-icon="link2"> <span data-i18n="nav.afiliados">Afiliados</span></a>
+      <a href="admin-conversoes.html" class="sidebar-item" data-icon="barChart"> <span data-i18n="nav.conversoes">Conversões</span></a>
+
+      <div class="sidebar-divider"></div>
+
+      <a href="dashboard.html" class="sidebar-item" data-icon="clipboardList"> <span data-i18n="nav.minhaConta">Minha conta (cliente)</span></a>
+      <a href="configuracoes.html" class="sidebar-item" data-icon="settings"> <span data-i18n="nav.configuracoes">Configurações</span></a>
+      <a href="suporte.html" class="sidebar-item" data-icon="messageCircle"> <span data-i18n="nav.suporte">Suporte</span></a>
+    </nav>
+
+    <div class="sidebar-user">
+      <div class="sidebar-avatar" id="user-avatar">--</div>
+      <div class="sidebar-user-info">
+        <div class="sidebar-user-name" id="user-name">—</div>
+        <div class="sidebar-user-email" id="user-email">—</div>
+      </div>
+      <button class="sidebar-logout" id="logout-btn" title="Sair" data-icon="logOut"></button>
+    </div>
+  </aside>
+
+  <main class="app-main">
+    <div class="app-topbar">
+      <div>
+        <div class="app-title">Produtos</div>
+        <div class="app-title-sub">Planos vendidos pelo Zync e seus preços.</div>
+      </div>
+    </div>
+
+    <div class="kanban-header">
+      <div class="app-title" style="font-size:1.15rem;">Planos</div>
+      <button class="btn btn-primary btn-sm" id="open-new-plano">+ Novo plano</button>
+    </div>
+    <div class="agenda-list" id="admin-planos-list">
+      <div class="empty-state"><span class="spinner"></span></div>
+    </div>
+  </main>
+</div>
+
+<!-- Modal: novo / editar plano -->
+<div class="modal-overlay" id="plano-modal">
+  <div class="modal-box">
+    <div class="modal-header">
+      <div class="modal-title" id="plano-modal-title">Novo plano</div>
+      <button class="modal-close" data-close-modal aria-label="Fechar" data-icon="x"></button>
+    </div>
+
+    <form id="plano-form" novalidate>
+      <input type="hidden" id="pl-id">
+      <div class="field">
+        <label for="pl-nome">Nome</label>
+        <input type="text" id="pl-nome" placeholder="Ex: Pro Mensal" required>
+      </div>
+      <div class="field-row">
+        <div class="field">
+          <label for="pl-preco">Preço (R$)</label>
+          <input type="number" id="pl-preco" min="0" step="0.01" required>
+        </div>
+        <div class="field">
+          <label for="pl-intervalo">Intervalo (dias)</label>
+          <input type="number" id="pl-intervalo" min="1" step="1" value="30" required>
+        </div>
+      </div>
+      <div class="field" id="pl-ativo-field" style="display:none;">
+        <label for="pl-ativo">Status</label>
+        <select id="pl-ativo">
+          <option value="1">Ativo</option>
+          <option value="0">Inativo</option>
+        </select>
+      </div>
+
+      <div class="modal-actions">
+        <button type="button" class="btn btn-secondary" data-close-modal>Cancelar</button>
+        <button type="submit" class="btn btn-primary" id="plano-submit"><span id="plano-submit-label">Salvar</span></button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script src="../assets/js/api.js"></script>
+<script src="../assets/js/icons.js"></script>
+<script src="../assets/js/i18n.js"></script>
+<script src="../assets/js/app-shell.js"></script>
+<script src="../assets/js/admin-produtos.js"></script>
+
+</body>
+</html>

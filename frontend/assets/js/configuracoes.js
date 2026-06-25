@@ -3,6 +3,39 @@ Auth.requireAuth();
 let fotoAtual = null;
 let fotoAlterada = false;
 
+/* ---------- ABAS ---------- */
+document.querySelectorAll('.settings-tab').forEach((tab) => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.settings-tab').forEach((t) => t.classList.remove('active'));
+    document.querySelectorAll('.settings-panel').forEach((p) => p.classList.remove('active'));
+    tab.classList.add('active');
+    document.querySelector(`.settings-panel[data-panel="${tab.dataset.tab}"]`).classList.add('active');
+  });
+});
+
+/* ---------- IDIOMA ---------- */
+const selectIdioma = document.getElementById('config-idioma');
+selectIdioma.value = Lang.get();
+selectIdioma.addEventListener('change', () => Lang.set(selectIdioma.value));
+
+/* ---------- TEMA ---------- */
+function marcarTemaAtivo() {
+  const atual = Tema.get();
+  document.querySelectorAll('[data-tema]').forEach((btn) => {
+    btn.classList.toggle('btn-primary', btn.dataset.tema === atual);
+    btn.classList.toggle('btn-secondary', btn.dataset.tema !== atual);
+  });
+}
+
+document.querySelectorAll('[data-tema]').forEach((btn) => {
+  btn.addEventListener('click', () => {
+    Tema.set(btn.dataset.tema);
+    marcarTemaAtivo();
+  });
+});
+
+marcarTemaAtivo();
+
 function atualizarPreviewFoto(url) {
   const preview = document.getElementById('foto-preview');
   if (url) {
@@ -19,6 +52,7 @@ async function carregarPerfil() {
     const usuario = await Api.auth.me();
     document.getElementById('perfil-nome').value = usuario.nome;
     document.getElementById('perfil-email').value = usuario.email;
+    document.getElementById('perfil-nome-empresa').value = usuario.nome_empresa || '';
     document.getElementById('perfil-idade').value = usuario.idade ?? '';
     document.getElementById('perfil-cpf').value = usuario.cpf || '';
     document.getElementById('perfil-telefone').value = usuario.telefone || '';
@@ -202,6 +236,7 @@ document.getElementById('form-pessoal').addEventListener('submit', async (e) => 
 
   const idadeRaw = document.getElementById('perfil-idade').value;
   const dados = {
+    nome_empresa: document.getElementById('perfil-nome-empresa').value.trim() || null,
     idade: idadeRaw === '' ? null : Number(idadeRaw),
     cpf: document.getElementById('perfil-cpf').value.trim() || null,
     telefone: document.getElementById('perfil-telefone').value.trim() || null,

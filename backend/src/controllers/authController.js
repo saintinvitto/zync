@@ -128,12 +128,19 @@ async function atualizarMe(req, res) {
     dados.senha_hash = await bcrypt.hash(senha, 10);
   }
 
-  const { foto_url, idade, cpf, instagram, facebook, telefone } = req.body;
+  const { foto_url, idade, cpf, instagram, facebook, telefone, nome_empresa } = req.body;
 
   if (foto_url !== undefined) dados.foto_url = foto_url || null;
   if (instagram !== undefined) dados.instagram = instagram || null;
   if (facebook !== undefined) dados.facebook = facebook || null;
   if (telefone !== undefined) dados.telefone = telefone || null;
+
+  if (nome_empresa !== undefined) {
+    if (nome_empresa && !validators.dentroDoTamanho(nome_empresa, 120)) {
+      return res.status(400).json({ error: 'nome_empresa deve ter no máximo 120 caracteres' });
+    }
+    dados.nome_empresa = nome_empresa || null;
+  }
 
   if (idade !== undefined) {
     if (idade !== null && (!Number.isInteger(idade) || idade < 0 || idade > 130)) {

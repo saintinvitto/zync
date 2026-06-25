@@ -738,7 +738,7 @@ function getCmdkAcoes() {
     { icon: icon('plus', 16), label: 'Criar novo lead', hint: 'Ação', run: () => abrirModal() },
     { icon: icon('tag', 16), label: 'Gerenciar tags', hint: 'Ação', run: () => abrirTagModal() },
     { icon: icon('calendar', 16), label: 'Ir para Agenda', hint: 'Ação', run: () => { window.location.href = 'agenda.html'; } },
-    { icon: icon('user', 16), label: 'Ir para Perfil', hint: 'Ação', run: () => { window.location.href = 'perfil.html'; } },
+    { icon: icon('settings', 16), label: 'Ir para Configurações', hint: 'Ação', run: () => { window.location.href = 'configuracoes.html'; } },
     { icon: icon('refreshCw', 16), label: 'Atualizar dados', hint: 'Ação', run: () => { loadLeads(); loadDashboard(); } },
     { icon: icon('logOut', 16), label: 'Sair da conta', hint: 'Ação', run: () => Auth.logout() },
   ];
