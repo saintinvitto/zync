@@ -255,6 +255,37 @@
   </div>
 </div>
 
+<!-- Modal: campanha (mensagem em massa por tag) -->
+<div class="modal-overlay" id="campanha-modal">
+  <div class="modal-box" style="max-width: 460px;">
+    <div class="modal-header">
+      <div class="modal-title">Enviar mensagem — <span id="campanha-tag-nome"></span></div>
+      <button class="modal-close" data-close-modal aria-label="Fechar" data-icon="x"></button>
+    </div>
+
+    <p class="campanha-contagem" id="campanha-contagem"></p>
+
+    <form id="form-campanha" novalidate>
+      <div class="field">
+        <label for="campanha-mensagem">Mensagem</label>
+        <textarea id="campanha-mensagem" rows="4" maxlength="1000" required placeholder="Escreva a mensagem que vai pro WhatsApp de cada lead…"></textarea>
+      </div>
+
+      <p class="campanha-aviso">
+        Leads que não falaram com você nas últimas 24h podem não receber a mensagem —
+        é uma regra do WhatsApp, não do Zync.
+      </p>
+
+      <div class="modal-actions">
+        <button type="button" class="btn btn-secondary" data-close-modal>Cancelar</button>
+        <button type="submit" class="btn btn-primary" id="campanha-submit">
+          <span id="campanha-submit-label">Enviar mensagem</span>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
 <!-- Modal: gerenciar campos personalizados -->
 <div class="modal-overlay" id="campos-modal">
   <div class="modal-box">

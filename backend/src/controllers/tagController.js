@@ -1,6 +1,7 @@
 const tagModel = require('../models/tagModel');
 const leadModel = require('../models/leadModel');
 const logModel = require('../models/logModel');
+const campanhaService = require('../services/campanhaService');
 const asyncHandler = require('../utils/asyncHandler');
 const validators = require('../utils/validators');
 
@@ -72,6 +73,38 @@ async function desassociarDoLead(req, res) {
   res.status(204).send();
 }
 
+async function contarLeadsDaTag(req, res) {
+  const tag = await tagModel.buscarPorId(req.params.id, req.usuario.id);
+  if (!tag) return res.status(404).json({ error: 'Tag não encontrada' });
+
+  const leads = await tagModel.listarLeadsPorTag(req.params.id, req.usuario.id);
+  res.json({ total: leads.length, comTelefone: leads.filter((l) => l.telefone).length });
+}
+
+async function dispararCampanha(req, res) {
+  const tag = await tagModel.buscarPorId(req.params.id, req.usuario.id);
+  if (!tag) return res.status(404).json({ error: 'Tag não encontrada' });
+
+  const { mensagem } = req.body;
+  if (!mensagem) return res.status(400).json({ error: 'mensagem é obrigatória' });
+  if (!validators.dentroDoTamanho(mensagem, 1000)) {
+    return res.status(400).json({ error: 'mensagem deve ter no máximo 1000 caracteres' });
+  }
+
+  const todosLeads = await tagModel.listarLeadsPorTag(req.params.id, req.usuario.id);
+  const comTelefone = todosLeads.filter((l) => l.telefone);
+
+  campanhaService.disparar({
+    usuarioId: req.usuario.id,
+    tagId: tag.id,
+    tagNome: tag.nome,
+    mensagem,
+    leads: comTelefone,
+  });
+
+  res.status(202).json({ totalLeads: todosLeads.length, comTelefone: comTelefone.length });
+}
+
 module.exports = {
   listar: asyncHandler(listar),
   criar: asyncHandler(criar),
@@ -79,4 +112,6 @@ module.exports = {
   listarDoLead: asyncHandler(listarDoLead),
   associarAoLead: asyncHandler(associarAoLead),
   desassociarDoLead: asyncHandler(desassociarDoLead),
+  contarLeadsDaTag: asyncHandler(contarLeadsDaTag),
+  dispararCampanha: asyncHandler(dispararCampanha),
 };

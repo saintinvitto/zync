@@ -8,5 +8,7 @@ router.use(autenticar);
 router.get('/', tagController.listar);
 router.post('/', tagController.criar);
 router.delete('/:id', tagController.remover);
+router.get('/:id/contagem', tagController.contarLeadsDaTag);
+router.post('/:id/disparar', tagController.dispararCampanha);
 
 module.exports = router;

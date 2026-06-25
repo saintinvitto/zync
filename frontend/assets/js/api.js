@@ -161,6 +161,8 @@ const Api = {
     doLead: (leadId) => apiRequest(`/leads/${leadId}/tags`),
     associar: (leadId, tagId) => apiRequest(`/leads/${leadId}/tags`, { method: 'POST', body: { tagId } }),
     desassociar: (leadId, tagId) => apiRequest(`/leads/${leadId}/tags/${tagId}`, { method: 'DELETE' }),
+    contagem: (tagId) => apiRequest(`/tags/${tagId}/contagem`),
+    disparar: (tagId, mensagem) => apiRequest(`/tags/${tagId}/disparar`, { method: 'POST', body: { mensagem } }),
   },
 
   camposPersonalizados: {

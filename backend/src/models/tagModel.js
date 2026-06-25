@@ -41,6 +41,16 @@ async function desassociarLead(leadId, tagId) {
   await db.query('DELETE FROM lead_tags WHERE lead_id = $1 AND tag_id = $2', [leadId, tagId]);
 }
 
+async function listarLeadsPorTag(tagId, usuarioId) {
+  const { rows } = await db.query(
+    `SELECT l.id, l.nome, l.telefone FROM leads l
+     INNER JOIN lead_tags lt ON lt.lead_id = l.id
+     WHERE lt.tag_id = $1 AND l.usuario_id = $2`,
+    [tagId, usuarioId]
+  );
+  return rows;
+}
+
 module.exports = {
   listarPorUsuario,
   buscarPorId,
@@ -49,4 +59,5 @@ module.exports = {
   listarPorLead,
   associarLead,
   desassociarLead,
+  listarLeadsPorTag,
 };

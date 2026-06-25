@@ -152,7 +152,11 @@ function renderTagManageList() {
   }
 
   list.innerHTML = tagsCache.map((t) => `
-    <span class="tag-chip">${escapeHtml(t.nome)} <button type="button" class="tag-chip-remove" data-tag-id="${t.id}" aria-label="Excluir tag ${escapeHtml(t.nome)}">${icon('x', 12)}</button></span>
+    <span class="tag-chip">
+      ${escapeHtml(t.nome)}
+      <button type="button" class="tag-chip-campanha" data-tag-id="${t.id}" data-tag-nome="${escapeHtml(t.nome)}" aria-label="Enviar mensagem pra leads com a tag ${escapeHtml(t.nome)}">${icon('send', 12)}</button>
+      <button type="button" class="tag-chip-remove" data-tag-id="${t.id}" aria-label="Excluir tag ${escapeHtml(t.nome)}">${icon('x', 12)}</button>
+    </span>
   `).join('');
 
   list.querySelectorAll('.tag-chip-remove').forEach((btn) => {
@@ -171,7 +175,65 @@ function renderTagManageList() {
       }
     });
   });
+
+  list.querySelectorAll('.tag-chip-campanha').forEach((btn) => {
+    btn.addEventListener('click', () => abrirCampanhaModal(btn.dataset.tagId, btn.dataset.tagNome));
+  });
 }
+
+/* ---------- CAMPANHA (mensagem em massa por tag) ---------- */
+const campanhaModal = document.getElementById('campanha-modal');
+let campanhaTagId = null;
+
+async function abrirCampanhaModal(tagId, tagNome) {
+  campanhaTagId = tagId;
+  document.getElementById('campanha-tag-nome').textContent = tagNome;
+  document.getElementById('campanha-contagem').textContent = 'Carregando...';
+  document.getElementById('campanha-mensagem').value = '';
+  campanhaModal.classList.add('visible');
+
+  try {
+    const { total, comTelefone } = await Api.tags.contagem(tagId);
+    document.getElementById('campanha-contagem').textContent =
+      total === 0
+        ? 'Nenhum lead com essa tag.'
+        : `${comTelefone} de ${total} leads com essa tag têm telefone cadastrado e vão receber a mensagem.`;
+  } catch (err) {
+    document.getElementById('campanha-contagem').textContent = 'Não foi possível carregar a contagem.';
+  }
+}
+
+function fecharCampanhaModal() {
+  campanhaModal.classList.remove('visible');
+  campanhaTagId = null;
+}
+
+campanhaModal.querySelectorAll('[data-close-modal]').forEach((el) => el.addEventListener('click', fecharCampanhaModal));
+campanhaModal.addEventListener('click', (e) => { if (e.target === campanhaModal) fecharCampanhaModal(); });
+
+document.getElementById('form-campanha').addEventListener('submit', async (e) => {
+  e.preventDefault();
+
+  const mensagem = document.getElementById('campanha-mensagem').value.trim();
+  if (!mensagem) return;
+  if (!confirm('Enviar essa mensagem pra todos os leads dessa tag? Não dá pra desfazer.')) return;
+
+  const btn = document.getElementById('campanha-submit');
+  const label = document.getElementById('campanha-submit-label');
+  btn.disabled = true;
+  label.innerHTML = '<span class="spinner"></span>';
+
+  try {
+    const { comTelefone } = await Api.tags.disparar(campanhaTagId, mensagem);
+    showToast(`Campanha iniciada para ${comTelefone} leads. Você recebe uma notificação quando terminar.`, 'success');
+    fecharCampanhaModal();
+  } catch (err) {
+    showToast(err.message, 'error');
+  } finally {
+    btn.disabled = false;
+    label.textContent = 'Enviar mensagem';
+  }
+});
 
 document.getElementById('new-tag-form').addEventListener('submit', async (e) => {
   e.preventDefault();
