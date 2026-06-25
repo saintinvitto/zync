@@ -27,7 +27,7 @@ async function processarMensagemRecebida({ usuarioId, telefone, nome, mensagem }
   });
 
   const empresa = await usuarioModel.buscarPorId(usuarioId);
-  const respostaTexto = await iaService.gerarResposta(mensagem, empresa);
+  const respostaTexto = await iaService.gerarResposta(mensagem, empresa, { usuarioId, leadId: lead.id });
   await mensagemModel.criar({ leadId: lead.id, conteudo: respostaTexto, enviadoPor: 'ia' });
 
   await whatsappService.enviarMensagem(telefone, respostaTexto);

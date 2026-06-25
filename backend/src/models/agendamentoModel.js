@@ -60,4 +60,26 @@ async function remover(id, usuarioId) {
   await db.query('DELETE FROM agendamentos WHERE id = $1 AND usuario_id = $2', [id, usuarioId]);
 }
 
-module.exports = { listarPorUsuario, listarPorLead, buscarPorId, criar, atualizar, remover };
+async function listarParaLembrete(janelaHoras) {
+  const { rows } = await db.query(
+    `SELECT a.id, a.usuario_id, a.lead_id, a.servico, a.data_hora,
+            l.nome AS lead_nome, l.telefone AS lead_telefone
+     FROM agendamentos a
+     JOIN leads l ON l.id = a.lead_id
+     WHERE a.status = 'agendado'
+       AND a.lembrete_enviado_em IS NULL
+       AND a.data_hora BETWEEN NOW() AND NOW() + ($1 || ' hours')::interval
+       AND l.telefone IS NOT NULL`,
+    [janelaHoras]
+  );
+  return rows;
+}
+
+async function marcarLembreteEnviado(id) {
+  await db.query('UPDATE agendamentos SET lembrete_enviado_em = NOW() WHERE id = $1', [id]);
+}
+
+module.exports = {
+  listarPorUsuario, listarPorLead, buscarPorId, criar, atualizar, remover,
+  listarParaLembrete, marcarLembreteEnviado,
+};

@@ -27,6 +27,9 @@ describe('Agendamentos', () => {
 
     expect(resposta.status).toBe(201);
     expect(resposta.body.status).toBe('agendado');
+
+    const notificacoes = await request(app).get('/api/notificacoes').set('Authorization', `Bearer ${token}`);
+    expect(notificacoes.body.some((n) => n.tipo === 'agendamento_criado')).toBe(true);
   });
 
   test('rejeita sem data_hora', async () => {

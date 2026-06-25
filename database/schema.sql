@@ -95,7 +95,8 @@ CREATE TABLE IF NOT EXISTS agendamentos (
   servico VARCHAR(120),
   data_hora TIMESTAMPTZ NOT NULL,
   status VARCHAR(20) DEFAULT 'agendado' CHECK (status IN ('agendado', 'confirmado', 'cancelado', 'concluido')),
-  criado_em TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
+  criado_em TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+  lembrete_enviado_em TIMESTAMPTZ NULL
 );
 
 CREATE INDEX IF NOT EXISTS idx_agendamentos_usuario_data ON agendamentos (usuario_id, data_hora);

@@ -42,7 +42,8 @@ describe('POST /api/leads/:leadId/ia/responder', () => {
     expect(resposta.body.mensagemIA.enviado_por).toBe('ia');
     expect(iaService.gerarResposta).toHaveBeenCalledWith(
       'Quanto custa o plano?',
-      expect.objectContaining({ id: expect.anything() })
+      expect.objectContaining({ id: expect.anything() }),
+      expect.objectContaining({ leadId: String(lead.id) })
     );
 
     const historico = await request(app)

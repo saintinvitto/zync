@@ -1,8 +1,7 @@
 const agendamentoModel = require('../models/agendamentoModel');
 const leadModel = require('../models/leadModel');
 const logModel = require('../models/logModel');
-const notificacaoModel = require('../models/notificacaoModel');
-const webhookService = require('../services/webhookService');
+const agendamentoService = require('../services/agendamentoService');
 const asyncHandler = require('../utils/asyncHandler');
 const validators = require('../utils/validators');
 
@@ -43,33 +42,11 @@ async function criar(req, res) {
   const erro = validarDadosAgendamento(req.body);
   if (erro) return res.status(400).json({ error: erro });
 
-  const agendamento = await agendamentoModel.criar({
+  const agendamento = await agendamentoService.criarComEfeitos({
     usuarioId: req.usuario.id,
     leadId: req.params.leadId,
     servico,
     data_hora,
-  });
-
-  await logModel.registrar({
-    usuarioId: req.usuario.id,
-    leadId: lead.id,
-    acao: 'agendamento_criado',
-    detalhes: { data_hora: agendamento.data_hora, servico: agendamento.servico },
-  });
-
-  await notificacaoModel.criar({
-    usuarioId: req.usuario.id,
-    leadId: lead.id,
-    tipo: 'agendamento_criado',
-    mensagem: `Novo agendamento para ${lead.nome}`,
-  });
-
-  webhookService.disparar(req.usuario.id, 'agendamento_criado', {
-    id: agendamento.id,
-    leadId: lead.id,
-    leadNome: lead.nome,
-    servico: agendamento.servico,
-    data_hora: agendamento.data_hora,
   });
 
   res.status(201).json(agendamento);

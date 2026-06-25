@@ -18,7 +18,10 @@ async function responder(req, res) {
   });
 
   const empresa = await usuarioModel.buscarPorId(req.usuario.id);
-  const respostaTexto = await iaService.gerarResposta(conteudo, empresa);
+  const respostaTexto = await iaService.gerarResposta(conteudo, empresa, {
+    usuarioId: req.usuario.id,
+    leadId: req.params.leadId,
+  });
 
   const mensagemIA = await mensagemModel.criar({
     leadId: req.params.leadId,
