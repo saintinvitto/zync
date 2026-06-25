@@ -15,10 +15,16 @@ async function receber(req, res) {
   }
 
   if (dados.status === 'completed') {
+    if (assinatura.status === 'ativa') {
+      return res.status(200).send();
+    }
     const plano = await planoModel.buscarPorId(assinatura.plano_id);
     await assinaturaModel.marcarAtiva(dados.id, plano.intervalo_dias);
     ntfy.notificar('Pagamento recebido no Zync!', { titulo: 'Zync · Pagamento aprovado', tag: 'moneybag' });
   } else if (dados.status === 'failed' || dados.status === 'refunded') {
+    if (assinatura.status === 'cancelada') {
+      return res.status(200).send();
+    }
     await assinaturaModel.marcarFalha(dados.id);
   }
 

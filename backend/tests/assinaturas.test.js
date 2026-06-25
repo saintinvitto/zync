@@ -10,7 +10,12 @@ jest.mock('../src/services/syncpayService', () => ({
   consultarTransacao: jest.fn(),
 }));
 
+jest.mock('../src/utils/ntfy', () => ({
+  notificar: jest.fn(),
+}));
+
 const app = require('../src/app');
+const ntfy = require('../src/utils/ntfy');
 const db = require('../src/config/db');
 const { criarUsuarioEToken } = require('./helpers');
 
@@ -97,6 +102,31 @@ describe('Webhook do SyncPay + ciclo de vida da assinatura', () => {
     const atual = await request(app).get('/api/assinaturas/atual').set('Authorization', `Bearer ${token}`);
     expect(atual.body.status).toBe('ativa');
     expect(atual.body.expira_em).not.toBeNull();
+  });
+
+  test('reenvio do mesmo webhook completed não reprocessa nem duplica notificação', async () => {
+    const { token } = await criarUsuarioEToken(app, request);
+    const checkout = await fazerCheckout(token);
+    ntfy.notificar.mockClear();
+
+    const primeira = await request(app)
+      .post('/api/webhooks/syncpay')
+      .set('Authorization', autorizacaoWebhook())
+      .send({ data: { id: checkout.body.identifier, status: 'completed' } });
+    expect(primeira.status).toBe(200);
+
+    const atualAntes = await request(app).get('/api/assinaturas/atual').set('Authorization', `Bearer ${token}`);
+    const expiraAntes = atualAntes.body.expira_em;
+
+    const reenvio = await request(app)
+      .post('/api/webhooks/syncpay')
+      .set('Authorization', autorizacaoWebhook())
+      .send({ data: { id: checkout.body.identifier, status: 'completed' } });
+    expect(reenvio.status).toBe(200);
+
+    const atualDepois = await request(app).get('/api/assinaturas/atual').set('Authorization', `Bearer ${token}`);
+    expect(atualDepois.body.expira_em).toBe(expiraAntes);
+    expect(ntfy.notificar).toHaveBeenCalledTimes(1);
   });
 
   test('webhook com identifier desconhecido não derruba a API', async () => {

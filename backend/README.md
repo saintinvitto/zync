@@ -20,6 +20,8 @@ npm test
 
 Usa Jest + Supertest contra um schema Postgres separado (`zync_test`), criado e destruído automaticamente a partir do `database/schema.sql` a cada execução — não toca nos dados em `public`. Usa a mesma `DATABASE_URL` do `.env` (conecta na mesma instância Supabase, só isola via `search_path`).
 
+Roda automaticamente no CI (`.github/workflows/test.yml`) em todo push/PR pra `main`, usando o secret `DATABASE_URL` do GitHub.
+
 ## Rotas
 
 | Rota | Auth | Descrição |
