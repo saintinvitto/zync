@@ -118,6 +118,7 @@
     justify-content: space-between;
     gap: 3rem;
     width: calc(100% - 3rem);
+    user-select: none;
     max-width: 1180px;
     padding: 0.9rem 1rem 0.9rem 1.6rem;
     border-radius: 100px;
@@ -140,7 +141,7 @@
 
   .nav-links {
     display: flex;
-    gap: 2.5rem;
+    gap: 1.8rem;
     list-style: none;
   }
 
@@ -210,6 +211,7 @@
     text-align: left;
     padding: 10rem 4rem 4rem;
     overflow: hidden;
+    user-select: none;
   }
 
   /* CORNER GLOW — circulo azul solido com blur pesado no canto superior direito (igual a tecnica do Framer: cor solida + filter:blur, nao gradiente suave), com um blob menor por cima que fica derivando */
@@ -446,7 +448,7 @@
   .hero-float-badge .icon { color: var(--azul-claro); flex-shrink: 0; }
 
   .badge-float-1 { top: -1.3rem; right: 2.5rem; animation-delay: 0s; }
-  .badge-float-2 { top: 40%; left: -1.8rem; animation-delay: 1.4s; }
+  .badge-float-2 { top: 40%; left: -9rem; animation-delay: 1.4s; }
   .badge-float-3 { bottom: -1.1rem; right: -1.2rem; animation-delay: 2.8s; }
 
   @keyframes badge-float {
@@ -573,9 +575,16 @@
 
   .mockup-content {
     padding: 1.5rem;
-    display: flex;
+  }
+
+  .mockup-panel {
+    display: none;
     flex-direction: column;
     gap: 1rem;
+  }
+
+  .mockup-panel.active {
+    display: flex;
   }
 
   .mockup-cards {
@@ -830,6 +839,87 @@
     color: var(--cinza);
     font-size: 0.9rem;
     line-height: 1.65;
+  }
+
+  #contato { user-select: none; }
+
+  /* POR QUE ESCOLHER */
+  .why-section {
+    padding: 7rem 4rem;
+    max-width: 1200px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4rem;
+    align-items: center;
+  }
+
+  .why-list {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    margin-top: 2.5rem;
+  }
+
+  .why-item {
+    display: flex;
+    gap: 1rem;
+  }
+
+  .why-icon {
+    width: 44px;
+    height: 44px;
+    flex-shrink: 0;
+    background: var(--azul-bg);
+    border: 1px solid var(--borda);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .why-item-title {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 600;
+    font-size: 1.05rem;
+    margin-bottom: 0.4rem;
+  }
+
+  .why-item-desc {
+    color: var(--cinza);
+    font-size: 0.9rem;
+    line-height: 1.6;
+  }
+
+  .why-visual {
+    background: var(--glass-bg);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid var(--glass-border);
+    border-radius: 16px;
+    padding: 2.4rem;
+  }
+
+  .why-visual-stat {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding: 1.1rem 0;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+  }
+
+  .why-visual-stat:last-child { border-bottom: none; }
+
+  .why-visual-num {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--azul-claro);
+  }
+
+  .why-visual-label {
+    color: var(--cinza);
+    font-size: 0.85rem;
   }
 
   /* PRICING */
@@ -1195,6 +1285,7 @@
     .stats { gap: 1.5rem; flex-wrap: wrap; justify-content: center; }
     .features { padding: 4rem 1.5rem; }
     .features-grid { grid-template-columns: 1fr; }
+    .why-section { padding: 4rem 1.5rem; grid-template-columns: 1fr; gap: 2.5rem; }
     .pricing { padding: 4rem 1.5rem; }
     .pricing-grid { grid-template-columns: 1fr; }
     .pricing-grid-4 { grid-template-columns: 1fr; }
@@ -1221,7 +1312,9 @@
 <nav>
   <div class="nav-logo"><span>Zync</span></div>
   <ul class="nav-links">
+    <li><a href="#solucoes">Soluções</a></li>
     <li><a href="#features">Funcionalidades</a></li>
+    <li><a href="#por-que">Sobre nós</a></li>
     <li><a href="#pricing">Preços</a></li>
     <li><a href="#contato">Contato</a></li>
     <li><a href="frontend/pages/login.html">Entrar</a></li>
@@ -1281,63 +1374,138 @@
       </div>
       <div class="mockup-inner">
         <div class="mockup-sidebar">
-          <div class="sidebar-item active" data-icon="dashboard" data-icon-size="13"> Visão geral</div>
-          <div class="sidebar-item" data-icon="trendingUp" data-icon-size="13"> Análises</div>
-          <div class="sidebar-item" data-icon="users" data-icon-size="13"> Leads</div>
-          <div class="sidebar-item" data-icon="calendar" data-icon-size="13"> Agenda</div>
-          <div class="sidebar-item" data-icon="messageCircle" data-icon-size="13"> Suporte</div>
+          <div class="sidebar-item active" data-tab="geral" data-icon="dashboard" data-icon-size="13"> Visão geral</div>
+          <div class="sidebar-item" data-tab="analises" data-icon="trendingUp" data-icon-size="13"> Análises</div>
+          <div class="sidebar-item" data-tab="leads" data-icon="users" data-icon-size="13"> Leads</div>
+          <div class="sidebar-item" data-tab="agenda" data-icon="calendar" data-icon-size="13"> Agenda</div>
+          <div class="sidebar-item" data-tab="suporte" data-icon="messageCircle" data-icon-size="13"> Suporte</div>
         </div>
         <div class="mockup-content">
-          <div class="mockup-cards">
-            <div class="m-card">
-              <div class="m-card-label">Leads hoje</div>
-              <div class="m-card-num">47</div>
-              <div class="m-card-sub">↑ 12% vs ontem</div>
+
+          <div class="mockup-panel active" data-panel="geral">
+            <div class="mockup-cards">
+              <div class="m-card">
+                <div class="m-card-label">Leads hoje</div>
+                <div class="m-card-num">47</div>
+                <div class="m-card-sub">↑ 12% vs ontem</div>
+              </div>
+              <div class="m-card">
+                <div class="m-card-label">Conversões</div>
+                <div class="m-card-num">18</div>
+                <div class="m-card-sub">↑ 8% esta semana</div>
+              </div>
+              <div class="m-card">
+                <div class="m-card-label">Msgs enviadas</div>
+                <div class="m-card-num">324</div>
+                <div class="m-card-sub">Automático</div>
+              </div>
+              <div class="m-card">
+                <div class="m-card-label">Resp. IA</div>
+                <div class="m-card-num">89%</div>
+                <div class="m-card-sub">Taxa de resolução</div>
+              </div>
             </div>
-            <div class="m-card">
-              <div class="m-card-label">Conversões</div>
-              <div class="m-card-num">18</div>
-              <div class="m-card-sub">↑ 8% esta semana</div>
-            </div>
-            <div class="m-card">
-              <div class="m-card-label">Msgs enviadas</div>
-              <div class="m-card-num">324</div>
-              <div class="m-card-sub">Automático</div>
-            </div>
-            <div class="m-card">
-              <div class="m-card-label">Resp. IA</div>
-              <div class="m-card-num">89%</div>
-              <div class="m-card-sub">Taxa de resolução</div>
-            </div>
-          </div>
-          <div class="kanban">
-            <div class="k-col">
-              <div class="k-header"><div class="k-dot" style="background:#4D8DFF"></div>Novos leads</div>
-              <div class="k-card"><strong>Maria Souza</strong>Implante dental<div class="k-tag">WhatsApp</div></div>
-              <div class="k-card"><strong>João Lima</strong>Clareamento<div class="k-tag">Instagram</div></div>
-            </div>
-            <div class="k-col">
-              <div class="k-header"><div class="k-dot" style="background:#4D8DFF"></div>Em contato</div>
-              <div class="k-card"><strong>Ana Costa</strong>Harmonização<div class="k-tag">IA ativa</div></div>
-            </div>
-            <div class="k-col">
-              <div class="k-header"><div class="k-dot" style="background:#34D399"></div>Proposta enviada</div>
-              <div class="k-card"><strong>Pedro Rocha</strong>Prótese total<div class="k-tag">R$ 4.800</div></div>
-            </div>
-            <div class="k-col">
-              <div class="k-header"><div class="k-dot" style="background:#F59E0B"></div>Fechado</div>
-              <div class="k-card"><strong>Carla Neves</strong>Lente de contato<div class="k-tag">R$ 3.200</div></div>
+            <div class="mockup-analytics">
+              <div class="mockup-analytics-title">Leads por origem</div>
+              <div class="mockup-bar-row"><div class="mockup-bar-label">WhatsApp</div><div class="mockup-bar-track"><div class="mockup-bar-fill" style="width:85%"></div></div></div>
+              <div class="mockup-bar-row"><div class="mockup-bar-label">Instagram</div><div class="mockup-bar-track"><div class="mockup-bar-fill" style="width:60%"></div></div></div>
+              <div class="mockup-bar-row"><div class="mockup-bar-label">Site</div><div class="mockup-bar-track"><div class="mockup-bar-fill" style="width:35%"></div></div></div>
             </div>
           </div>
-          <div class="mockup-analytics">
-            <div class="mockup-analytics-title">Leads por origem</div>
-            <div class="mockup-bar-row"><div class="mockup-bar-label">WhatsApp</div><div class="mockup-bar-track"><div class="mockup-bar-fill" style="width:85%"></div></div></div>
-            <div class="mockup-bar-row"><div class="mockup-bar-label">Instagram</div><div class="mockup-bar-track"><div class="mockup-bar-fill" style="width:60%"></div></div></div>
-            <div class="mockup-bar-row"><div class="mockup-bar-label">Site</div><div class="mockup-bar-track"><div class="mockup-bar-fill" style="width:35%"></div></div></div>
+
+          <div class="mockup-panel" data-panel="analises">
+            <div class="mockup-cards" style="grid-template-columns: repeat(2, 1fr);">
+              <div class="m-card">
+                <div class="m-card-label">Faturamento no mês</div>
+                <div class="m-card-num">R$ 28.4k</div>
+                <div class="m-card-sub">↑ 15% vs mês anterior</div>
+              </div>
+              <div class="m-card">
+                <div class="m-card-label">Ticket médio</div>
+                <div class="m-card-num">R$ 580</div>
+                <div class="m-card-sub">Por negócio fechado</div>
+              </div>
+            </div>
+            <div class="mockup-analytics">
+              <div class="mockup-analytics-title">Funil de conversão</div>
+              <div class="mockup-bar-row"><div class="mockup-bar-label">Novos leads</div><div class="mockup-bar-track"><div class="mockup-bar-fill" style="width:100%"></div></div></div>
+              <div class="mockup-bar-row"><div class="mockup-bar-label">Em contato</div><div class="mockup-bar-track"><div class="mockup-bar-fill" style="width:64%"></div></div></div>
+              <div class="mockup-bar-row"><div class="mockup-bar-label">Proposta</div><div class="mockup-bar-track"><div class="mockup-bar-fill" style="width:38%"></div></div></div>
+              <div class="mockup-bar-row"><div class="mockup-bar-label">Fechado</div><div class="mockup-bar-track"><div class="mockup-bar-fill" style="width:21%"></div></div></div>
+            </div>
           </div>
+
+          <div class="mockup-panel" data-panel="leads">
+            <div class="kanban">
+              <div class="k-col">
+                <div class="k-header"><div class="k-dot" style="background:#4D8DFF"></div>Novos leads</div>
+                <div class="k-card"><strong>Maria Souza</strong>Plano Pro<div class="k-tag">WhatsApp</div></div>
+                <div class="k-card"><strong>João Lima</strong>Consultoria inicial<div class="k-tag">Instagram</div></div>
+              </div>
+              <div class="k-col">
+                <div class="k-header"><div class="k-dot" style="background:#4D8DFF"></div>Em contato</div>
+                <div class="k-card"><strong>Ana Costa</strong>Orçamento<div class="k-tag">IA ativa</div></div>
+              </div>
+              <div class="k-col">
+                <div class="k-header"><div class="k-dot" style="background:#34D399"></div>Proposta enviada</div>
+                <div class="k-card"><strong>Pedro Rocha</strong>Contrato anual<div class="k-tag">R$ 4.800</div></div>
+              </div>
+              <div class="k-col">
+                <div class="k-header"><div class="k-dot" style="background:#F59E0B"></div>Fechado</div>
+                <div class="k-card"><strong>Carla Neves</strong>Assinatura mensal<div class="k-tag">R$ 3.200</div></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="mockup-panel" data-panel="agenda">
+            <div class="k-col" style="width:100%;">
+              <div class="k-header"><div class="k-dot" style="background:#4D8DFF"></div>Hoje</div>
+              <div class="k-card"><strong>14:00 — Maria Souza</strong>Reunião inicial<div class="k-tag">WhatsApp</div></div>
+              <div class="k-card"><strong>16:30 — João Lima</strong>Apresentação de proposta<div class="k-tag">Instagram</div></div>
+            </div>
+            <div class="k-col" style="width:100%; margin-top:0.6rem;">
+              <div class="k-header"><div class="k-dot" style="background:#34D399"></div>Amanhã</div>
+              <div class="k-card"><strong>10:00 — Ana Costa</strong>Follow-up<div class="k-tag">Agendado pela IA</div></div>
+            </div>
+          </div>
+
+          <div class="mockup-panel" data-panel="suporte">
+            <div class="mockup-analytics">
+              <div class="mockup-analytics-title">Atendimento</div>
+              <div class="k-card"><strong>Tempo médio de resposta</strong>4 minutos</div>
+              <div class="k-card"><strong>Conversas hoje</strong>32 — 89% respondidas pela IA</div>
+            </div>
+          </div>
+
         </div>
       </div>
     </div>
+    </div>
+  </div>
+</section>
+
+<section class="features" id="solucoes">
+  <div class="reveal">
+    <div class="section-eyebrow">Soluções</div>
+    <h2 class="section-title">Feito sob medida pro seu negócio</h2>
+    <p class="section-sub">Além do CRM e da automação padrão, o Zync se adapta ao jeito que você vende.</p>
+  </div>
+
+  <div class="features-grid">
+    <div class="feat-card reveal">
+      <div class="feat-icon" data-icon="settings"></div>
+      <div class="feat-title">Desenvolvimento Personalizado</div>
+      <div class="feat-desc">Crie campos personalizados nos seus leads — convênio, plano de interesse, o que for relevante pro seu negócio — sem precisar pedir nada pra nossa equipe.</div>
+    </div>
+    <div class="feat-card reveal">
+      <div class="feat-icon" data-icon="refreshCw"></div>
+      <div class="feat-title">Automações e Integrações</div>
+      <div class="feat-desc">Conecte o Zync a outros sistemas via webhooks. Receba notificações automáticas a cada novo lead, mensagem ou negócio fechado.</div>
+    </div>
+    <div class="feat-card reveal">
+      <div class="feat-icon" data-icon="creditCard"></div>
+      <div class="feat-title">E-commerce e Marketplaces</div>
+      <div class="feat-desc">Cadastre seu catálogo de produtos e gere um link de vendas direto pro WhatsApp. Pedidos entram automaticamente como leads.</div>
     </div>
   </div>
 </section>
@@ -1379,6 +1547,54 @@
       <div class="feat-icon" data-icon="tag"></div>
       <div class="feat-title">Tags e Segmentação</div>
       <div class="feat-desc">Organize seus leads por serviço, origem e interesse. Envie mensagens segmentadas para cada grupo.</div>
+    </div>
+  </div>
+</section>
+
+<section class="why-section" id="por-que">
+  <div>
+    <div class="reveal">
+      <div class="section-eyebrow">Sobre nós</div>
+      <h2 class="section-title" style="max-width: 420px;">Nosso compromisso vai além da tecnologia</h2>
+    </div>
+
+    <div class="why-list">
+      <div class="why-item reveal">
+        <div class="why-icon" data-icon="checkCircle"></div>
+        <div>
+          <div class="why-item-title">Clareza</div>
+          <div class="why-item-desc">Comunicação transparente em todas as etapas, sem letra miúda.</div>
+        </div>
+      </div>
+      <div class="why-item reveal">
+        <div class="why-icon" data-icon="users"></div>
+        <div>
+          <div class="why-item-title">Parceria</div>
+          <div class="why-item-desc">Time disponível pra te ajudar a configurar e tirar dúvidas, sempre que precisar.</div>
+        </div>
+      </div>
+      <div class="why-item reveal">
+        <div class="why-icon" data-icon="trendingUp"></div>
+        <div>
+          <div class="why-item-title">Evolução Contínua</div>
+          <div class="why-item-desc">Novas funcionalidades chegam direto pra sua conta, sem custo extra.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="why-visual reveal">
+    <div class="why-visual-stat">
+      <div class="why-visual-label">Empresas usando o Zync</div>
+      <div class="why-visual-num">2.400+</div>
+    </div>
+    <div class="why-visual-stat">
+      <div class="why-visual-label">Taxa média de resolução por IA</div>
+      <div class="why-visual-num">89%</div>
+    </div>
+    <div class="why-visual-stat">
+      <div class="why-visual-label">Tempo médio de setup</div>
+      <div class="why-visual-num">5 min</div>
     </div>
   </div>
 </section>
@@ -1549,6 +1765,18 @@ s0.parentNode.insertBefore(s1,s0);
   }, { threshold: 0.1 });
 
   document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+  // MOCKUP TABS
+  document.querySelectorAll('.mockup-sidebar .sidebar-item').forEach(item => {
+    item.addEventListener('click', () => {
+      const tab = item.dataset.tab;
+      document.querySelectorAll('.mockup-sidebar .sidebar-item').forEach(i => i.classList.remove('active'));
+      item.classList.add('active');
+      document.querySelectorAll('.mockup-panel').forEach(panel => {
+        panel.classList.toggle('active', panel.dataset.panel === tab);
+      });
+    });
+  });
 
   const footerYear = document.getElementById('footer-year');
   if (footerYear) footerYear.textContent = new Date().getFullYear();
