@@ -100,6 +100,11 @@ CREATE TABLE IF NOT EXISTS agendamentos (
 );
 
 CREATE INDEX IF NOT EXISTS idx_agendamentos_usuario_data ON agendamentos (usuario_id, data_hora);
+-- Indice parcial pro job de lembrete (lembreteAgendamentoJob.js), que varre
+-- TODOS os tenants buscando agendamentos proximos ainda sem lembrete - nao
+-- e filtrado por usuario_id, entao o indice acima nao ajuda nessa consulta.
+CREATE INDEX IF NOT EXISTS idx_agendamentos_lembrete_pendente ON agendamentos (data_hora)
+  WHERE status = 'agendado' AND lembrete_enviado_em IS NULL;
 
 CREATE TABLE IF NOT EXISTS logs_atividade (
   id SERIAL PRIMARY KEY,
@@ -123,6 +128,9 @@ CREATE TABLE IF NOT EXISTS notificacoes (
 );
 
 CREATE INDEX IF NOT EXISTS idx_notificacoes_usuario_lida_criado ON notificacoes (usuario_id, lida, criado_em);
+-- Cobre existeDoTipoNoMes (usoService.verificarLimitesEAvisar), chamada a
+-- cada lead/mensagem criada e a cada campanha disparada.
+CREATE INDEX IF NOT EXISTS idx_notificacoes_usuario_tipo_criado ON notificacoes (usuario_id, tipo, criado_em);
 
 CREATE TABLE IF NOT EXISTS planos (
   id SERIAL PRIMARY KEY,
@@ -198,3 +206,26 @@ CREATE TABLE IF NOT EXISTS produtos (
 );
 
 CREATE INDEX IF NOT EXISTS idx_produtos_usuario ON produtos (usuario_id);
+
+-- RLS em todas as tabelas. O backend conecta direto como usuario "postgres"
+-- (table owner), que sempre ignora RLS - entao isso nao afeta o backend. O
+-- efeito e fechar a API publica do Supabase (PostgREST/anon key), que
+-- ficaria liberada por padrao em qualquer tabela sem isso. Antes desse bloco
+-- entrar aqui, RLS só existia como migration aplicada manualmente na
+-- produção (017_enable_rls.sql) - um setup novo (staging, banco local,
+-- restore de backup) ficava sem nenhuma proteção.
+ALTER TABLE usuarios ENABLE ROW LEVEL SECURITY;
+ALTER TABLE leads ENABLE ROW LEVEL SECURITY;
+ALTER TABLE mensagens ENABLE ROW LEVEL SECURITY;
+ALTER TABLE tags ENABLE ROW LEVEL SECURITY;
+ALTER TABLE lead_tags ENABLE ROW LEVEL SECURITY;
+ALTER TABLE campos_personalizados ENABLE ROW LEVEL SECURITY;
+ALTER TABLE lead_campos_valores ENABLE ROW LEVEL SECURITY;
+ALTER TABLE agendamentos ENABLE ROW LEVEL SECURITY;
+ALTER TABLE logs_atividade ENABLE ROW LEVEL SECURITY;
+ALTER TABLE notificacoes ENABLE ROW LEVEL SECURITY;
+ALTER TABLE planos ENABLE ROW LEVEL SECURITY;
+ALTER TABLE assinaturas ENABLE ROW LEVEL SECURITY;
+ALTER TABLE mensagens_suporte ENABLE ROW LEVEL SECURITY;
+ALTER TABLE webhooks ENABLE ROW LEVEL SECURITY;
+ALTER TABLE produtos ENABLE ROW LEVEL SECURITY;
