@@ -32,7 +32,7 @@ async function receberMensagem(req, res) {
     mensagem: `${lead.nome} enviou uma mensagem`,
   });
 
-  const respostaTexto = iaService.gerarResposta(mensagem);
+  const respostaTexto = await iaService.gerarResposta(mensagem);
   await mensagemModel.criar({ leadId: lead.id, conteudo: respostaTexto, enviadoPor: 'ia' });
 
   whatsappService.enviarMensagem(telefone, respostaTexto);

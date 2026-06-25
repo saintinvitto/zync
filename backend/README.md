@@ -40,7 +40,7 @@ Usa Jest + Supertest contra um schema Postgres separado (`zync_test`), criado e 
 | E-mail (`src/services/emailService.js`) | Real via SendGrid — precisa de `SENDGRID_API_KEY` e `EMAIL_FROM` (e-mail verificado em Single Sender Verification). Sem essas variáveis, cai no mock (`console.log`) — é o que acontece localmente/nos testes. |
 | Pagamento (`src/services/syncpayService.js`) | Real, já configurado em produção (`SYNCPAY_*`). |
 | WhatsApp (`src/services/whatsappService.js`) | Mock — webhook recebe mensagens reais, mas o envio ainda não chama nenhuma API real (Meta Cloud API/Twilio). |
-| IA de atendimento (`src/services/iaService.js`) | Mock — resposta por palavra-chave, não é um LLM real. |
+| IA de atendimento (`src/services/iaService.js`) | Real via Claude (Anthropic) — precisa de `ANTHROPIC_API_KEY` (console.anthropic.com). Sem ela, cai no mock por palavra-chave — é o que acontece localmente/nos testes. Se a chamada à API falhar por qualquer motivo, também cai no mock em vez de quebrar o atendimento. |
 
 ## Monitoramento
 

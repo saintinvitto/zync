@@ -16,7 +16,7 @@ async function responder(req, res) {
     enviadoPor: 'cliente',
   });
 
-  const respostaTexto = iaService.gerarResposta(conteudo);
+  const respostaTexto = await iaService.gerarResposta(conteudo);
 
   const mensagemIA = await mensagemModel.criar({
     leadId: req.params.leadId,

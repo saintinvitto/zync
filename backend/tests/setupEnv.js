@@ -8,3 +8,4 @@ process.env.SYNCPAY_WEBHOOK_TOKEN = process.env.SYNCPAY_WEBHOOK_TOKEN || 'token-
 process.env.SENTRY_DSN = '';
 process.env.SENDGRID_API_KEY = '';
 process.env.NTFY_TOPIC = '';
+process.env.ANTHROPIC_API_KEY = '';
