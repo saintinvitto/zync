@@ -2,11 +2,12 @@ const adminModel = require('../models/adminModel');
 const planoModel = require('../models/planoModel');
 const usuarioModel = require('../models/usuarioModel');
 const suporteModel = require('../models/suporteModel');
+const assinaturaModel = require('../models/assinaturaModel');
 const asyncHandler = require('../utils/asyncHandler');
 const validators = require('../utils/validators');
 
 async function listarUsuarios(req, res) {
-  const usuarios = await adminModel.listarUsuarios();
+  const usuarios = await adminModel.listarUsuarios({ incluirRemovidos: req.query.incluirRemovidos === 'true' });
   res.json(usuarios);
 }
 
@@ -30,6 +31,36 @@ async function definirAdmin(req, res) {
 
   await usuarioModel.definirAdmin(req.params.id, isAdmin);
   res.json({ ok: true });
+}
+
+async function removerUsuario(req, res) {
+  const usuario = await usuarioModel.buscarPorId(req.params.id);
+  if (!usuario) return res.status(404).json({ error: 'Usuário não encontrado' });
+
+  if (Number(req.params.id) === req.usuario.id) {
+    return res.status(400).json({ error: 'Você não pode remover a própria conta por aqui' });
+  }
+
+  await adminModel.removerUsuario(req.params.id);
+  res.status(204).send();
+}
+
+async function reativarUsuario(req, res) {
+  const usuario = await usuarioModel.buscarPorId(req.params.id);
+  if (!usuario) return res.status(404).json({ error: 'Usuário não encontrado' });
+
+  await adminModel.reativarUsuario(req.params.id);
+  res.status(204).send();
+}
+
+async function cancelarAssinatura(req, res) {
+  const assinatura = await assinaturaModel.buscarAtualPorUsuario(req.params.id);
+  if (!assinatura || assinatura.status !== 'ativa') {
+    return res.status(400).json({ error: 'Não há assinatura ativa para cancelar' });
+  }
+
+  await assinaturaModel.cancelar(assinatura.id, req.params.id);
+  res.status(204).send();
 }
 
 async function listarPlanos(req, res) {
@@ -92,6 +123,9 @@ module.exports = {
   listarUsuarios: asyncHandler(listarUsuarios),
   metricas: asyncHandler(metricas),
   definirAdmin: asyncHandler(definirAdmin),
+  removerUsuario: asyncHandler(removerUsuario),
+  reativarUsuario: asyncHandler(reativarUsuario),
+  cancelarAssinatura: asyncHandler(cancelarAssinatura),
   listarPlanos: asyncHandler(listarPlanos),
   criarPlano: asyncHandler(criarPlano),
   atualizarPlano: asyncHandler(atualizarPlano),

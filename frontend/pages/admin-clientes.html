@@ -49,6 +49,10 @@
 
     <div class="kanban-header">
       <div class="app-title" style="font-size:1.15rem;">Empresas cadastradas</div>
+      <label style="display:flex; align-items:center; gap:0.5rem; font-size:0.82rem; color:var(--cinza); font-weight:400;">
+        <input type="checkbox" id="mostrar-removidas">
+        Mostrar empresas removidas
+      </label>
     </div>
     <div class="agenda-list" id="admin-users-list">
       <div class="empty-state"><span class="spinner"></span></div>
@@ -61,6 +65,22 @@
       <div class="empty-state"><span class="spinner"></span></div>
     </div>
   </main>
+</div>
+
+<!-- Modal: detalhes da assinatura -->
+<div class="modal-overlay" id="detalhes-modal">
+  <div class="modal-box" style="max-width: 420px;">
+    <div class="modal-header">
+      <div class="modal-title">Detalhes da assinatura</div>
+      <button class="modal-close" data-close-modal aria-label="Fechar" data-icon="x"></button>
+    </div>
+
+    <div id="detalhes-conteudo" style="display:flex; flex-direction:column; gap:0.7rem; font-size:0.88rem;"></div>
+
+    <div class="modal-actions">
+      <button type="button" class="btn btn-secondary" data-close-modal>Fechar</button>
+    </div>
+  </div>
 </div>
 
 <script src="../assets/js/api.js"></script>

@@ -104,8 +104,11 @@ const Api = {
 
   admin: {
     metricas: () => apiRequest('/admin/metricas'),
-    usuarios: () => apiRequest('/admin/usuarios'),
+    usuarios: (incluirRemovidos) => apiRequest(`/admin/usuarios${incluirRemovidos ? '?incluirRemovidos=true' : ''}`),
     definirAdmin: (id, isAdmin) => apiRequest(`/admin/usuarios/${id}/admin`, { method: 'PATCH', body: { isAdmin } }),
+    removerUsuario: (id) => apiRequest(`/admin/usuarios/${id}/remover`, { method: 'PATCH' }),
+    reativarUsuario: (id) => apiRequest(`/admin/usuarios/${id}/reativar`, { method: 'PATCH' }),
+    cancelarAssinatura: (id) => apiRequest(`/admin/usuarios/${id}/assinatura/cancelar`, { method: 'PATCH' }),
     planos: {
       listar: () => apiRequest('/admin/planos'),
       criar: (dados) => apiRequest('/admin/planos', { method: 'POST', body: dados }),
