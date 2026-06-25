@@ -20,7 +20,8 @@ CREATE TABLE IF NOT EXISTS usuarios (
   nome_empresa VARCHAR(120) NULL,
   senha_alterada_em TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
   catalogo_slug VARCHAR(32) NULL UNIQUE,
-  removido_em TIMESTAMPTZ NULL
+  removido_em TIMESTAMPTZ NULL,
+  whatsapp_phone_number_id VARCHAR(60) NULL UNIQUE
 );
 
 CREATE INDEX IF NOT EXISTS idx_usuarios_reset_token ON usuarios (reset_token_hash);
