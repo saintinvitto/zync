@@ -193,7 +193,7 @@ async function carregarSuporte() {
           <div class="agenda-servico">${escapeHtml(m.mensagem)}</div>
           <div class="agenda-servico">
             ${formatDataHoraCurta(m.criado_em)}
-            ${m.video_url ? ` · <a href="${escapeHtml(m.video_url)}" target="_blank" rel="noopener noreferrer" style="color:var(--roxo-claro);">${icon('video', 12)} ver vídeo</a>` : ''}
+            ${m.video_url ? ` · <a href="${escapeHtml(m.video_url)}" target="_blank" rel="noopener noreferrer" style="color:var(--azul-claro);">${icon('video', 12)} ver vídeo</a>` : ''}
           </div>
         </div>
         <div class="agenda-actions">

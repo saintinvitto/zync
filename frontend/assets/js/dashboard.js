@@ -206,12 +206,12 @@ function renderSparkline() {
   document.getElementById('sparkline').innerHTML = `
     <defs>
       <linearGradient id="sparkFill" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0%" stop-color="#7C3AED" stop-opacity="0.35"/>
-        <stop offset="100%" stop-color="#7C3AED" stop-opacity="0"/>
+        <stop offset="0%" stop-color="#0055FE" stop-opacity="0.35"/>
+        <stop offset="100%" stop-color="#0055FE" stop-opacity="0"/>
       </linearGradient>
     </defs>
     <path d="${areaPath}" fill="url(#sparkFill)" stroke="none"></path>
-    <path d="${linePath}" fill="none" stroke="#A78BFA" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"></path>
+    <path d="${linePath}" fill="none" stroke="#4D8DFF" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"></path>
   `;
 
   const total = contagem.reduce((a, b) => a + b, 0);
@@ -938,17 +938,17 @@ function renderFaturamento(dados, dias) {
   document.getElementById('faturamento-chart').innerHTML = `
     <defs>
       <linearGradient id="fatFill" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0%" stop-color="#EC4899" stop-opacity="0.4"/>
-        <stop offset="100%" stop-color="#7C3AED" stop-opacity="0"/>
+        <stop offset="0%" stop-color="#4D8DFF" stop-opacity="0.4"/>
+        <stop offset="100%" stop-color="#0055FE" stop-opacity="0"/>
       </linearGradient>
       <linearGradient id="fatStroke" x1="0" y1="0" x2="1" y2="0">
-        <stop offset="0%" stop-color="#7C3AED"/>
-        <stop offset="100%" stop-color="#EC4899"/>
+        <stop offset="0%" stop-color="#0055FE"/>
+        <stop offset="100%" stop-color="#4D8DFF"/>
       </linearGradient>
     </defs>
     <path d="${areaPath}" fill="url(#fatFill)" stroke="none"></path>
     <path d="${linePath}" fill="none" stroke="url(#fatStroke)" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"></path>
-    <circle id="faturamento-marker" cx="0" cy="0" r="4" fill="#fff" stroke="#EC4899" stroke-width="2" class="hidden"></circle>
+    <circle id="faturamento-marker" cx="0" cy="0" r="4" fill="#fff" stroke="#0055FE" stroke-width="2" class="hidden"></circle>
   `;
 
   const total = valores.reduce((a, b) => a + b, 0);
