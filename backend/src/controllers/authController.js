@@ -5,6 +5,7 @@ const usuarioModel = require('../models/usuarioModel');
 const emailService = require('../services/emailService');
 const asyncHandler = require('../utils/asyncHandler');
 const validators = require('../utils/validators');
+const ntfy = require('../utils/ntfy');
 
 async function register(req, res) {
   const { nome, email, senha } = req.body;
@@ -27,6 +28,8 @@ async function register(req, res) {
 
   const senha_hash = await bcrypt.hash(senha, 10);
   const usuario = await usuarioModel.create({ nome, email, senha_hash });
+
+  ntfy.notificar(`${nome} (${email})`, { titulo: 'Zync · Novo cadastro', tag: 'tada' });
 
   res.status(201).json(usuario);
 }
@@ -56,6 +59,8 @@ async function login(req, res) {
     process.env.JWT_SECRET,
     { expiresIn: '7d' }
   );
+
+  ntfy.notificar(`${usuario.nome} (${usuario.email})`, { titulo: 'Zync · Login', tag: 'unlock' });
 
   res.json({
     token,

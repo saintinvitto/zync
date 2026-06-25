@@ -47,6 +47,14 @@ Usa Jest + Supertest contra um schema Postgres separado (`zync_test`), criado e 
   cria uma conta grátis no UptimeRobot (ou similar), aponta um monitor HTTP
   pra `https://zync-backend-production.up.railway.app/health` a cada 5 min,
   e configura o contato de alerta (e-mail/Discord/Slack).
+- **Atividade do negócio**: novo cadastro, login e pagamento aprovado disparam
+  um push via [ntfy.sh](https://ntfy.sh) (ver `src/utils/ntfy.js`, chamado em
+  `authController.js` e `syncpayWebhookController.js`). Só ativa se a env var
+  `NTFY_TOPIC` estiver configurada. Pra receber no celular: instala o app
+  ntfy (iOS/Android), assina o mesmo tópico configurado em `NTFY_TOPIC` — sem
+  precisar criar conta. É um serviço público por tópico (quem souber o nome
+  do tópico recebe as mensagens), por isso o nome deve ser longo e aleatório,
+  nunca algo previsível como `zync` ou `alertas`.
 
 ## Produção (Railway)
 

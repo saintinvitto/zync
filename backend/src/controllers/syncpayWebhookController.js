@@ -1,6 +1,8 @@
 const assinaturaModel = require('../models/assinaturaModel');
 const planoModel = require('../models/planoModel');
+const usuarioModel = require('../models/usuarioModel');
 const asyncHandler = require('../utils/asyncHandler');
+const ntfy = require('../utils/ntfy');
 
 async function receber(req, res) {
   const dados = req.body && req.body.data;
@@ -16,6 +18,12 @@ async function receber(req, res) {
   if (dados.status === 'completed') {
     const plano = await planoModel.buscarPorId(assinatura.plano_id);
     await assinaturaModel.marcarAtiva(dados.id, plano.intervalo_dias);
+
+    const usuario = await usuarioModel.buscarPorId(assinatura.usuario_id);
+    ntfy.notificar(
+      `${usuario.nome} (${usuario.email}) — ${plano.nome} — R$ ${assinatura.valor}`,
+      { titulo: 'Zync · Pagamento aprovado', tag: 'moneybag' }
+    );
   } else if (dados.status === 'failed' || dados.status === 'refunded') {
     await assinaturaModel.marcarFalha(dados.id);
   }
