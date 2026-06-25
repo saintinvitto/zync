@@ -1,6 +1,7 @@
 const leadModel = require('../models/leadModel');
 const logModel = require('../models/logModel');
 const notificacaoModel = require('../models/notificacaoModel');
+const webhookService = require('../services/webhookService');
 const asyncHandler = require('../utils/asyncHandler');
 const validators = require('../utils/validators');
 const { paraCsv } = require('../utils/csv');
@@ -112,6 +113,14 @@ async function criar(req, res) {
     mensagem: `Novo lead: ${lead.nome}`,
   });
 
+  webhookService.disparar(req.usuario.id, 'lead_criado', {
+    id: lead.id,
+    nome: lead.nome,
+    servico: lead.servico,
+    origem: lead.origem,
+    status: lead.status,
+  });
+
   res.status(201).json(lead);
 }
 
@@ -130,6 +139,13 @@ async function atualizar(req, res) {
       leadId: lead.id,
       acao: 'lead_status_alterado',
       detalhes: { de: lead.status, para: req.body.status },
+    });
+
+    webhookService.disparar(req.usuario.id, 'lead_status_alterado', {
+      id: lead.id,
+      nome: lead.nome,
+      de: lead.status,
+      para: req.body.status,
     });
   }
 

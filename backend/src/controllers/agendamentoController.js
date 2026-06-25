@@ -2,6 +2,7 @@ const agendamentoModel = require('../models/agendamentoModel');
 const leadModel = require('../models/leadModel');
 const logModel = require('../models/logModel');
 const notificacaoModel = require('../models/notificacaoModel');
+const webhookService = require('../services/webhookService');
 const asyncHandler = require('../utils/asyncHandler');
 const validators = require('../utils/validators');
 
@@ -61,6 +62,14 @@ async function criar(req, res) {
     leadId: lead.id,
     tipo: 'agendamento_criado',
     mensagem: `Novo agendamento para ${lead.nome}`,
+  });
+
+  webhookService.disparar(req.usuario.id, 'agendamento_criado', {
+    id: agendamento.id,
+    leadId: lead.id,
+    leadNome: lead.nome,
+    servico: agendamento.servico,
+    data_hora: agendamento.data_hora,
   });
 
   res.status(201).json(agendamento);

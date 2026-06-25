@@ -203,3 +203,41 @@ describe('DELETE /api/leads/:id', () => {
     expect(buscar.status).toBe(404);
   });
 });
+
+describe('Disparo de webhook ao criar/atualizar lead', () => {
+  const ORIGINAL_FETCH = global.fetch;
+
+  afterEach(() => {
+    global.fetch = ORIGINAL_FETCH;
+  });
+
+  test('criar lead com integração ativa pra lead_criado dispara o webhook assinado', async () => {
+    const { token } = await criarUsuarioEToken(app, request);
+
+    await request(app)
+      .post('/api/integracoes')
+      .set('Authorization', `Bearer ${token}`)
+      .send({ url: 'https://exemplo.com/hook', eventos: ['lead_criado'] });
+
+    global.fetch = jest.fn().mockResolvedValue({ ok: true, status: 200 });
+
+    await criarLead(token, { nome: 'Lead Webhook' });
+    await new Promise((resolve) => setTimeout(resolve, 50));
+
+    expect(global.fetch).toHaveBeenCalledTimes(1);
+    const [url, opcoes] = global.fetch.mock.calls[0];
+    expect(url).toBe('https://exemplo.com/hook');
+    expect(opcoes.headers['X-Zync-Signature']).toMatch(/^sha256=/);
+    expect(JSON.parse(opcoes.body).evento).toBe('lead_criado');
+  });
+
+  test('criar lead sem integração cadastrada não chama fetch', async () => {
+    const { token } = await criarUsuarioEToken(app, request);
+
+    global.fetch = jest.fn();
+    await criarLead(token, { nome: 'Lead Sem Webhook' });
+    await new Promise((resolve) => setTimeout(resolve, 50));
+
+    expect(global.fetch).not.toHaveBeenCalled();
+  });
+});

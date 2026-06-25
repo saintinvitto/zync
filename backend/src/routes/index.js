@@ -20,6 +20,7 @@ const syncpayWebhookRoutes = require('./syncpayWebhookRoutes');
 const relatorioRoutes = require('./relatorioRoutes');
 const adminRoutes = require('./adminRoutes');
 const suporteRoutes = require('./suporteRoutes');
+const webhookRoutes = require('./webhookRoutes');
 
 router.get('/health', (req, res) => {
   res.json({ status: 'ok' });
@@ -44,5 +45,6 @@ router.use('/webhooks/syncpay', syncpayWebhookRoutes);
 router.use('/relatorios', relatorioRoutes);
 router.use('/admin', adminRoutes);
 router.use('/suporte', suporteRoutes);
+router.use('/integracoes', webhookRoutes);
 
 module.exports = router;

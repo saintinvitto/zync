@@ -259,4 +259,133 @@ document.getElementById('form-senha').addEventListener('submit', async (e) => {
   }
 });
 
+/* ---------- INTEGRAÇÕES (WEBHOOKS) ---------- */
+const ROTULOS_EVENTO = {
+  lead_criado: 'Novo lead',
+  lead_status_alterado: 'Status do lead mudou',
+  agendamento_criado: 'Novo agendamento',
+  pagamento_aprovado: 'Pagamento aprovado',
+};
+
+function renderIntegracoes(lista) {
+  const container = document.getElementById('integracoes-list');
+
+  if (lista.length === 0) {
+    container.innerHTML = '<div class="integracao-empty">Nenhuma integração cadastrada ainda.</div>';
+    return;
+  }
+
+  container.innerHTML = lista.map((it) => `
+    <div class="integracao-row" data-id="${it.id}">
+      <div class="integracao-info">
+        <div class="integracao-url">${escapeHtml(it.url)}</div>
+        <div class="integracao-eventos">
+          ${it.eventos.map((ev) => `<span class="tag-chip">${escapeHtml(ROTULOS_EVENTO[ev] || ev)}</span>`).join('')}
+          <span class="badge ${it.ativo ? 'badge-ativa' : 'badge-cancelada'}">${it.ativo ? 'Ativo' : 'Inativo'}</span>
+        </div>
+      </div>
+      <div class="integracao-actions">
+        <button type="button" class="btn btn-secondary btn-sm" data-acao="testar">Testar</button>
+        <button type="button" class="btn btn-secondary btn-sm" data-acao="alternar">${it.ativo ? 'Desativar' : 'Ativar'}</button>
+        <button type="button" class="btn btn-ghost btn-sm" data-acao="remover" aria-label="Remover">${icon('x', 14)}</button>
+      </div>
+    </div>
+  `).join('');
+
+  container.querySelectorAll('[data-acao]').forEach((btn) => {
+    const id = btn.closest('.integracao-row').dataset.id;
+    const item = lista.find((i) => String(i.id) === id);
+
+    btn.addEventListener('click', async () => {
+      if (btn.dataset.acao === 'testar') {
+        btn.disabled = true;
+        try {
+          const resultado = await Api.integracoes.testar(id);
+          showToast(resultado.sucesso ? 'Teste enviado com sucesso!' : 'A URL não respondeu corretamente', resultado.sucesso ? 'success' : 'error');
+        } catch (err) {
+          showToast(err.message, 'error');
+        } finally {
+          btn.disabled = false;
+        }
+      }
+
+      if (btn.dataset.acao === 'alternar') {
+        try {
+          await Api.integracoes.atualizar(id, { ativo: !item.ativo });
+          carregarIntegracoes();
+        } catch (err) {
+          showToast(err.message, 'error');
+        }
+      }
+
+      if (btn.dataset.acao === 'remover') {
+        if (!confirm('Remover essa integração?')) return;
+        try {
+          await Api.integracoes.remover(id);
+          carregarIntegracoes();
+        } catch (err) {
+          showToast(err.message, 'error');
+        }
+      }
+    });
+  });
+}
+
+async function carregarIntegracoes() {
+  try {
+    const lista = await Api.integracoes.listar();
+    renderIntegracoes(lista);
+  } catch (err) {
+    showToast(err.message, 'error');
+  }
+}
+
+(function configurarModalIntegracao() {
+  const modal = document.getElementById('integracao-modal');
+  const form = document.getElementById('form-integracao');
+
+  function abrirModal() {
+    modal.classList.add('visible');
+  }
+
+  function fecharModal() {
+    modal.classList.remove('visible');
+    form.reset();
+  }
+
+  document.getElementById('integracao-nova').addEventListener('click', abrirModal);
+  modal.querySelectorAll('[data-close-modal]').forEach((el) => el.addEventListener('click', fecharModal));
+  modal.addEventListener('click', (e) => { if (e.target === modal) fecharModal(); });
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const url = document.getElementById('integracao-url').value;
+    const eventos = Array.from(form.querySelectorAll('input[name="integracao-evento"]:checked')).map((c) => c.value);
+
+    if (eventos.length === 0) {
+      showToast('Escolha pelo menos um evento', 'error');
+      return;
+    }
+
+    const btn = document.getElementById('integracao-submit');
+    const label = document.getElementById('integracao-submit-label');
+    btn.disabled = true;
+    label.innerHTML = '<span class="spinner"></span>';
+
+    try {
+      await Api.integracoes.criar({ url, eventos });
+      fecharModal();
+      carregarIntegracoes();
+      showToast('Integração criada com sucesso', 'success');
+    } catch (err) {
+      showToast(err.message, 'error');
+    } finally {
+      btn.disabled = false;
+      label.textContent = 'Criar integração';
+    }
+  });
+})();
+
 carregarPerfil();
+carregarIntegracoes();

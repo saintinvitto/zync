@@ -128,7 +128,61 @@
         </button>
       </form>
     </section>
+
+    <section class="chart-card" style="max-width: 680px;">
+      <div class="chart-card-header">
+        <div class="chart-title">Integrações (Webhooks)</div>
+        <button type="button" class="btn btn-secondary btn-sm" id="integracao-nova" data-icon="plus"> Nova integração</button>
+      </div>
+      <p style="color:var(--cinza); font-size:0.85rem; margin-bottom:1rem; max-width:520px;">
+        Conecte o Zync a outras ferramentas (ERP, automações, planilhas). Sempre
+        que um evento escolhido acontecer na sua conta, o Zync envia um POST
+        assinado pra URL cadastrada.
+      </p>
+      <div class="integracao-list" id="integracoes-list"></div>
+    </section>
   </main>
+</div>
+
+<!-- Modal: nova integração (webhook) -->
+<div class="modal-overlay" id="integracao-modal">
+  <div class="modal-box" style="max-width: 460px;">
+    <div class="modal-header">
+      <div class="modal-title">Nova integração</div>
+      <button class="modal-close" data-close-modal aria-label="Fechar" data-icon="x"></button>
+    </div>
+
+    <form id="form-integracao" novalidate>
+      <div class="field">
+        <label for="integracao-url">URL de destino</label>
+        <input type="url" id="integracao-url" placeholder="https://meu-erp.com/webhook" required>
+      </div>
+      <div class="field">
+        <label>Eventos</label>
+        <div style="display:flex; flex-direction:column; gap:0.5rem; margin-top:0.4rem;">
+          <label style="display:flex; align-items:center; gap:0.5rem; font-weight:400; font-size:0.85rem;">
+            <input type="checkbox" name="integracao-evento" value="lead_criado"> Novo lead
+          </label>
+          <label style="display:flex; align-items:center; gap:0.5rem; font-weight:400; font-size:0.85rem;">
+            <input type="checkbox" name="integracao-evento" value="lead_status_alterado"> Status do lead mudou
+          </label>
+          <label style="display:flex; align-items:center; gap:0.5rem; font-weight:400; font-size:0.85rem;">
+            <input type="checkbox" name="integracao-evento" value="agendamento_criado"> Novo agendamento
+          </label>
+          <label style="display:flex; align-items:center; gap:0.5rem; font-weight:400; font-size:0.85rem;">
+            <input type="checkbox" name="integracao-evento" value="pagamento_aprovado"> Pagamento aprovado
+          </label>
+        </div>
+      </div>
+
+      <div class="modal-actions">
+        <button type="button" class="btn btn-secondary" data-close-modal>Cancelar</button>
+        <button type="submit" class="btn btn-primary" id="integracao-submit">
+          <span id="integracao-submit-label">Criar integração</span>
+        </button>
+      </div>
+    </form>
+  </div>
 </div>
 
 <!-- Modal: ajustar foto de perfil -->

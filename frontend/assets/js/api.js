@@ -189,6 +189,14 @@ const Api = {
     checkout: (dados) => apiRequest('/assinaturas/checkout', { method: 'POST', body: dados }),
     atual: () => apiRequest('/assinaturas/atual'),
   },
+
+  integracoes: {
+    listar: () => apiRequest('/integracoes'),
+    criar: (dados) => apiRequest('/integracoes', { method: 'POST', body: dados }),
+    atualizar: (id, dados) => apiRequest(`/integracoes/${id}`, { method: 'PATCH', body: dados }),
+    remover: (id) => apiRequest(`/integracoes/${id}`, { method: 'DELETE' }),
+    testar: (id) => apiRequest(`/integracoes/${id}/testar`, { method: 'POST' }),
+  },
 };
 
 async function downloadComAuth(path, filename) {
