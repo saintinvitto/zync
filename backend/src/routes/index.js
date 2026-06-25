@@ -21,6 +21,8 @@ const relatorioRoutes = require('./relatorioRoutes');
 const adminRoutes = require('./adminRoutes');
 const suporteRoutes = require('./suporteRoutes');
 const webhookRoutes = require('./webhookRoutes');
+const produtoRoutes = require('./produtoRoutes');
+const catalogoPublicoRoutes = require('./catalogoPublicoRoutes');
 
 router.get('/health', (req, res) => {
   res.json({ status: 'ok' });
@@ -46,5 +48,7 @@ router.use('/relatorios', relatorioRoutes);
 router.use('/admin', adminRoutes);
 router.use('/suporte', suporteRoutes);
 router.use('/integracoes', webhookRoutes);
+router.use('/catalogo', produtoRoutes);
+router.use('/catalogo-publico/:slug', catalogoPublicoRoutes);
 
 module.exports = router;

@@ -17,7 +17,8 @@ CREATE TABLE IF NOT EXISTS usuarios (
   instagram VARCHAR(120) NULL,
   facebook VARCHAR(120) NULL,
   telefone VARCHAR(20) NULL,
-  senha_alterada_em TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
+  senha_alterada_em TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  catalogo_slug VARCHAR(32) NULL UNIQUE
 );
 
 CREATE INDEX IF NOT EXISTS idx_usuarios_reset_token ON usuarios (reset_token_hash);
@@ -157,3 +158,16 @@ CREATE TABLE IF NOT EXISTS webhooks (
 );
 
 CREATE INDEX IF NOT EXISTS idx_webhooks_usuario ON webhooks (usuario_id);
+
+CREATE TABLE IF NOT EXISTS produtos (
+  id SERIAL PRIMARY KEY,
+  usuario_id INT NOT NULL REFERENCES usuarios(id) ON DELETE CASCADE,
+  nome VARCHAR(120) NOT NULL,
+  descricao VARCHAR(500),
+  preco DECIMAL(10,2) NOT NULL,
+  foto_url TEXT,
+  ativo BOOLEAN NOT NULL DEFAULT true,
+  criado_em TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX IF NOT EXISTS idx_produtos_usuario ON produtos (usuario_id);

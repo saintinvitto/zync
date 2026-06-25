@@ -197,6 +197,19 @@ const Api = {
     remover: (id) => apiRequest(`/integracoes/${id}`, { method: 'DELETE' }),
     testar: (id) => apiRequest(`/integracoes/${id}/testar`, { method: 'POST' }),
   },
+
+  catalogo: {
+    listar: () => apiRequest('/catalogo'),
+    criar: (dados) => apiRequest('/catalogo', { method: 'POST', body: dados }),
+    atualizar: (id, dados) => apiRequest(`/catalogo/${id}`, { method: 'PATCH', body: dados }),
+    remover: (id) => apiRequest(`/catalogo/${id}`, { method: 'DELETE' }),
+    link: () => apiRequest('/catalogo/link'),
+  },
+
+  catalogoPublico: {
+    obter: (slug) => apiRequest(`/catalogo-publico/${slug}`, { auth: false }),
+    solicitar: (slug, dados) => apiRequest(`/catalogo-publico/${slug}/solicitar`, { method: 'POST', body: dados, auth: false }),
+  },
 };
 
 async function downloadComAuth(path, filename) {
