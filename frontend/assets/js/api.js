@@ -160,6 +160,15 @@ const Api = {
     desassociar: (leadId, tagId) => apiRequest(`/leads/${leadId}/tags/${tagId}`, { method: 'DELETE' }),
   },
 
+  camposPersonalizados: {
+    listar: () => apiRequest('/campos-personalizados'),
+    criar: (dados) => apiRequest('/campos-personalizados', { method: 'POST', body: dados }),
+    remover: (id) => apiRequest(`/campos-personalizados/${id}`, { method: 'DELETE' }),
+    doLead: (leadId) => apiRequest(`/leads/${leadId}/campos-personalizados`),
+    definir: (leadId, campoId, valor) => apiRequest(`/leads/${leadId}/campos-personalizados/${campoId}`, { method: 'PUT', body: { valor } }),
+    removerValor: (leadId, campoId) => apiRequest(`/leads/${leadId}/campos-personalizados/${campoId}`, { method: 'DELETE' }),
+  },
+
   agendamentos: {
     listarTodos: () => apiRequest('/agendamentos'),
     doLead: (leadId) => apiRequest(`/leads/${leadId}/agendamentos`),

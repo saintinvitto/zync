@@ -23,6 +23,8 @@ const suporteRoutes = require('./suporteRoutes');
 const webhookRoutes = require('./webhookRoutes');
 const produtoRoutes = require('./produtoRoutes');
 const catalogoPublicoRoutes = require('./catalogoPublicoRoutes');
+const campoPersonalizadoRoutes = require('./campoPersonalizadoRoutes');
+const leadCampoPersonalizadoRoutes = require('./leadCampoPersonalizadoRoutes');
 
 router.get('/health', (req, res) => {
   res.json({ status: 'ok' });
@@ -50,5 +52,7 @@ router.use('/suporte', suporteRoutes);
 router.use('/integracoes', webhookRoutes);
 router.use('/catalogo', produtoRoutes);
 router.use('/catalogo-publico/:slug', catalogoPublicoRoutes);
+router.use('/campos-personalizados', campoPersonalizadoRoutes);
+router.use('/leads/:leadId/campos-personalizados', leadCampoPersonalizadoRoutes);
 
 module.exports = router;

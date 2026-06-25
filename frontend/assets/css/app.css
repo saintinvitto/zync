@@ -1174,6 +1174,46 @@ a { color: inherit; text-decoration: none; }
 .tag-manage-form { display: flex; gap: 0.6rem; }
 .tag-manage-form input { flex: 1; }
 
+.panel-campos {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  margin-top: 0.8rem;
+}
+.campo-row { display: flex; flex-direction: column; gap: 0.3rem; }
+.campo-row label { font-size: 0.72rem; color: var(--cinza); }
+.campo-row .campo-input {
+  background: var(--preto3);
+  border: 1px solid var(--borda);
+  border-radius: 8px;
+  padding: 0.45rem 0.6rem;
+  font-size: 0.82rem;
+  color: var(--branco);
+  font-family: inherit;
+}
+.campo-row select.campo-input { cursor: pointer; }
+
+.campo-manage-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 1.2rem;
+  min-height: 32px;
+}
+.campo-manage-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--preto3);
+  border: 1px solid var(--borda);
+  border-radius: var(--radius);
+  padding: 0.5rem 0.8rem;
+  font-size: 0.85rem;
+}
+.campo-manage-form { display: flex; gap: 0.6rem; flex-wrap: wrap; }
+.campo-manage-form input,
+.campo-manage-form select { flex: 1; min-width: 120px; }
+
 /* ---------- AGENDA ---------- */
 .badge-agendado { background: rgba(167,139,250,0.15); color: var(--azul-claro); }
 .badge-confirmado { background: rgba(34,211,238,0.15); color: var(--ciano); }

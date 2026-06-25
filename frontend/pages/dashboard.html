@@ -41,6 +41,7 @@
       <div style="display:flex; gap:0.7rem;">
         <button class="btn btn-secondary" id="open-cmdk" data-icon="search"> Buscar (Ctrl+K)</button>
         <button class="btn btn-secondary" id="open-tags" data-icon="tag"> Tags</button>
+        <button class="btn btn-secondary" id="open-campos" data-icon="clipboardList"> Campos</button>
         <button class="btn btn-primary" id="open-new-lead">+ Novo lead</button>
       </div>
     </div>
@@ -250,6 +251,30 @@
   </div>
 </div>
 
+<!-- Modal: gerenciar campos personalizados -->
+<div class="modal-overlay" id="campos-modal">
+  <div class="modal-box">
+    <div class="modal-header">
+      <div class="modal-title">Gerenciar campos personalizados</div>
+      <button class="modal-close" data-close-modal aria-label="Fechar" data-icon="x"></button>
+    </div>
+
+    <div class="campo-manage-list" id="campos-manage-list"></div>
+
+    <form id="new-campo-form" class="campo-manage-form" novalidate>
+      <input type="text" id="nc-nome" placeholder="Nome do campo" aria-label="Nome do novo campo" required>
+      <select id="nc-tipo" aria-label="Tipo do campo">
+        <option value="texto">Texto</option>
+        <option value="numero">Número</option>
+        <option value="data">Data</option>
+        <option value="selecao">Seleção</option>
+      </select>
+      <input type="text" id="nc-opcoes" placeholder="Opções separadas por vírgula" aria-label="Opções do campo de seleção" class="hidden">
+      <button type="submit" class="btn btn-primary btn-sm">Adicionar</button>
+    </form>
+  </div>
+</div>
+
 <!-- Painel de conversa do lead -->
 <div class="panel-overlay" id="panel-overlay"></div>
 <aside class="lead-panel" id="lead-panel">
@@ -276,6 +301,8 @@
         <option value="">+ tag</option>
       </select>
     </div>
+
+    <div class="panel-campos" id="panel-campos"></div>
 
     <div class="panel-agenda">
       <div class="panel-agenda-header">
