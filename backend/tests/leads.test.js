@@ -211,6 +211,16 @@ describe('Disparo de webhook ao criar/atualizar lead', () => {
     global.fetch = ORIGINAL_FETCH;
   });
 
+  // o disparo e fire-and-forget (nao bloqueia a resposta da API), entao o
+  // teste precisa esperar a chamada acontecer em vez de assumir um tempo
+  // fixo -- um sleep fixo e flaky (passa local, falha em CI mais lento).
+  async function aguardarChamada(mockFn, tentativas = 40) {
+    for (let i = 0; i < tentativas; i++) {
+      if (mockFn.mock.calls.length > 0) return;
+      await new Promise((resolve) => setTimeout(resolve, 50));
+    }
+  }
+
   test('criar lead com integração ativa pra lead_criado dispara o webhook assinado', async () => {
     const { token } = await criarUsuarioEToken(app, request);
 
@@ -222,22 +232,22 @@ describe('Disparo de webhook ao criar/atualizar lead', () => {
     global.fetch = jest.fn().mockResolvedValue({ ok: true, status: 200 });
 
     await criarLead(token, { nome: 'Lead Webhook' });
-    await new Promise((resolve) => setTimeout(resolve, 50));
+    await aguardarChamada(global.fetch);
 
     expect(global.fetch).toHaveBeenCalledTimes(1);
     const [url, opcoes] = global.fetch.mock.calls[0];
     expect(url).toBe('https://exemplo.com/hook');
     expect(opcoes.headers['X-Zync-Signature']).toMatch(/^sha256=/);
     expect(JSON.parse(opcoes.body).evento).toBe('lead_criado');
-  });
+  }, 10000);
 
   test('criar lead sem integração cadastrada não chama fetch', async () => {
     const { token } = await criarUsuarioEToken(app, request);
 
     global.fetch = jest.fn();
     await criarLead(token, { nome: 'Lead Sem Webhook' });
-    await new Promise((resolve) => setTimeout(resolve, 50));
+    await new Promise((resolve) => setTimeout(resolve, 300));
 
     expect(global.fetch).not.toHaveBeenCalled();
-  });
+  }, 10000);
 });
