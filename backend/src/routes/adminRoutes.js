@@ -17,5 +17,10 @@ router.post('/planos', adminController.criarPlano);
 router.put('/planos/:id', adminController.atualizarPlano);
 router.get('/suporte', adminController.listarSuporte);
 router.patch('/suporte/:id/respondida', adminController.responderSuporte);
+router.get('/afiliados', adminController.listarAfiliados);
+router.post('/afiliados', adminController.criarAfiliado);
+router.put('/afiliados/:id', adminController.atualizarAfiliado);
+router.get('/afiliados/:id/comissoes', adminController.listarComissoesAfiliado);
+router.patch('/comissoes/:id/paga', adminController.marcarComissaoPaga);
 
 module.exports = router;

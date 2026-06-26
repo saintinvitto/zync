@@ -1,6 +1,7 @@
 const assinaturaModel = require('../models/assinaturaModel');
 const planoModel = require('../models/planoModel');
 const webhookService = require('../services/webhookService');
+const afiliadoService = require('../services/afiliadoService');
 const asyncHandler = require('../utils/asyncHandler');
 const ntfy = require('../utils/ntfy');
 
@@ -21,6 +22,7 @@ async function receber(req, res) {
     }
     const plano = await planoModel.buscarPorId(assinatura.plano_id);
     await assinaturaModel.marcarAtiva(dados.id, plano.intervalo_dias);
+    await afiliadoService.gerarComissaoSeAplicavel(assinatura);
     ntfy.notificar('Pagamento recebido no Zync!', { titulo: 'Zync · Pagamento aprovado', tag: 'moneybag' });
     webhookService.disparar(assinatura.usuario_id, 'pagamento_aprovado', {
       assinaturaId: assinatura.id,

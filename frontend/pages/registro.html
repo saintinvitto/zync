@@ -80,9 +80,11 @@
       return;
     }
 
+    const codigoIndicacao = new URLSearchParams(window.location.search).get('ref') || undefined;
+
     setLoading(true);
     try {
-      await Api.register(nome, email, senha);
+      await Api.register(nome, email, senha, codigoIndicacao);
       const { token, usuario } = await Api.login(email, senha);
       Auth.setSession(token, usuario);
       window.location.href = Auth.destinoPosLogin();

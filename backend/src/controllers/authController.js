@@ -2,6 +2,7 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
 const usuarioModel = require('../models/usuarioModel');
+const afiliadoModel = require('../models/afiliadoModel');
 const emailService = require('../services/emailService');
 const asyncHandler = require('../utils/asyncHandler');
 const validators = require('../utils/validators');
@@ -9,7 +10,7 @@ const ntfy = require('../utils/ntfy');
 const frontendUrl = require('../utils/frontendUrl');
 
 async function register(req, res) {
-  const { nome, email, senha } = req.body;
+  const { nome, email, senha, codigoIndicacao } = req.body;
   if (!nome || !email || !senha) {
     return res.status(400).json({ error: 'nome, email e senha são obrigatórios' });
   }
@@ -37,6 +38,13 @@ async function register(req, res) {
 
   const senha_hash = await bcrypt.hash(senha, 10);
   const usuario = await usuarioModel.create({ nome, email, senha_hash });
+
+  if (codigoIndicacao) {
+    const afiliado = await afiliadoModel.buscarPorCodigo(codigoIndicacao.trim().toUpperCase());
+    if (afiliado) {
+      await usuarioModel.definirAfiliadoIndicador(usuario.id, afiliado.id);
+    }
+  }
 
   ntfy.notificar('Novo cadastro no Zync!', { titulo: 'Zync · Novo cadastro', tag: 'tada' });
 

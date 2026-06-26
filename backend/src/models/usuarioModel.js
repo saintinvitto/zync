@@ -18,7 +18,7 @@ async function buscarPorId(id) {
   const { rows } = await db.query(
     `SELECT id, nome, email, criado_em, is_admin,
             foto_url, idade, cpf, instagram, facebook, telefone, nome_empresa,
-            whatsapp_phone_number_id,
+            whatsapp_phone_number_id, indicado_por_afiliado_id,
             ia_o_que_vende, ia_horario_funcionamento, ia_tom_de_voz
      FROM usuarios WHERE id = $1`,
     [id]
@@ -125,6 +125,10 @@ async function buscarPorWhatsappPhoneNumberId(phoneNumberId) {
   return rows[0];
 }
 
+async function definirAfiliadoIndicador(usuarioId, afiliadoId) {
+  await db.query('UPDATE usuarios SET indicado_por_afiliado_id = $1 WHERE id = $2', [afiliadoId, usuarioId]);
+}
+
 module.exports = {
   findByEmail,
   create,
@@ -140,4 +144,5 @@ module.exports = {
   garantirSlugCatalogo,
   buscarPorSlugCatalogo,
   buscarPorWhatsappPhoneNumberId,
+  definirAfiliadoIndicador,
 };

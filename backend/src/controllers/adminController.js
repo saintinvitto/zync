@@ -3,6 +3,8 @@ const planoModel = require('../models/planoModel');
 const usuarioModel = require('../models/usuarioModel');
 const suporteModel = require('../models/suporteModel');
 const assinaturaModel = require('../models/assinaturaModel');
+const afiliadoModel = require('../models/afiliadoModel');
+const comissaoAfiliadoModel = require('../models/comissaoAfiliadoModel');
 const asyncHandler = require('../utils/asyncHandler');
 const validators = require('../utils/validators');
 
@@ -119,6 +121,64 @@ async function responderSuporte(req, res) {
   res.status(204).send();
 }
 
+async function listarAfiliados(req, res) {
+  const afiliados = await afiliadoModel.listarTodos();
+  res.json(afiliados);
+}
+
+async function criarAfiliado(req, res) {
+  const { email, percentualComissao } = req.body;
+
+  if (!email) return res.status(400).json({ error: 'email é obrigatório' });
+
+  if (
+    percentualComissao !== undefined &&
+    (typeof percentualComissao !== 'number' || percentualComissao <= 0 || percentualComissao > 100)
+  ) {
+    return res.status(400).json({ error: 'percentualComissao deve ser um número entre 0 e 100' });
+  }
+
+  const usuario = await usuarioModel.findByEmail(email);
+  if (!usuario) return res.status(404).json({ error: 'Usuário não encontrado com esse e-mail' });
+
+  const existente = await afiliadoModel.buscarPorUsuarioId(usuario.id);
+  if (existente) return res.status(409).json({ error: 'Esse usuário já é afiliado' });
+
+  const afiliado = await afiliadoModel.criar({ usuarioId: usuario.id, percentualComissao });
+  res.status(201).json(afiliado);
+}
+
+async function atualizarAfiliado(req, res) {
+  const afiliado = await afiliadoModel.buscarPorId(req.params.id);
+  if (!afiliado) return res.status(404).json({ error: 'Afiliado não encontrado' });
+
+  if (
+    req.body.percentual_comissao !== undefined &&
+    (typeof req.body.percentual_comissao !== 'number' || req.body.percentual_comissao <= 0 || req.body.percentual_comissao > 100)
+  ) {
+    return res.status(400).json({ error: 'percentual_comissao deve ser um número entre 0 e 100' });
+  }
+
+  const atualizado = await afiliadoModel.atualizar(req.params.id, req.body);
+  res.json(atualizado);
+}
+
+async function listarComissoesAfiliado(req, res) {
+  const afiliado = await afiliadoModel.buscarPorId(req.params.id);
+  if (!afiliado) return res.status(404).json({ error: 'Afiliado não encontrado' });
+
+  const comissoes = await comissaoAfiliadoModel.listarPorAfiliado(req.params.id);
+  res.json(comissoes);
+}
+
+async function marcarComissaoPaga(req, res) {
+  const comissao = await comissaoAfiliadoModel.buscarPorId(req.params.id);
+  if (!comissao) return res.status(404).json({ error: 'Comissão não encontrada' });
+
+  await comissaoAfiliadoModel.marcarPaga(req.params.id);
+  res.status(204).send();
+}
+
 module.exports = {
   listarUsuarios: asyncHandler(listarUsuarios),
   metricas: asyncHandler(metricas),
@@ -131,4 +191,9 @@ module.exports = {
   atualizarPlano: asyncHandler(atualizarPlano),
   listarSuporte: asyncHandler(listarSuporte),
   responderSuporte: asyncHandler(responderSuporte),
+  listarAfiliados: asyncHandler(listarAfiliados),
+  criarAfiliado: asyncHandler(criarAfiliado),
+  atualizarAfiliado: asyncHandler(atualizarAfiliado),
+  listarComissoesAfiliado: asyncHandler(listarComissoesAfiliado),
+  marcarComissaoPaga: asyncHandler(marcarComissaoPaga),
 };

@@ -92,7 +92,7 @@ async function apiRequest(path, { method = 'GET', body, auth = true } = {}) {
 }
 
 const Api = {
-  register: (nome, email, senha) => apiRequest('/auth/register', { method: 'POST', body: { nome, email, senha }, auth: false }),
+  register: (nome, email, senha, codigoIndicacao) => apiRequest('/auth/register', { method: 'POST', body: { nome, email, senha, codigoIndicacao }, auth: false }),
   login: (email, senha) => apiRequest('/auth/login', { method: 'POST', body: { email, senha }, auth: false }),
 
   auth: {
@@ -117,6 +117,13 @@ const Api = {
     suporte: {
       listar: () => apiRequest('/admin/suporte'),
       marcarRespondida: (id) => apiRequest(`/admin/suporte/${id}/respondida`, { method: 'PATCH' }),
+    },
+    afiliados: {
+      listar: () => apiRequest('/admin/afiliados'),
+      criar: (dados) => apiRequest('/admin/afiliados', { method: 'POST', body: dados }),
+      atualizar: (id, dados) => apiRequest(`/admin/afiliados/${id}`, { method: 'PUT', body: dados }),
+      comissoes: (id) => apiRequest(`/admin/afiliados/${id}/comissoes`),
+      marcarComissaoPaga: (comissaoId) => apiRequest(`/admin/comissoes/${comissaoId}/paga`, { method: 'PATCH' }),
     },
   },
 

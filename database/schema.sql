@@ -207,6 +207,34 @@ CREATE TABLE IF NOT EXISTS produtos (
 
 CREATE INDEX IF NOT EXISTS idx_produtos_usuario ON produtos (usuario_id);
 
+-- Programa de afiliados: comissao recorrente (% sobre cada pagamento
+-- confirmado de quem foi indicado).
+CREATE TABLE IF NOT EXISTS afiliados (
+  id SERIAL PRIMARY KEY,
+  usuario_id INT NOT NULL REFERENCES usuarios(id) ON DELETE CASCADE,
+  codigo VARCHAR(20) NOT NULL UNIQUE,
+  percentual_comissao DECIMAL(5,2) NOT NULL DEFAULT 20.00,
+  ativo BOOLEAN NOT NULL DEFAULT TRUE,
+  criado_em TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT idx_afiliados_usuario_unico UNIQUE (usuario_id)
+);
+
+-- So pode ser adicionada depois que "afiliados" existe (referencia ele).
+ALTER TABLE usuarios ADD COLUMN IF NOT EXISTS indicado_por_afiliado_id INT NULL REFERENCES afiliados(id);
+
+CREATE TABLE IF NOT EXISTS comissoes_afiliado (
+  id SERIAL PRIMARY KEY,
+  afiliado_id INT NOT NULL REFERENCES afiliados(id) ON DELETE CASCADE,
+  usuario_indicado_id INT NOT NULL REFERENCES usuarios(id),
+  assinatura_id INT NOT NULL REFERENCES assinaturas(id) ON DELETE CASCADE,
+  valor DECIMAL(10,2) NOT NULL,
+  status VARCHAR(20) NOT NULL DEFAULT 'pendente' CHECK (status IN ('pendente', 'paga')),
+  criado_em TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT idx_comissoes_assinatura_unica UNIQUE (assinatura_id)
+);
+
+CREATE INDEX IF NOT EXISTS idx_comissoes_afiliado_status ON comissoes_afiliado (afiliado_id, status);
+
 -- RLS em todas as tabelas. O backend conecta direto como usuario "postgres"
 -- (table owner), que sempre ignora RLS - entao isso nao afeta o backend. O
 -- efeito e fechar a API publica do Supabase (PostgREST/anon key), que
@@ -229,3 +257,5 @@ ALTER TABLE assinaturas ENABLE ROW LEVEL SECURITY;
 ALTER TABLE mensagens_suporte ENABLE ROW LEVEL SECURITY;
 ALTER TABLE webhooks ENABLE ROW LEVEL SECURITY;
 ALTER TABLE produtos ENABLE ROW LEVEL SECURITY;
+ALTER TABLE afiliados ENABLE ROW LEVEL SECURITY;
+ALTER TABLE comissoes_afiliado ENABLE ROW LEVEL SECURITY;

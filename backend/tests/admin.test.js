@@ -26,6 +26,7 @@ describe('Controle de acesso do admin', () => {
       ['get', '/api/admin/usuarios'],
       ['get', '/api/admin/metricas'],
       ['get', '/api/admin/planos'],
+      ['get', '/api/admin/afiliados'],
     ];
 
     for (const [metodo, rota] of rotas) {
