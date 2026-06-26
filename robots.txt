@@ -1,0 +1,14 @@
+User-agent: *
+Disallow: /frontend/pages/dashboard.html
+Disallow: /frontend/pages/agenda.html
+Disallow: /frontend/pages/catalogo.html
+Disallow: /frontend/pages/configuracoes.html
+Disallow: /frontend/pages/suporte.html
+Disallow: /frontend/pages/admin.html
+Disallow: /frontend/pages/admin-produtos.html
+Disallow: /frontend/pages/admin-analises.html
+Disallow: /frontend/pages/admin-clientes.html
+Disallow: /frontend/pages/admin-afiliados.html
+Disallow: /frontend/pages/admin-conversoes.html
+
+Sitemap: https://zync-mocha.vercel.app/sitemap.xml
