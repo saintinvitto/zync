@@ -33,12 +33,18 @@ async function listarPorLead(leadId, { page, limit } = {}) {
   };
 }
 
-async function criar({ leadId, conteudo, enviadoPor }) {
+async function criar({ leadId, conteudo, enviadoPor, tipo, midiaId, midiaMimeType }) {
   const { rows } = await db.query(
-    'INSERT INTO mensagens (lead_id, conteudo, enviado_por) VALUES ($1, $2, $3) RETURNING *',
-    [leadId, conteudo, enviadoPor]
+    `INSERT INTO mensagens (lead_id, conteudo, enviado_por, tipo, midia_id, midia_mime_type)
+     VALUES ($1, $2, $3, $4, $5, $6) RETURNING *`,
+    [leadId, conteudo ?? null, enviadoPor, tipo || 'texto', midiaId || null, midiaMimeType || null]
   );
   return rows[0];
 }
 
-module.exports = { listarPorLead, criar };
+async function buscarPorId(id) {
+  const { rows } = await db.query('SELECT * FROM mensagens WHERE id = $1', [id]);
+  return rows[0];
+}
+
+module.exports = { listarPorLead, criar, buscarPorId };

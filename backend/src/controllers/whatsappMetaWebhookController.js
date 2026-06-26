@@ -57,14 +57,27 @@ async function receber(req, res) {
       const contato = (valor.contacts || [])[0];
 
       for (const mensagem of mensagens) {
-        if (mensagem.type !== 'text' || !mensagem.text?.body) continue;
-
-        await whatsappController.processarMensagemRecebida({
+        const base = {
           usuarioId: usuario.id,
           telefone: mensagem.from,
           nome: contato?.profile?.name,
-          mensagem: mensagem.text.body,
-        });
+        };
+
+        if (mensagem.type === 'text' && mensagem.text?.body) {
+          await whatsappController.processarMensagemRecebida({ ...base, mensagem: mensagem.text.body });
+        } else if (mensagem.type === 'image' && mensagem.image?.id) {
+          await whatsappController.processarMensagemRecebida({
+            ...base,
+            mensagem: mensagem.image.caption || null,
+            midia: { tipo: 'imagem', midiaId: mensagem.image.id, mimeType: mensagem.image.mime_type },
+          });
+        } else if (mensagem.type === 'document' && mensagem.document?.id) {
+          await whatsappController.processarMensagemRecebida({
+            ...base,
+            mensagem: mensagem.document.caption || null,
+            midia: { tipo: 'documento', midiaId: mensagem.document.id, mimeType: mensagem.document.mime_type },
+          });
+        }
       }
     }
   }

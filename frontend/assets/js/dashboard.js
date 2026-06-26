@@ -806,12 +806,37 @@ function criarEntradaAtividade(a) {
 function criarBolhaMensagem(m) {
   const div = document.createElement('div');
   div.className = `msg ${m.enviado_por}`;
+
+  const corpo = m.tipo && m.tipo !== 'texto'
+    ? `<div class="msg-midia" data-midia-id="${m.id}" data-midia-tipo="${m.tipo}"><span class="spinner"></span></div>${m.conteudo ? `<div>${escapeHtml(m.conteudo)}</div>` : ''}`
+    : `<div>${escapeHtml(m.conteudo)}</div>`;
+
   div.innerHTML = `
     <div class="msg-sender-tag">${SENDER_LABELS[m.enviado_por] || m.enviado_por}</div>
-    <div>${escapeHtml(m.conteudo)}</div>
+    ${corpo}
     <div class="msg-meta">${formatHora(m.criado_em)}</div>
   `;
+
+  if (m.tipo && m.tipo !== 'texto') {
+    carregarMidiaMensagem(div.querySelector('.msg-midia'), m);
+  }
+
   return div;
+}
+
+async function carregarMidiaMensagem(container, m) {
+  try {
+    const blobUrl = await Api.whatsapp.buscarMidiaBlob(currentLeadId, m.id);
+
+    if (m.tipo === 'imagem') {
+      container.innerHTML = `<img src="${blobUrl}" alt="Imagem enviada" class="msg-midia-img">`;
+      container.querySelector('img').addEventListener('click', () => window.open(blobUrl, '_blank'));
+    } else {
+      container.innerHTML = `<a href="${blobUrl}" target="_blank" rel="noopener" class="msg-midia-doc">${icon('clipboardList', 16)} Ver documento</a>`;
+    }
+  } catch {
+    container.innerHTML = '<span style="color:var(--cinza); font-size:0.8rem;">Não foi possível carregar a mídia</span>';
+  }
 }
 
 document.getElementById('panel-status').addEventListener('change', async (e) => {
@@ -971,6 +996,35 @@ function setModo(modo) {
 
 modeHumanoBtn.addEventListener('click', () => setModo('humano'));
 modeIaBtn.addEventListener('click', () => setModo('ia'));
+
+document.getElementById('panel-anexar').addEventListener('click', () => {
+  document.getElementById('panel-arquivo').click();
+});
+
+document.getElementById('panel-arquivo').addEventListener('change', async (e) => {
+  const arquivo = e.target.files[0];
+  if (!arquivo || !currentLeadId) return;
+
+  const anexarBtn = document.getElementById('panel-anexar');
+  anexarBtn.disabled = true;
+
+  try {
+    const legenda = panelInput.value.trim() || undefined;
+    const mensagem = await Api.whatsapp.enviarMidia(currentLeadId, arquivo, legenda);
+    const body = document.getElementById('panel-messages');
+    const vazio = body.querySelector('.empty-state');
+    if (vazio) vazio.remove();
+    body.appendChild(criarBolhaMensagem(mensagem));
+    body.scrollTop = body.scrollHeight;
+    panelInput.value = '';
+    loadDashboard();
+  } catch (err) {
+    showToast(err.message, 'error');
+  } finally {
+    anexarBtn.disabled = false;
+    e.target.value = '';
+  }
+});
 
 document.getElementById('panel-send').addEventListener('click', enviarMensagem);
 panelInput.addEventListener('keydown', (e) => {

@@ -197,6 +197,33 @@ const Api = {
 
   whatsapp: {
     enviar: (leadId, conteudo) => apiRequest(`/leads/${leadId}/whatsapp/enviar`, { method: 'POST', body: { conteudo } }),
+    async enviarMidia(leadId, arquivo, legenda) {
+      const formData = new FormData();
+      formData.append('arquivo', arquivo);
+      if (legenda) formData.append('legenda', legenda);
+
+      let res;
+      try {
+        res = await fetch(`${API_BASE}/leads/${leadId}/whatsapp/enviar-midia`, {
+          method: 'POST',
+          headers: { Authorization: `Bearer ${Auth.getToken()}` },
+          body: formData,
+        });
+      } catch {
+        throw new ApiError('Não foi possível conectar ao servidor.', 0);
+      }
+
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new ApiError(data.error || 'Erro ao enviar arquivo', res.status);
+      return data;
+    },
+    async buscarMidiaBlob(leadId, mensagemId) {
+      const res = await fetch(`${API_BASE}/leads/${leadId}/whatsapp/midia/${mensagemId}`, {
+        headers: { Authorization: `Bearer ${Auth.getToken()}` },
+      });
+      if (!res.ok) throw new Error('Falha ao carregar mídia');
+      return URL.createObjectURL(await res.blob());
+    },
   },
 
   ia: {

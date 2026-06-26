@@ -889,6 +889,10 @@ a { color: inherit; text-decoration: none; }
 }
 .msg-meta { font-size: 0.65rem; opacity: 0.6; margin-top: 0.3rem; }
 
+.msg-midia { display: flex; align-items: center; justify-content: center; min-height: 2rem; }
+.msg-midia-img { max-width: 220px; max-height: 220px; border-radius: 8px; cursor: pointer; display: block; }
+.msg-midia-doc { display: inline-flex; align-items: center; gap: 0.4rem; color: inherit; text-decoration: underline; font-size: 0.85rem; }
+
 .msg.cliente {
   align-self: flex-start;
   background: var(--preto3);

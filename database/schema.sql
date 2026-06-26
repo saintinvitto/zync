@@ -50,9 +50,12 @@ CREATE INDEX IF NOT EXISTS idx_leads_usuario_status_fechado ON leads (usuario_id
 CREATE TABLE IF NOT EXISTS mensagens (
   id SERIAL PRIMARY KEY,
   lead_id INT NOT NULL REFERENCES leads(id) ON DELETE CASCADE,
-  conteudo TEXT NOT NULL,
+  conteudo TEXT NULL,
   enviado_por VARCHAR(20) NOT NULL CHECK (enviado_por IN ('ia', 'humano', 'cliente')),
-  criado_em TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
+  criado_em TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+  tipo VARCHAR(20) NOT NULL DEFAULT 'texto' CHECK (tipo IN ('texto', 'imagem', 'documento')),
+  midia_id VARCHAR(100) NULL,
+  midia_mime_type VARCHAR(100) NULL
 );
 
 CREATE INDEX IF NOT EXISTS idx_mensagens_lead_criado ON mensagens (lead_id, criado_em);
