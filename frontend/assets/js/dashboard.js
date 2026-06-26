@@ -1,17 +1,26 @@
 Auth.requireAuth();
 
-const STATUS_LABELS = {
-  novo: 'Novo lead',
-  em_contato: 'Em contato',
-  proposta_enviada: 'Proposta enviada',
-  fechado: 'Fechado',
+const STATUS_LABEL_KEYS = {
+  novo: 'dash.novoLead',
+  em_contato: 'dash.colEmContato',
+  proposta_enviada: 'dash.colPropostaEnviada',
+  fechado: 'dash.colFechado',
 };
 
-const SENDER_LABELS = {
-  cliente: `${icon('user', 12)} Cliente`,
-  humano: `${icon('user', 12)} Você`,
-  ia: `${icon('bot', 12)} IA`,
+function statusLabel(status) {
+  return Lang.t(STATUS_LABEL_KEYS[status]) || status;
+}
+
+const SENDER_LABEL_KEYS = {
+  cliente: 'dash.senderCliente',
+  humano: 'dash.senderVoce',
+  ia: 'dash.senderIa',
 };
+
+function senderLabel(enviadoPor) {
+  const iconeNome = enviadoPor === 'ia' ? 'bot' : 'user';
+  return `${icon(iconeNome, 12)} ${Lang.t(SENDER_LABEL_KEYS[enviadoPor]) || enviadoPor}`;
+}
 
 let leadsCache = [];
 let currentLeadId = null;
@@ -23,21 +32,29 @@ let panelTagsCache = [];
 let camposCache = [];
 let panelCamposCache = [];
 
-const TIPO_CAMPO_LABELS = {
-  texto: 'Texto',
-  numero: 'Número',
-  data: 'Data',
-  selecao: 'Seleção',
+const TIPO_CAMPO_LABEL_KEYS = {
+  texto: 'dash.tipoTexto',
+  numero: 'dash.tipoNumero',
+  data: 'dash.tipoData',
+  selecao: 'dash.tipoSelecao',
 };
+
+function tipoCampoLabel(tipo) {
+  return Lang.t(TIPO_CAMPO_LABEL_KEYS[tipo]) || tipo;
+}
 let cmdkItems = [];
 let cmdkIndex = 0;
 
-const STATUS_AGENDAMENTO_LABELS = {
-  agendado: 'Agendado',
-  confirmado: 'Confirmado',
-  cancelado: 'Cancelado',
-  concluido: 'Concluído',
+const STATUS_AGENDAMENTO_LABEL_KEYS = {
+  agendado: 'dash.agAgendado',
+  confirmado: 'dash.agConfirmado',
+  cancelado: 'dash.agCancelado',
+  concluido: 'dash.agConcluido',
 };
+
+function statusAgendamentoLabel(status) {
+  return Lang.t(STATUS_AGENDAMENTO_LABEL_KEYS[status]) || status;
+}
 
 function formatMoeda(valor) {
   if (valor === null || valor === undefined || valor === '') return null;
@@ -87,7 +104,7 @@ function popularFiltroOrigem() {
   const select = document.getElementById('kanban-filter-origem');
   const atual = select.value;
   const origens = [...new Set(leadsCache.map((l) => l.origem).filter(Boolean))].sort();
-  select.innerHTML = '<option value="">Todas as origens</option>' + origens.map((o) => `<option value="${escapeHtml(o)}">${escapeHtml(o)}</option>`).join('');
+  select.innerHTML = `<option value="">${Lang.t('dash.todasOrigens')}</option>` + origens.map((o) => `<option value="${escapeHtml(o)}">${escapeHtml(o)}</option>`).join('');
   const novoValor = origens.includes(atual) ? atual : '';
   select.value = novoValor;
   leadsFiltro.origem = novoValor;
@@ -121,7 +138,7 @@ async function loadTags() {
 function popularFiltroTag() {
   const select = document.getElementById('kanban-filter-tag');
   const atual = select.value;
-  select.innerHTML = '<option value="">Todas as tags</option>' + tagsCache.map((t) => `<option value="${t.id}">${escapeHtml(t.nome)}</option>`).join('');
+  select.innerHTML = `<option value="">${Lang.t('dash.todasTags')}</option>` + tagsCache.map((t) => `<option value="${t.id}">${escapeHtml(t.nome)}</option>`).join('');
   const aindaExiste = tagsCache.some((t) => String(t.id) === atual);
   select.value = aindaExiste ? atual : '';
   if (!aindaExiste) leadsTagFiltro = '';
@@ -147,7 +164,7 @@ tagModal.addEventListener('click', (e) => { if (e.target === tagModal) fecharTag
 function renderTagManageList() {
   const list = document.getElementById('tag-manage-list');
   if (tagsCache.length === 0) {
-    list.innerHTML = '<div class="tag-manage-empty">Nenhuma tag ainda. Crie a primeira abaixo.</div>';
+    list.innerHTML = `<div class="tag-manage-empty">${Lang.t('dash.nenhumaTagAinda')}</div>`;
     return;
   }
 
@@ -162,13 +179,13 @@ function renderTagManageList() {
   list.querySelectorAll('.tag-chip-remove').forEach((btn) => {
     btn.addEventListener('click', async () => {
       const tagId = btn.dataset.tagId;
-      if (!confirm('Excluir esta tag? Ela será removida de todos os leads.')) return;
+      if (!confirm(Lang.t('dash.confirmExcluirTag'))) return;
 
       try {
         await Api.tags.remover(tagId);
         await loadTags();
         renderTagManageList();
-        showToast('Tag excluída', 'success');
+        showToast(Lang.t('dash.tagExcluida'), 'success');
         loadLeads();
       } catch (err) {
         showToast(err.message, 'error');
@@ -188,7 +205,7 @@ let campanhaTagId = null;
 async function abrirCampanhaModal(tagId, tagNome) {
   campanhaTagId = tagId;
   document.getElementById('campanha-tag-nome').textContent = tagNome;
-  document.getElementById('campanha-contagem').textContent = 'Carregando...';
+  document.getElementById('campanha-contagem').textContent = Lang.t('dash.carregando');
   document.getElementById('campanha-mensagem').value = '';
   campanhaModal.classList.add('visible');
 
@@ -196,10 +213,10 @@ async function abrirCampanhaModal(tagId, tagNome) {
     const { total, comTelefone } = await Api.tags.contagem(tagId);
     document.getElementById('campanha-contagem').textContent =
       total === 0
-        ? 'Nenhum lead com essa tag.'
-        : `${comTelefone} de ${total} leads com essa tag têm telefone cadastrado e vão receber a mensagem.`;
+        ? Lang.t('dash.nenhumLeadComTag')
+        : Lang.t('dash.leadsComTagTemTelefone', { comTelefone, total });
   } catch (err) {
-    document.getElementById('campanha-contagem').textContent = 'Não foi possível carregar a contagem.';
+    document.getElementById('campanha-contagem').textContent = Lang.t('dash.naoFoiPossivelCarregarContagem');
   }
 }
 
@@ -216,7 +233,7 @@ document.getElementById('form-campanha').addEventListener('submit', async (e) =>
 
   const mensagem = document.getElementById('campanha-mensagem').value.trim();
   if (!mensagem) return;
-  if (!confirm('Enviar essa mensagem pra todos os leads dessa tag? Não dá pra desfazer.')) return;
+  if (!confirm(Lang.t('dash.confirmEnviarCampanha'))) return;
 
   const btn = document.getElementById('campanha-submit');
   const label = document.getElementById('campanha-submit-label');
@@ -225,13 +242,13 @@ document.getElementById('form-campanha').addEventListener('submit', async (e) =>
 
   try {
     const { comTelefone } = await Api.tags.disparar(campanhaTagId, mensagem);
-    showToast(`Campanha iniciada para ${comTelefone} leads. Você recebe uma notificação quando terminar.`, 'success');
+    showToast(Lang.t('dash.campanhaIniciada', { comTelefone }), 'success');
     fecharCampanhaModal();
   } catch (err) {
     showToast(err.message, 'error');
   } finally {
     btn.disabled = false;
-    label.textContent = 'Enviar mensagem';
+    label.textContent = Lang.t('dash.enviarMensagem');
   }
 });
 
@@ -246,7 +263,7 @@ document.getElementById('new-tag-form').addEventListener('submit', async (e) => 
     input.value = '';
     await loadTags();
     renderTagManageList();
-    showToast('Tag criada', 'success');
+    showToast(Lang.t('dash.tagCriada'), 'success');
   } catch (err) {
     showToast(err.message, 'error');
   }
@@ -275,7 +292,7 @@ function sairDoModoEdicaoCampo() {
   document.getElementById('new-campo-form').reset();
   document.getElementById('nc-opcoes').classList.add('hidden');
   document.getElementById('nc-tipo').disabled = false;
-  document.getElementById('nc-submit').textContent = 'Adicionar';
+  document.getElementById('nc-submit').textContent = Lang.t('dash.adicionar');
 }
 
 function fecharCamposModal() {
@@ -295,7 +312,7 @@ function abrirEdicaoCampo(campo) {
   } else {
     opcoesInput.classList.add('hidden');
   }
-  document.getElementById('nc-submit').textContent = 'Salvar alterações';
+  document.getElementById('nc-submit').textContent = Lang.t('dash.salvarAlteracoes');
   document.getElementById('nc-nome').focus();
 }
 
@@ -310,15 +327,15 @@ document.getElementById('nc-tipo').addEventListener('change', (e) => {
 function renderCamposManageList() {
   const list = document.getElementById('campos-manage-list');
   if (camposCache.length === 0) {
-    list.innerHTML = '<div class="tag-manage-empty">Nenhum campo ainda. Crie o primeiro abaixo.</div>';
+    list.innerHTML = `<div class="tag-manage-empty">${Lang.t('dash.nenhumCampoAinda')}</div>`;
     return;
   }
 
   list.innerHTML = camposCache.map((c) => `
     <div class="campo-manage-row" data-campo-id="${c.id}">
-      <span>${escapeHtml(c.nome)} <span class="badge badge-ativa">${TIPO_CAMPO_LABELS[c.tipo] || c.tipo}</span></span>
+      <span>${escapeHtml(c.nome)} <span class="badge badge-ativa">${tipoCampoLabel(c.tipo)}</span></span>
       <span>
-        <button type="button" class="btn btn-ghost btn-sm campo-manage-editar" data-campo-id="${c.id}" aria-label="Editar campo ${escapeHtml(c.nome)}">Editar</button>
+        <button type="button" class="btn btn-ghost btn-sm campo-manage-editar" data-campo-id="${c.id}" aria-label="Editar campo ${escapeHtml(c.nome)}">${Lang.t('dash.editar')}</button>
         <button type="button" class="btn btn-ghost btn-sm campo-manage-remove" data-campo-id="${c.id}" aria-label="Excluir campo ${escapeHtml(c.nome)}">${icon('x', 14)}</button>
       </span>
     </div>
@@ -334,14 +351,14 @@ function renderCamposManageList() {
   list.querySelectorAll('.campo-manage-remove').forEach((btn) => {
     btn.addEventListener('click', async () => {
       const campoId = btn.dataset.campoId;
-      if (!confirm('Excluir este campo? Os valores dele em todos os leads serão perdidos.')) return;
+      if (!confirm(Lang.t('dash.confirmExcluirCampo'))) return;
 
       try {
         await Api.camposPersonalizados.remover(campoId);
         if (String(campoEditandoId) === campoId) sairDoModoEdicaoCampo();
         await loadCampos();
         renderCamposManageList();
-        showToast('Campo excluído', 'success');
+        showToast(Lang.t('dash.campoExcluido'), 'success');
         if (currentLeadId) await carregarCamposDoLead(currentLeadId);
       } catch (err) {
         showToast(err.message, 'error');
@@ -360,7 +377,7 @@ document.getElementById('new-campo-form').addEventListener('submit', async (e) =
   if (tipo === 'selecao') {
     opcoes = document.getElementById('nc-opcoes').value.split(',').map((s) => s.trim()).filter(Boolean);
     if (opcoes.length === 0) {
-      showToast('Informe pelo menos uma opção separada por vírgula', 'error');
+      showToast(Lang.t('dash.informeOpcao'), 'error');
       return;
     }
   }
@@ -370,12 +387,12 @@ document.getElementById('new-campo-form').addEventListener('submit', async (e) =
       const dados = { nome };
       if (opcoes) dados.opcoes = opcoes;
       await Api.camposPersonalizados.atualizar(campoEditandoId, dados);
-      showToast('Campo atualizado', 'success');
+      showToast(Lang.t('dash.campoAtualizado'), 'success');
     } else {
       const dados = { nome, tipo };
       if (opcoes) dados.opcoes = opcoes;
       await Api.camposPersonalizados.criar(dados);
-      showToast('Campo criado', 'success');
+      showToast(Lang.t('dash.campoCriado'), 'success');
     }
 
     sairDoModoEdicaoCampo();
@@ -421,8 +438,8 @@ function renderSparkline() {
   `;
 
   const total = contagem.reduce((a, b) => a + b, 0);
-  document.getElementById('chart-sub').textContent = `${total} leads novos nos últimos ${dias} dias`;
-  document.getElementById('sparkline-labels').innerHTML = `<span>${dias - 1} dias atrás</span><span>Hoje</span>`;
+  document.getElementById('chart-sub').textContent = Lang.t('dash.leadsNovosUltimosDias', { total, dias });
+  document.getElementById('sparkline-labels').innerHTML = `<span>${Lang.t('dash.diasAtras', { n: dias - 1 })}</span><span>${Lang.t('dash.hoje')}</span>`;
 
   atualizarBadgeLeadsHoje(contagem[dias - 1], contagem[dias - 2]);
 }
@@ -465,7 +482,7 @@ function renderKanban() {
     if (contagem[status] === 0) {
       const vazio = document.createElement('div');
       vazio.className = 'kanban-empty';
-      vazio.textContent = 'Sem leads aqui';
+      vazio.textContent = Lang.t('dash.semLeadsAqui');
       col.appendChild(vazio);
     }
   });
@@ -493,7 +510,7 @@ function criarLeadCard(lead) {
   card.style.borderLeftColor = CORES_STATUS_KANBAN[lead.status] || 'var(--azul-claro)';
 
   const valor = formatMoeda(lead.valor);
-  const meta = [lead.servico, lead.origem].filter(Boolean).join(' • ') || 'Sem detalhes';
+  const meta = [lead.servico, lead.origem].filter(Boolean).join(' • ') || Lang.t('dash.semDetalhes');
 
   card.innerHTML = `
     <div class="lead-card-top">
@@ -546,7 +563,7 @@ async function moverLead(leadId, novoStatus) {
   try {
     await Api.leads.atualizar(leadId, { status: novoStatus });
     addActivity(leadId, { tipo: 'status', de: statusAnterior, para: novoStatus });
-    showToast(`${lead.nome} movido para "${STATUS_LABELS[novoStatus]}"`, 'success');
+    showToast(Lang.t('dash.movidoPara', { nome: lead.nome, status: statusLabel(novoStatus) }), 'success');
     loadDashboard();
   } catch (err) {
     lead.status = statusAnterior;
@@ -629,7 +646,7 @@ document.getElementById('new-lead-form').addEventListener('submit', async (e) =>
 
   try {
     await Api.leads.criar(dados);
-    showToast('Lead criado com sucesso', 'success');
+    showToast(Lang.t('dash.leadCriadoSucesso'), 'success');
     fecharModal();
     loadLeads();
     loadDashboard();
@@ -637,7 +654,7 @@ document.getElementById('new-lead-form').addEventListener('submit', async (e) =>
     showToast(err.message, 'error');
   } finally {
     btn.disabled = false;
-    label.textContent = 'Criar lead';
+    label.textContent = Lang.t('dash.criarLead');
   }
 });
 
@@ -651,7 +668,7 @@ async function abrirPainel(leadId) {
   if (!lead) return;
 
   document.getElementById('panel-nome').textContent = lead.nome;
-  document.getElementById('panel-meta').textContent = [lead.servico, lead.origem, lead.telefone].filter(Boolean).join(' • ') || 'Sem detalhes adicionais';
+  document.getElementById('panel-meta').textContent = [lead.servico, lead.origem, lead.telefone].filter(Boolean).join(' • ') || Lang.t('dash.semDetalhesAdicionais');
   document.getElementById('panel-status').value = lead.status;
 
   panel.classList.add('visible');
@@ -679,14 +696,14 @@ panelOverlay.addEventListener('click', fecharPainel);
 /* ---------- AGENDAMENTOS DO LEAD ---------- */
 async function carregarAgendamentosDoLead(leadId) {
   const lista = document.getElementById('panel-agenda-list');
-  lista.innerHTML = '<div class="panel-agenda-empty">Carregando…</div>';
+  lista.innerHTML = `<div class="panel-agenda-empty">${Lang.t('dash.carregando')}</div>`;
 
   try {
     const agendamentos = await Api.agendamentos.doLead(leadId);
     lista.innerHTML = '';
 
     if (agendamentos.length === 0) {
-      lista.innerHTML = '<div class="panel-agenda-empty">Nenhum agendamento ainda</div>';
+      lista.innerHTML = `<div class="panel-agenda-empty">${Lang.t('dash.nenhumAgendamentoAinda')}</div>`;
       return;
     }
 
@@ -707,10 +724,10 @@ function criarItemAgendamento(leadId, ag) {
   `;
 
   const select = document.createElement('select');
-  Object.entries(STATUS_AGENDAMENTO_LABELS).forEach(([valor, label]) => {
+  Object.keys(STATUS_AGENDAMENTO_LABEL_KEYS).forEach((valor) => {
     const option = document.createElement('option');
     option.value = valor;
-    option.textContent = label;
+    option.textContent = statusAgendamentoLabel(valor);
     if (valor === ag.status) option.selected = true;
     select.appendChild(option);
   });
@@ -718,7 +735,7 @@ function criarItemAgendamento(leadId, ag) {
   select.addEventListener('change', async () => {
     try {
       await Api.agendamentos.atualizar(ag.id, { status: select.value });
-      showToast('Agendamento atualizado', 'success');
+      showToast(Lang.t('dash.agendamentoAtualizado'), 'success');
     } catch (err) {
       showToast(err.message, 'error');
       select.value = ag.status;
@@ -754,7 +771,7 @@ panelAgendaForm.addEventListener('submit', async (e) => {
 
   try {
     await Api.agendamentos.criar(currentLeadId, dados);
-    showToast('Agendamento criado', 'success');
+    showToast(Lang.t('dash.agendamentoCriado'), 'success');
     panelAgendaForm.classList.add('hidden');
     panelAgendaForm.reset();
     await carregarAgendamentosDoLead(currentLeadId);
@@ -786,7 +803,7 @@ function renderTimeline(leadId, mensagens) {
   body.innerHTML = '';
 
   if (itens.length === 0) {
-    body.innerHTML = `<div class="empty-state" style="padding:2rem 1rem;"><div class="empty-state-icon">${icon('messageCircle', 36)}</div><div>Nenhuma atividade ainda</div></div>`;
+    body.innerHTML = `<div class="empty-state" style="padding:2rem 1rem;"><div class="empty-state-icon">${icon('messageCircle', 36)}</div><div>${Lang.t('dash.nenhumaAtividadeAinda')}</div></div>`;
     return;
   }
 
@@ -799,7 +816,7 @@ function renderTimeline(leadId, mensagens) {
 function criarEntradaAtividade(a) {
   const div = document.createElement('div');
   div.className = 'timeline-status';
-  div.innerHTML = `<span>${STATUS_LABELS[a.de] || a.de} → <strong>${STATUS_LABELS[a.para] || a.para}</strong> · ${formatHora(a.ts)}</span>`;
+  div.innerHTML = `<span>${statusLabel(a.de)} → <strong>${statusLabel(a.para)}</strong> · ${formatHora(a.ts)}</span>`;
   return div;
 }
 
@@ -812,7 +829,7 @@ function criarBolhaMensagem(m) {
     : `<div>${escapeHtml(m.conteudo)}</div>`;
 
   div.innerHTML = `
-    <div class="msg-sender-tag">${SENDER_LABELS[m.enviado_por] || m.enviado_por}</div>
+    <div class="msg-sender-tag">${senderLabel(m.enviado_por)}</div>
     ${corpo}
     <div class="msg-meta">${formatHora(m.criado_em)}</div>
   `;
@@ -832,10 +849,10 @@ async function carregarMidiaMensagem(container, m) {
       container.innerHTML = `<img src="${blobUrl}" alt="Imagem enviada" class="msg-midia-img">`;
       container.querySelector('img').addEventListener('click', () => window.open(blobUrl, '_blank'));
     } else {
-      container.innerHTML = `<a href="${blobUrl}" target="_blank" rel="noopener" class="msg-midia-doc">${icon('clipboardList', 16)} Ver documento</a>`;
+      container.innerHTML = `<a href="${blobUrl}" target="_blank" rel="noopener" class="msg-midia-doc">${icon('clipboardList', 16)} ${Lang.t('dash.verDocumento')}</a>`;
     }
   } catch {
-    container.innerHTML = '<span style="color:var(--cinza); font-size:0.8rem;">Não foi possível carregar a mídia</span>';
+    container.innerHTML = `<span style="color:var(--cinza); font-size:0.8rem;">${Lang.t('dash.naoFoiPossivelCarregarMidia')}</span>`;
   }
 }
 
@@ -856,7 +873,7 @@ document.getElementById('panel-status').addEventListener('change', async (e) => 
     }
     renderKanban();
     loadDashboard();
-    showToast('Status atualizado', 'success');
+    showToast(Lang.t('dash.statusAtualizado'), 'success');
   } catch (err) {
     showToast(err.message, 'error');
   }
@@ -882,7 +899,7 @@ function renderPanelTags() {
       try {
         await Api.tags.desassociar(currentLeadId, btn.dataset.tagId);
         await carregarTagsDoLead(currentLeadId);
-        showToast('Tag removida do lead', 'success');
+        showToast(Lang.t('dash.tagRemovidaDoLead'), 'success');
       } catch (err) {
         showToast(err.message, 'error');
       }
@@ -891,7 +908,7 @@ function renderPanelTags() {
 
   const select = document.getElementById('panel-tag-add');
   const disponiveis = tagsCache.filter((t) => !panelTagsCache.some((pt) => pt.id === t.id));
-  select.innerHTML = '<option value="">+ tag</option>' + disponiveis.map((t) => `<option value="${t.id}">${escapeHtml(t.nome)}</option>`).join('');
+  select.innerHTML = `<option value="">${Lang.t('dash.maisTag')}</option>` + disponiveis.map((t) => `<option value="${t.id}">${escapeHtml(t.nome)}</option>`).join('');
 }
 
 document.getElementById('panel-tag-add').addEventListener('change', async (e) => {
@@ -901,7 +918,7 @@ document.getElementById('panel-tag-add').addEventListener('change', async (e) =>
   try {
     await Api.tags.associar(currentLeadId, tagId);
     await carregarTagsDoLead(currentLeadId);
-    showToast('Tag adicionada', 'success');
+    showToast(Lang.t('dash.tagAdicionada'), 'success');
   } catch (err) {
     showToast(err.message, 'error');
   }
@@ -963,11 +980,11 @@ function renderPanelCampos() {
 
 document.getElementById('panel-delete').addEventListener('click', async () => {
   if (!currentLeadId) return;
-  if (!confirm('Tem certeza que deseja excluir este lead? Essa ação não pode ser desfeita.')) return;
+  if (!confirm(Lang.t('dash.confirmExcluirLead'))) return;
 
   try {
     await Api.leads.remover(currentLeadId);
-    showToast('Lead excluído', 'success');
+    showToast(Lang.t('dash.leadExcluido'), 'success');
     fecharPainel();
     loadLeads();
     loadDashboard();
@@ -986,11 +1003,11 @@ function setModo(modo) {
   if (modo === 'humano') {
     modeHumanoBtn.className = 'btn btn-secondary btn-sm';
     modeIaBtn.className = 'btn btn-ghost btn-sm';
-    panelInput.placeholder = 'Responder como atendente (envia via WhatsApp)…';
+    panelInput.placeholder = Lang.t('dash.placeholderHumano');
   } else {
     modeHumanoBtn.className = 'btn btn-ghost btn-sm';
     modeIaBtn.className = 'btn btn-secondary btn-sm';
-    panelInput.placeholder = 'Simule o que o cliente diria, e veja a IA responder…';
+    panelInput.placeholder = Lang.t('dash.placeholderIa');
   }
 }
 
@@ -1065,16 +1082,17 @@ async function enviarMensagem() {
 
 /* ---------- COMMAND PALETTE (Ctrl+K) ---------- */
 function getCmdkAcoes() {
+  const acao = Lang.t('dash.cmdkAcao');
   return [
-    { icon: icon('dashboard', 16), label: 'Ir para Visão geral', hint: 'Ação', run: () => document.getElementById('stats').scrollIntoView({ behavior: 'smooth' }) },
-    { icon: icon('users', 16), label: 'Ir para Leads (kanban)', hint: 'Ação', run: () => document.getElementById('kanban').scrollIntoView({ behavior: 'smooth' }) },
-    { icon: icon('plus', 16), label: 'Criar novo lead', hint: 'Ação', run: () => abrirModal() },
-    { icon: icon('tag', 16), label: 'Gerenciar tags', hint: 'Ação', run: () => abrirTagModal() },
-    { icon: icon('clipboardList', 16), label: 'Gerenciar campos personalizados', hint: 'Ação', run: () => abrirCamposModal() },
-    { icon: icon('calendar', 16), label: 'Ir para Agenda', hint: 'Ação', run: () => { window.location.href = 'agenda.html'; } },
-    { icon: icon('settings', 16), label: 'Ir para Configurações', hint: 'Ação', run: () => { window.location.href = 'configuracoes.html'; } },
-    { icon: icon('refreshCw', 16), label: 'Atualizar dados', hint: 'Ação', run: () => { loadLeads(); loadDashboard(); } },
-    { icon: icon('logOut', 16), label: 'Sair da conta', hint: 'Ação', run: () => Auth.logout() },
+    { icon: icon('dashboard', 16), label: Lang.t('dash.cmdkIrVisaoGeral'), hint: acao, run: () => document.getElementById('stats').scrollIntoView({ behavior: 'smooth' }) },
+    { icon: icon('users', 16), label: Lang.t('dash.cmdkIrLeads'), hint: acao, run: () => document.getElementById('kanban').scrollIntoView({ behavior: 'smooth' }) },
+    { icon: icon('plus', 16), label: Lang.t('dash.cmdkCriarLead'), hint: acao, run: () => abrirModal() },
+    { icon: icon('tag', 16), label: Lang.t('dash.cmdkGerenciarTags'), hint: acao, run: () => abrirTagModal() },
+    { icon: icon('clipboardList', 16), label: Lang.t('dash.cmdkGerenciarCampos'), hint: acao, run: () => abrirCamposModal() },
+    { icon: icon('calendar', 16), label: Lang.t('dash.cmdkIrAgenda'), hint: acao, run: () => { window.location.href = 'agenda.html'; } },
+    { icon: icon('settings', 16), label: Lang.t('dash.cmdkIrConfig'), hint: acao, run: () => { window.location.href = 'configuracoes.html'; } },
+    { icon: icon('refreshCw', 16), label: Lang.t('dash.cmdkAtualizarDados'), hint: acao, run: () => { loadLeads(); loadDashboard(); } },
+    { icon: icon('logOut', 16), label: Lang.t('dash.cmdkSairConta'), hint: acao, run: () => Auth.logout() },
   ];
 }
 
@@ -1097,13 +1115,13 @@ function renderCmdkResultados(termo) {
 
   cmdkItems = [
     ...acoes,
-    ...leadsResultado.map((l) => ({ icon: icon('user', 16), label: l.nome, hint: STATUS_LABELS[l.status], run: () => abrirPainel(l.id) })),
+    ...leadsResultado.map((l) => ({ icon: icon('user', 16), label: l.nome, hint: statusLabel(l.status), run: () => abrirPainel(l.id) })),
   ];
   cmdkIndex = 0;
 
   const list = document.getElementById('cmdk-list');
   if (cmdkItems.length === 0) {
-    list.innerHTML = '<div class="cmdk-empty">Nada encontrado</div>';
+    list.innerHTML = `<div class="cmdk-empty">${Lang.t('dash.cmdkNadaEncontrado')}</div>`;
     return;
   }
 
@@ -1202,7 +1220,7 @@ async function carregarFaturamento() {
 }
 
 document.getElementById('faturamento-periodo').addEventListener('change', () => {
-  document.getElementById('faturamento-sub').textContent = `últimos ${document.getElementById('faturamento-periodo').value} dias`;
+  document.getElementById('faturamento-sub').textContent = Lang.t('dash.ultimosDiasTemplate', { n: document.getElementById('faturamento-periodo').value });
   carregarFaturamento();
 });
 
@@ -1210,7 +1228,7 @@ function renderOrigem(dados) {
   const container = document.getElementById('chart-origem');
 
   if (dados.length === 0) {
-    container.innerHTML = '<div class="empty-state" style="padding:1.5rem;">Sem leads ainda</div>';
+    container.innerHTML = `<div class="empty-state" style="padding:1.5rem;">${Lang.t('dash.semLeadsAindaChart')}</div>`;
     return;
   }
 
@@ -1228,7 +1246,7 @@ function renderFunil(dados) {
   const { porStatus, totalGeral, taxaConversao } = dados;
 
   if (!totalGeral) {
-    container.innerHTML = '<div class="empty-state" style="padding:1.5rem;">Sem leads ainda</div>';
+    container.innerHTML = `<div class="empty-state" style="padding:1.5rem;">${Lang.t('dash.semLeadsAindaChart')}</div>`;
     document.getElementById('funil-gauge').style.setProperty('--value', 0);
     document.getElementById('funil-gauge-num').textContent = '—';
     return;
@@ -1238,7 +1256,7 @@ function renderFunil(dados) {
     const total = porStatus[status] || 0;
     return `
       <div class="barlist-row">
-        <div class="barlist-top"><span>${STATUS_LABELS[status]}</span><strong>${total}</strong></div>
+        <div class="barlist-top"><span>${statusLabel(status)}</span><strong>${total}</strong></div>
         <div class="barlist-track"><div class="barlist-fill" style="width:${(total / totalGeral) * 100}%"></div></div>
       </div>
     `;
