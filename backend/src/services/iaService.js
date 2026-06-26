@@ -1,6 +1,7 @@
 const Sentry = require('../config/sentry');
 const validators = require('../utils/validators');
 const agendamentoService = require('./agendamentoService');
+const logger = require('../utils/logger');
 
 const TOM_DE_VOZ = {
   formal: 'Mantenha um tom formal e cortês.',
@@ -122,7 +123,7 @@ async function executarAgendarHorario(input, contexto) {
     });
     return `Agendamento criado com sucesso para ${data_hora}.`;
   } catch (err) {
-    console.error('Erro ao criar agendamento via IA:', err.message);
+    logger.error('Erro ao criar agendamento via IA', err, { usuarioId: contexto.usuarioId, leadId: contexto.leadId });
     return 'Erro ao tentar criar o agendamento. Avise o cliente que um atendente vai confirmar o horário em breve.';
   }
 }
@@ -156,7 +157,7 @@ async function gerarResposta(mensagem, empresa = {}, contexto = {}) {
     const segunda = await chamarAnthropic({ system, messages, tools });
     return extrairTexto(segunda) || respostaMock(mensagem);
   } catch (err) {
-    console.error('Erro ao gerar resposta de IA:', err.message);
+    logger.error('Erro ao gerar resposta de IA', err);
     Sentry.captureException(err);
     return respostaMock(mensagem);
   }

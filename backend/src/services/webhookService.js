@@ -1,6 +1,7 @@
 const crypto = require('crypto');
 const Sentry = require('../config/sentry');
 const webhookModel = require('../models/webhookModel');
+const logger = require('../utils/logger');
 
 const EVENTOS = ['lead_criado', 'lead_status_alterado', 'agendamento_criado', 'pagamento_aprovado'];
 
@@ -44,7 +45,7 @@ async function enviarComRetry(webhook, corpo) {
       return { sucesso: true, status: resposta.status };
     } catch (err) {
       if (tentativa === 2) {
-        console.error('Erro ao disparar webhook:', err.message);
+        logger.error('Erro ao disparar webhook', err, { url: webhook.url });
         Sentry.captureException(err);
         return { sucesso: false, status: 0 };
       }
@@ -63,7 +64,7 @@ async function disparar(usuarioId, evento, payload) {
     }
   } catch (err) {
     /* disparo de webhook nunca pode quebrar o fluxo principal (criar lead, pagamento, etc) */
-    console.error('Erro ao preparar disparo de webhook:', err.message);
+    logger.error('Erro ao preparar disparo de webhook', err, { usuarioId, evento });
     Sentry.captureException(err);
   }
 }

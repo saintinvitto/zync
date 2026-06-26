@@ -2,6 +2,7 @@ const crypto = require('crypto');
 const usuarioModel = require('../models/usuarioModel');
 const whatsappController = require('./whatsappController');
 const asyncHandler = require('../utils/asyncHandler');
+const logger = require('../utils/logger');
 
 function verificar(req, res) {
   const modo = req.query['hub.mode'];
@@ -30,7 +31,7 @@ function assinaturaValida(req) {
 
 async function receber(req, res) {
   if (!process.env.WHATSAPP_APP_SECRET) {
-    console.error('WHATSAPP_APP_SECRET não configurada — bloqueando webhook por segurança');
+    logger.error('WHATSAPP_APP_SECRET não configurada — bloqueando webhook por segurança');
     return res.status(503).json({ error: 'Webhook não configurado' });
   }
 
@@ -50,7 +51,7 @@ async function receber(req, res) {
 
       const usuario = await usuarioModel.buscarPorWhatsappPhoneNumberId(phoneNumberId);
       if (!usuario) {
-        console.error(`Webhook do WhatsApp: nenhum usuário com phone_number_id ${phoneNumberId}`);
+        logger.error('Webhook do WhatsApp: nenhum usuário com esse phone_number_id', null, { phoneNumberId });
         continue;
       }
 

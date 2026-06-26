@@ -4,6 +4,7 @@ const logModel = require('../models/logModel');
 const whatsappService = require('./whatsappService');
 const usoService = require('./usoService');
 const Sentry = require('../config/sentry');
+const logger = require('../utils/logger');
 
 async function disparar({ usuarioId, tagId, tagNome, mensagem, leads }) {
   let enviados = 0;
@@ -15,7 +16,7 @@ async function disparar({ usuarioId, tagId, tagNome, mensagem, leads }) {
         const resultado = await whatsappService.enviarMensagem(lead.telefone, mensagem);
         if (resultado.sucesso) enviados++;
       } catch (err) {
-        console.error(`Erro ao enviar campanha pro lead ${lead.id}:`, err.message);
+        logger.error('Erro ao enviar campanha pro lead', err, { leadId: lead.id });
         Sentry.captureException(err);
       }
     }
@@ -35,7 +36,7 @@ async function disparar({ usuarioId, tagId, tagNome, mensagem, leads }) {
 
     await usoService.verificarLimitesEAvisar(usuarioId);
   } catch (err) {
-    console.error('Erro ao disparar campanha:', err.message);
+    logger.error('Erro ao disparar campanha', err, { usuarioId, tagId });
     Sentry.captureException(err);
   }
 }

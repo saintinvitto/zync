@@ -3,6 +3,7 @@ const notificacaoModel = require('../models/notificacaoModel');
 const logModel = require('../models/logModel');
 const emailService = require('../services/emailService');
 const Sentry = require('../config/sentry');
+const logger = require('../utils/logger');
 
 async function verificarAssinaturasExpiradas() {
   const expiradas = await assinaturaModel.listarAtivasExpiradas();
@@ -29,7 +30,7 @@ async function verificarAssinaturasExpiradas() {
         `Oi, ${assinatura.usuario_nome}! Sua assinatura do plano ${assinatura.plano_nome} expirou. Acesse Configurações para renovar e continuar usando o Zync normalmente.`
       );
     } catch (err) {
-      console.error(`Erro ao processar expiração da assinatura ${assinatura.id}:`, err.message);
+      logger.error('Erro ao processar expiração de assinatura', err, { assinaturaId: assinatura.id });
       Sentry.captureException(err);
     }
   }

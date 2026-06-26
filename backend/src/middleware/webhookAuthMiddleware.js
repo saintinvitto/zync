@@ -1,11 +1,12 @@
 const crypto = require('crypto');
+const logger = require('../utils/logger');
 
 function verificarTokenWebhook(envVar) {
   return function (req, res, next) {
     const tokenEsperado = process.env[envVar];
 
     if (!tokenEsperado) {
-      console.error(`${envVar} não configurada — bloqueando webhook por segurança`);
+      logger.error('Variável de ambiente do webhook não configurada — bloqueando por segurança', null, { envVar });
       return res.status(503).json({ error: 'Webhook não configurado' });
     }
 

@@ -24,6 +24,7 @@ async function receber(req, res) {
     }
     const plano = await planoModel.buscarPorId(assinatura.plano_id);
     await assinaturaModel.marcarAtiva(dados.id, plano.intervalo_dias);
+    await assinaturaModel.cancelarOutrasAtivas(assinatura.usuario_id, assinatura.id);
     await afiliadoService.gerarComissaoSeAplicavel(assinatura);
     ntfy.notificar('Pagamento recebido no Zync!', { titulo: 'Zync · Pagamento aprovado', tag: 'moneybag' });
     webhookService.disparar(assinatura.usuario_id, 'pagamento_aprovado', {

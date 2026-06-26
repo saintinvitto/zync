@@ -1,8 +1,9 @@
 const Sentry = require('../config/sentry');
+const logger = require('../utils/logger');
 
 async function enviarEmail(destinatario, assunto, corpo) {
   if (!process.env.SENDGRID_API_KEY) {
-    console.log(`[Email mock] Para: ${destinatario} | Assunto: ${assunto}\n${corpo}`);
+    logger.info('Email mock enviado', { destinatario, assunto, corpo });
     return { sucesso: true };
   }
 
@@ -28,7 +29,7 @@ async function enviarEmail(destinatario, assunto, corpo) {
 
     return { sucesso: true };
   } catch (err) {
-    console.error('Erro ao enviar e-mail:', err.message);
+    logger.error('Erro ao enviar e-mail', err, { destinatario });
     Sentry.captureException(err);
     return { sucesso: false };
   }

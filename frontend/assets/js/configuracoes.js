@@ -74,6 +74,59 @@ async function carregarUso() {
   }
 }
 
+async function carregarAssinatura() {
+  const card = document.getElementById('assinatura-card');
+  try {
+    const [assinatura, planos] = await Promise.all([Api.assinaturas.atual(), Api.planos.listar()]);
+
+    if (!assinatura || assinatura.status !== 'ativa') {
+      card.classList.add('hidden');
+      return;
+    }
+
+    card.classList.remove('hidden');
+    document.getElementById('assinatura-plano-nome').textContent = assinatura.plano_nome;
+    document.getElementById('assinatura-status-badge').textContent = 'Ativa';
+    document.getElementById('assinatura-status-badge').className = 'badge badge-ativa';
+    document.getElementById('assinatura-pix-resultado').classList.add('hidden');
+
+    document.getElementById('assinatura-novo-plano').innerHTML = planos
+      .filter((p) => p.id !== assinatura.plano_id)
+      .map((p) => `<option value="${p.id}">${escapeHtml(p.nome)}</option>`)
+      .join('');
+  } catch {
+    card.classList.add('hidden');
+  }
+}
+
+document.getElementById('assinatura-trocar').addEventListener('click', async () => {
+  const planoId = Number(document.getElementById('assinatura-novo-plano').value);
+  if (!planoId) return;
+  if (!confirm('Trocar de plano gera um novo Pix. O plano atual continua ativo até o pagamento ser confirmado. Continuar?')) return;
+
+  try {
+    const resultado = await Api.assinaturas.mudarPlano({ planoId });
+    document.getElementById('assinatura-pix-code').textContent = resultado.pixCode;
+    document.getElementById('assinatura-pix-resultado').classList.remove('hidden');
+    showToast('Pix gerado! Pague para confirmar a troca de plano.', 'success');
+  } catch (err) {
+    showToast(err.message, 'error');
+  }
+});
+
+document.getElementById('assinatura-cancelar').addEventListener('click', async () => {
+  if (!confirm('Cancelar sua assinatura? Você perde acesso aos recursos do plano pago.')) return;
+
+  try {
+    await Api.assinaturas.cancelar();
+    showToast('Assinatura cancelada', 'success');
+    carregarAssinatura();
+    carregarUso();
+  } catch (err) {
+    showToast(err.message, 'error');
+  }
+});
+
 async function carregarPerfil() {
   try {
     const usuario = await Api.auth.me();
@@ -490,5 +543,6 @@ async function carregarIntegracoes() {
 })();
 
 carregarPerfil();
+carregarAssinatura();
 carregarUso();
 carregarIntegracoes();

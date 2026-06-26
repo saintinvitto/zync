@@ -2,34 +2,44 @@ const app = require('./src/app');
 const db = require('./src/config/db');
 const { enviarLembretesPendentes } = require('./src/jobs/lembreteAgendamentoJob');
 const { verificarAssinaturasExpiradas } = require('./src/jobs/verificarExpiracaoJob');
+const { processarFilaCompleta } = require('./src/jobs/jobWorker');
+const logger = require('./src/utils/logger');
 
 const PORT = process.env.PORT || 3001;
 const server = app.listen(PORT, () => {
-  console.log(`Zync API rodando na porta ${PORT}`);
+  logger.info('Zync API rodando', { porta: PORT });
 });
 
 const INTERVALO_LEMBRETES_MS = 15 * 60 * 1000;
 function executarJobLembretes() {
-  enviarLembretesPendentes().catch((err) => console.error('Erro ao enviar lembretes de agendamento:', err.message));
+  enviarLembretesPendentes().catch((err) => logger.error('Erro ao enviar lembretes de agendamento', err));
 }
 executarJobLembretes();
 const lembreteIntervalId = setInterval(executarJobLembretes, INTERVALO_LEMBRETES_MS);
 
 const INTERVALO_EXPIRACAO_MS = 60 * 60 * 1000;
 function executarJobExpiracao() {
-  verificarAssinaturasExpiradas().catch((err) => console.error('Erro ao verificar assinaturas expiradas:', err.message));
+  verificarAssinaturasExpiradas().catch((err) => logger.error('Erro ao verificar assinaturas expiradas', err));
 }
 executarJobExpiracao();
 const expiracaoIntervalId = setInterval(executarJobExpiracao, INTERVALO_EXPIRACAO_MS);
 
+const INTERVALO_JOBS_MS = 5 * 1000;
+function executarFilaDeJobs() {
+  processarFilaCompleta().catch((err) => logger.error('Erro no worker de jobs', err));
+}
+executarFilaDeJobs();
+const jobsIntervalId = setInterval(executarFilaDeJobs, INTERVALO_JOBS_MS);
+
 function encerrarGraciosamente(sinal) {
-  console.log(`${sinal} recebido, encerrando requisições em andamento...`);
+  logger.info('Sinal recebido, encerrando requisições em andamento', { sinal });
   clearInterval(lembreteIntervalId);
   clearInterval(expiracaoIntervalId);
+  clearInterval(jobsIntervalId);
 
   server.close(async () => {
     await db.end();
-    console.log('Encerrado.');
+    logger.info('Encerrado');
     process.exit(0);
   });
 

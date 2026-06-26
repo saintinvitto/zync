@@ -79,6 +79,13 @@ async function marcarExpirada(id) {
   await db.query("UPDATE assinaturas SET status = 'expirada' WHERE id = $1 AND status = 'ativa'", [id]);
 }
 
+async function cancelarOutrasAtivas(usuarioId, idParaManter) {
+  await db.query(
+    "UPDATE assinaturas SET status = 'cancelada' WHERE usuario_id = $1 AND id != $2 AND status = 'ativa'",
+    [usuarioId, idParaManter]
+  );
+}
+
 module.exports = {
   criar,
   buscarPorId,
@@ -90,4 +97,5 @@ module.exports = {
   cancelar,
   listarAtivasExpiradas,
   marcarExpirada,
+  cancelarOutrasAtivas,
 };

@@ -1,7 +1,8 @@
 const Sentry = require('../config/sentry');
+const logger = require('../utils/logger');
 
 function enviarMock(telefone, texto) {
-  console.log(`[WhatsApp mock] Enviando para ${telefone}: ${texto}`);
+  logger.info('WhatsApp mock enviado', { telefone, texto });
   return { sucesso: true };
 }
 
@@ -35,7 +36,7 @@ async function enviarMensagem(telefone, texto) {
 
     return { sucesso: true };
   } catch (err) {
-    console.error('Erro ao enviar WhatsApp:', err.message);
+    logger.error('Erro ao enviar WhatsApp', err, { telefone });
     Sentry.captureException(err);
     return { sucesso: false };
   }
@@ -43,7 +44,7 @@ async function enviarMensagem(telefone, texto) {
 
 async function enviarMidia(telefone, { tipo, midiaId, legenda }) {
   if (!process.env.WHATSAPP_ACCESS_TOKEN || !process.env.WHATSAPP_PHONE_NUMBER_ID) {
-    console.log(`[WhatsApp mock] Enviando ${tipo} pra ${telefone}: midiaId=${midiaId}`);
+    logger.info('WhatsApp mock de mídia enviado', { telefone, tipo, midiaId });
     return { sucesso: true };
   }
 
@@ -73,7 +74,7 @@ async function enviarMidia(telefone, { tipo, midiaId, legenda }) {
 
     return { sucesso: true };
   } catch (err) {
-    console.error('Erro ao enviar mídia WhatsApp:', err.message);
+    logger.error('Erro ao enviar mídia WhatsApp', err, { telefone, tipo });
     Sentry.captureException(err);
     return { sucesso: false };
   }

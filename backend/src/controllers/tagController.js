@@ -1,7 +1,7 @@
 const tagModel = require('../models/tagModel');
 const leadModel = require('../models/leadModel');
 const logModel = require('../models/logModel');
-const campanhaService = require('../services/campanhaService');
+const jobModel = require('../models/jobModel');
 const asyncHandler = require('../utils/asyncHandler');
 const validators = require('../utils/validators');
 
@@ -94,7 +94,7 @@ async function dispararCampanha(req, res) {
   const todosLeads = await tagModel.listarLeadsPorTag(req.params.id, req.usuario.id);
   const comTelefone = todosLeads.filter((l) => l.telefone);
 
-  campanhaService.disparar({
+  await jobModel.enfileirar('disparar_campanha', {
     usuarioId: req.usuario.id,
     tagId: tag.id,
     tagNome: tag.nome,

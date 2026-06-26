@@ -52,6 +52,28 @@
     </div>
 
     <div class="settings-panel active" data-panel="perfil">
+      <section class="chart-card hidden" style="max-width: 560px;" id="assinatura-card">
+        <div class="chart-card-header">
+          <div class="chart-title" data-i18n="config.minhaAssinatura">Minha assinatura</div>
+        </div>
+        <div style="margin-bottom:1rem; display:flex; align-items:center; gap:0.6rem;">
+          <span id="assinatura-plano-nome"></span>
+          <span class="badge" id="assinatura-status-badge"></span>
+        </div>
+        <div class="field">
+          <label for="assinatura-novo-plano" data-i18n="config.trocarPlano">Trocar de plano</label>
+          <select id="assinatura-novo-plano"></select>
+        </div>
+        <div style="display:flex; gap:0.6rem; margin-top:0.8rem;">
+          <button type="button" class="btn btn-secondary btn-sm" id="assinatura-trocar" data-i18n="config.confirmarTroca">Confirmar troca</button>
+          <button type="button" class="btn btn-ghost btn-sm" id="assinatura-cancelar" data-i18n="config.cancelarAssinatura">Cancelar assinatura</button>
+        </div>
+        <div id="assinatura-pix-resultado" class="hidden" style="margin-top:1rem;">
+          <p style="font-size:0.85rem; color:var(--cinza);" data-i18n="config.pixGeradoTroca">Pix gerado pro novo plano — pague pra confirmar a troca:</p>
+          <div class="pix-code-box" id="assinatura-pix-code"></div>
+        </div>
+      </section>
+
       <section class="chart-card hidden" style="max-width: 560px;" id="uso-card">
         <div class="chart-card-header">
           <div class="chart-title">Uso do plano <span id="uso-plano-nome"></span></div>

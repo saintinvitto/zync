@@ -104,10 +104,73 @@ async function cancelar(req, res) {
   res.status(204).send();
 }
 
+async function mudarPlano(req, res) {
+  const { planoId } = req.body;
+  if (!planoId) return res.status(400).json({ error: 'planoId é obrigatório' });
+
+  const plano = await planoModel.buscarPorId(planoId);
+  if (!plano || !plano.ativo) {
+    return res.status(404).json({ error: 'Plano não encontrado' });
+  }
+
+  const assinaturaAtual = await assinaturaModel.buscarAtualPorUsuario(req.usuario.id);
+  if (!assinaturaAtual || assinaturaAtual.status !== 'ativa') {
+    return res.status(400).json({ error: 'Não há assinatura ativa para trocar de plano' });
+  }
+
+  if (assinaturaAtual.plano_id === Number(planoId)) {
+    return res.status(400).json({ error: 'Você já está nesse plano' });
+  }
+
+  const usuario = await usuarioModel.buscarPorId(req.usuario.id);
+  const nome = req.body.nome || usuario.nome;
+  const cpf = req.body.cpf || usuario.cpf;
+  const telefone = req.body.telefone || usuario.telefone;
+
+  if (!nome || !cpf || !telefone) {
+    return res.status(400).json({ error: 'nome, cpf e telefone são obrigatórios pra gerar a cobrança — preencha em Configurações ou envie junto com a troca de plano' });
+  }
+
+  if (!validators.cpfValido(cpf)) {
+    return res.status(400).json({ error: 'cpf inválido' });
+  }
+
+  const webhookUrl = `${process.env.BACKEND_PUBLIC_URL}/api/webhooks/syncpay`;
+
+  const { pixCode, identifier } = await syncpayService.criarCobrancaPix({
+    valor: plano.preco,
+    descricao: `Assinatura Zync - ${plano.nome}`,
+    cliente: { name: nome, cpf: cpf.replace(/\D/g, ''), email: usuario.email, phone: telefone.replace(/\D/g, '') },
+    webhookUrl,
+  });
+
+  const novaAssinatura = await assinaturaModel.criar({
+    usuarioId: req.usuario.id,
+    planoId: plano.id,
+    valor: plano.preco,
+    syncpayIdentifier: identifier,
+    pixCode,
+  });
+
+  await logModel.registrar({
+    usuarioId: req.usuario.id,
+    acao: 'plano_troca_iniciada',
+    detalhes: { de: assinaturaAtual.plano_nome, para: plano.nome },
+  });
+
+  res.status(201).json({
+    assinaturaId: novaAssinatura.id,
+    pixCode,
+    identifier,
+    valor: plano.preco,
+  });
+}
+
 module.exports = {
   checkout: asyncHandler(checkout),
   atual: asyncHandler(atual),
   historico: asyncHandler(historico),
   cancelar: asyncHandler(cancelar),
   uso: asyncHandler(uso),
+  mudarPlano: asyncHandler(mudarPlano),
 };

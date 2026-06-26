@@ -3,6 +3,7 @@ const mensagemModel = require('../models/mensagemModel');
 const notificacaoModel = require('../models/notificacaoModel');
 const whatsappService = require('../services/whatsappService');
 const Sentry = require('../config/sentry');
+const logger = require('../utils/logger');
 
 const JANELA_HORAS = 24;
 
@@ -34,7 +35,7 @@ async function enviarLembretesPendentes() {
       });
       await agendamentoModel.marcarLembreteEnviado(agendamento.id);
     } catch (err) {
-      console.error(`Erro ao enviar lembrete do agendamento ${agendamento.id}:`, err.message);
+      logger.error('Erro ao enviar lembrete do agendamento', err, { agendamentoId: agendamento.id });
       Sentry.captureException(err);
     }
   }

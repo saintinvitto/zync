@@ -1,7 +1,8 @@
 const Sentry = require('../config/sentry');
+const logger = require('../utils/logger');
 
 function tratarErro(err, req, res, next) {
-  console.error(err);
+  logger.error('Erro nao tratado', err, { path: req.path, method: req.method });
 
   if (err.code === 'ECONNREFUSED') {
     Sentry.captureException(err);

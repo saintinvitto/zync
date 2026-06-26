@@ -245,6 +245,8 @@ const Api = {
     checkout: (dados) => apiRequest('/assinaturas/checkout', { method: 'POST', body: dados }),
     atual: () => apiRequest('/assinaturas/atual'),
     uso: () => apiRequest('/assinaturas/uso'),
+    cancelar: () => apiRequest('/assinaturas/cancelar', { method: 'POST' }),
+    mudarPlano: (dados) => apiRequest('/assinaturas/mudar-plano', { method: 'POST', body: dados }),
   },
 
   integracoes: {

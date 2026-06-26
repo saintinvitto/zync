@@ -9,5 +9,6 @@ router.get('/atual', assinaturaController.atual);
 router.get('/uso', assinaturaController.uso);
 router.get('/historico', assinaturaController.historico);
 router.post('/cancelar', assinaturaController.cancelar);
+router.post('/mudar-plano', assinaturaController.mudarPlano);
 
 module.exports = router;

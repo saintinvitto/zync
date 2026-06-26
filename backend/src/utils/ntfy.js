@@ -1,4 +1,5 @@
 const Sentry = require('../config/sentry');
+const logger = require('./logger');
 
 async function notificar(mensagem, { titulo, tag } = {}) {
   const topico = process.env.NTFY_TOPIC;
@@ -19,7 +20,7 @@ async function notificar(mensagem, { titulo, tag } = {}) {
     }
   } catch (err) {
     /* alerta e best-effort -- nunca pode quebrar o fluxo principal (login/cadastro/pagamento) */
-    console.error('Erro ao notificar via ntfy:', err.message);
+    logger.error('Erro ao notificar via ntfy', err);
     Sentry.captureException(err);
   }
 }
