@@ -88,6 +88,7 @@ async function carregarPerfil() {
     document.getElementById('ia-o-que-vende').value = usuario.ia_o_que_vende || '';
     document.getElementById('ia-horario').value = usuario.ia_horario_funcionamento || '';
     document.getElementById('ia-tom').value = usuario.ia_tom_de_voz || 'amigavel';
+    document.getElementById('ia-whatsapp-phone-id').value = usuario.whatsapp_phone_number_id || '';
 
     fotoAtual = usuario.foto_url || null;
     fotoAlterada = false;
@@ -303,6 +304,7 @@ document.getElementById('form-ia').addEventListener('submit', async (e) => {
     ia_o_que_vende: document.getElementById('ia-o-que-vende').value.trim() || null,
     ia_horario_funcionamento: document.getElementById('ia-horario').value.trim() || null,
     ia_tom_de_voz: document.getElementById('ia-tom').value,
+    whatsapp_phone_number_id: document.getElementById('ia-whatsapp-phone-id').value.trim() || null,
   };
 
   const btn = document.getElementById('ia-submit');

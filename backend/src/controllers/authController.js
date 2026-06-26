@@ -130,7 +130,7 @@ async function atualizarMe(req, res) {
 
   const {
     foto_url, idade, cpf, instagram, facebook, telefone, nome_empresa,
-    ia_o_que_vende, ia_horario_funcionamento, ia_tom_de_voz,
+    ia_o_que_vende, ia_horario_funcionamento, ia_tom_de_voz, whatsapp_phone_number_id,
   } = req.body;
 
   if (foto_url !== undefined) dados.foto_url = foto_url || null;
@@ -178,6 +178,21 @@ async function atualizarMe(req, res) {
       return res.status(400).json({ error: 'ia_tom_de_voz deve ser formal, casual ou amigavel' });
     }
     dados.ia_tom_de_voz = ia_tom_de_voz;
+  }
+
+  if (whatsapp_phone_number_id !== undefined) {
+    if (whatsapp_phone_number_id) {
+      if (!validators.dentroDoTamanho(whatsapp_phone_number_id, 60)) {
+        return res.status(400).json({ error: 'whatsapp_phone_number_id deve ter no máximo 60 caracteres' });
+      }
+
+      const existente = await usuarioModel.buscarPorWhatsappPhoneNumberId(whatsapp_phone_number_id);
+      if (existente && existente.id !== req.usuario.id) {
+        return res.status(409).json({ error: 'Esse Phone Number ID já está em uso por outra conta' });
+      }
+    }
+
+    dados.whatsapp_phone_number_id = whatsapp_phone_number_id || null;
   }
 
   const usuario = await usuarioModel.atualizar(req.usuario.id, dados);
