@@ -2379,16 +2379,17 @@ s0.parentNode.insertBefore(s1,s0);
       return [a[0] + (b[0] - a[0]) * f, a[1] + (b[1] - a[1]) * f, a[2] + (b[2] - a[2]) * f];
     }
 
-    let w, h, dpr;
+    // Sem escalar por devicePixelRatio: em telas retina/4K isso multiplica os
+    // pixels a redesenhar por 4x e era a maior causa de lag. Linhas borradas
+    // de fundo nao perdem nada visualmente ficando em resolucao 1x.
+    let w, h;
     function resize() {
-      dpr = Math.min(window.devicePixelRatio || 1, 2);
       w = window.innerWidth;
       h = window.innerHeight;
-      canvas.width = w * dpr;
-      canvas.height = h * dpr;
+      canvas.width = w;
+      canvas.height = h;
       canvas.style.width = `${w}px`;
       canvas.style.height = `${h}px`;
-      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     }
     resize();
     window.addEventListener('resize', resize, { passive: true });
@@ -2415,9 +2416,26 @@ s0.parentNode.insertBefore(s1,s0);
     }
 
     const rotRad = cfg.rotation * Math.PI / 180;
+    const cosNegRot = Math.cos(-rotRad);
+    const sinNegRot = Math.sin(-rotRad);
+    const segments = 46;
+    const mouseRadius = 260;
+    const mouseRadius2 = mouseRadius * mouseRadius;
     const t0 = performance.now();
 
+    // Trava em ~30fps: o canvas roda escondido atras de varios cards com
+    // backdrop-filter (blur), e cada frame novo forca o navegador a
+    // recalcular o blur de tudo que esta por cima. Redesenhar menos vezes
+    // por segundo reduz bastante esse custo sem dar pra notar visualmente.
+    const frameInterval = 1000 / 30;
+    let lastDraw = 0;
+    let rafId = null;
+
     function draw(now) {
+      rafId = requestAnimationFrame(draw);
+      if (now - lastDraw < frameInterval) return;
+      lastDraw = now;
+
       const t = Math.max(0, now - t0) / 1000 * cfg.speed;
       ctx.clearRect(0, 0, w, h);
       ctx.save();
@@ -2429,28 +2447,34 @@ s0.parentNode.insertBefore(s1,s0);
       const colorT = (t * cfg.colorCycleSpeed) % 3;
       const baseAlpha = 0.12 + cfg.brightness * 0.9;
 
+      // Posicao do mouse no espaco local (rotacionado) calculada uma unica
+      // vez por frame, em vez de em todo ponto de toda linha.
+      const mouseOn = cfg.enableMouseInteraction && mouse.active;
+      let lmx = 0, lmy = 0;
+      if (mouseOn) {
+        const mx = mouse.x - w / 2, my = mouse.y - h / 2;
+        lmx = mx * cosNegRot - my * sinNegRot;
+        lmy = mx * sinNegRot + my * cosNegRot;
+      }
+
       lines.forEach((line, idx) => {
         const spread = line.isInner ? span * 0.35 : span;
         const baseY = -spread / 2 + line.offset * spread;
         const amp = (line.isInner ? span * 0.025 : span * 0.012) * (0.4 + cfg.warpIntensity * 2);
 
         ctx.beginPath();
-        const segments = 90;
         for (let s = 0; s <= segments; s++) {
           const px = -span / 2 + (s / segments) * span;
           let py = baseY
             + Math.sin(px * 0.006 * line.freq + t * 1.4 + line.phase) * amp
             + Math.sin(px * 0.018 + t * 0.8 + line.phase * 1.7) * amp * 0.35;
 
-          if (cfg.enableMouseInteraction && mouse.active) {
-            const mx = mouse.x - w / 2, my = mouse.y - h / 2;
-            const lmx = mx * Math.cos(-rotRad) - my * Math.sin(-rotRad);
-            const lmy = mx * Math.sin(-rotRad) + my * Math.cos(-rotRad);
+          if (mouseOn) {
             const dx = px - lmx, dy = py - lmy;
-            const dist = Math.sqrt(dx * dx + dy * dy);
-            const radius = 260;
-            if (dist < radius) {
-              const force = (1 - dist / radius) * cfg.mouseInfluence * 80;
+            const dist2 = dx * dx + dy * dy;
+            if (dist2 < mouseRadius2) {
+              const dist = Math.sqrt(dist2);
+              const force = (1 - dist / mouseRadius) * cfg.mouseInfluence * 80;
               py += (dy / (dist || 1)) * force;
             }
           }
@@ -2468,10 +2492,20 @@ s0.parentNode.insertBefore(s1,s0);
       });
 
       ctx.restore();
-      requestAnimationFrame(draw);
     }
 
-    requestAnimationFrame(draw);
+    rafId = requestAnimationFrame(draw);
+
+    // Para de desenhar quando a aba nao esta visivel (economiza CPU/bateria).
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) {
+        if (rafId) cancelAnimationFrame(rafId);
+        rafId = null;
+      } else if (!rafId) {
+        lastDraw = 0;
+        rafId = requestAnimationFrame(draw);
+      }
+    });
   })();
 
   // SCROLL PARALLAX (mockup depth)
