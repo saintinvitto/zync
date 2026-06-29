@@ -934,6 +934,278 @@
     font-size: 0.85rem;
   }
 
+  /* IA — DEMO DE CHAT */
+  .ia-demo-section {
+    padding: 7rem 4rem;
+    max-width: 1200px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4rem;
+    align-items: center;
+  }
+
+  .ia-demo-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1.1rem;
+    margin-top: 1.8rem;
+  }
+
+  .ia-demo-list-item {
+    display: flex;
+    align-items: center;
+    gap: 0.9rem;
+    color: var(--cinza);
+    font-size: 0.92rem;
+  }
+
+  .ia-demo-check {
+    width: 30px;
+    height: 30px;
+    flex-shrink: 0;
+    background: var(--azul-bg);
+    border: 1px solid var(--borda);
+    border-radius: 9px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--azul-claro);
+  }
+
+  .chat-widget {
+    background: var(--glass-bg);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid var(--glass-border);
+    border-radius: 18px;
+    overflow: hidden;
+    box-shadow: 0 30px 80px rgba(0,0,0,0.45);
+  }
+
+  .chat-widget-header {
+    display: flex;
+    align-items: center;
+    gap: 0.9rem;
+    padding: 1.1rem 1.3rem;
+    border-bottom: 1px solid var(--borda);
+    background: var(--preto2);
+  }
+
+  .chat-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 11px;
+    background: linear-gradient(135deg, var(--azul), var(--azul-claro));
+    box-shadow: 0 0 18px var(--azul-glow);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+
+  .chat-widget-name { font-weight: 600; font-size: 0.95rem; }
+
+  .chat-widget-status {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.75rem;
+    color: #34D399;
+    margin-top: 0.2rem;
+  }
+
+  .chat-status-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #34D399;
+    box-shadow: 0 0 8px #34D399;
+  }
+
+  .chat-widget-body {
+    padding: 1.4rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+    min-height: 320px;
+  }
+
+  .chat-bubble {
+    max-width: 78%;
+    padding: 0.75rem 1rem;
+    border-radius: 14px;
+    font-size: 0.88rem;
+    line-height: 1.55;
+    opacity: 0;
+    transform: translateY(10px) scale(0.98);
+    transition: opacity 0.4s, transform 0.4s;
+  }
+
+  .chat-bubble.show { opacity: 1; transform: none; }
+
+  .chat-bubble.user {
+    align-self: flex-end;
+    background: linear-gradient(135deg, var(--azul), var(--azul-claro));
+    color: #fff;
+    border-radius: 14px 14px 4px 14px;
+  }
+
+  .chat-bubble.ai {
+    align-self: flex-start;
+    background: var(--preto2);
+    border: 1px solid var(--borda);
+    color: var(--branco);
+    border-radius: 14px 14px 14px 4px;
+  }
+
+  .chat-typing {
+    align-self: flex-start;
+    display: flex;
+    gap: 4px;
+    padding: 0.85rem 1.1rem;
+    background: var(--preto2);
+    border: 1px solid var(--borda);
+    border-radius: 14px 14px 14px 4px;
+  }
+
+  .chat-typing span {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--cinza);
+    animation: chatTyping 1.2s infinite;
+  }
+
+  .chat-typing span:nth-child(2) { animation-delay: 0.2s; }
+  .chat-typing span:nth-child(3) { animation-delay: 0.4s; }
+
+  @keyframes chatTyping {
+    0%, 60%, 100% { transform: translateY(0); opacity: 0.5; }
+    30% { transform: translateY(-4px); opacity: 1; }
+  }
+
+  /* FUNIL ANIMADO */
+  .funnel-section {
+    padding: 7rem 4rem;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .funnel-board-wrap {
+    background: var(--glass-bg);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid var(--glass-border);
+    border-radius: 18px;
+    padding: 1.6rem;
+  }
+
+  .funnel-board {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1rem;
+    min-height: 320px;
+  }
+
+  .funnel-board .k-col { background: var(--preto2); }
+
+  .funnel-board .k-card {
+    transition: opacity 0.5s, transform 0.5s, border-color 0.5s, box-shadow 0.5s;
+  }
+
+  .funnel-board .k-count {
+    font-size: 0.65rem;
+    font-weight: 700;
+    color: var(--cinza);
+    background: rgba(255,255,255,0.06);
+    padding: 0.1rem 0.45rem;
+    border-radius: 6px;
+    margin-left: auto;
+  }
+
+  /* DEPOIMENTOS */
+  .testimonials {
+    padding: 7rem 4rem 8rem;
+    max-width: 1240px;
+    margin: 0 auto;
+    overflow: hidden;
+  }
+
+  .testimonials-viewport { overflow: hidden; }
+
+  .testimonials-track {
+    display: flex;
+    gap: 1.5rem;
+    transition: transform 0.8s cubic-bezier(.22,.8,.2,1);
+  }
+
+  .testimonial-card {
+    flex: 0 0 calc(33.333% - 1rem);
+    min-width: 260px;
+    background: var(--glass-bg);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid var(--glass-border);
+    border-radius: 14px;
+    padding: 1.8rem;
+  }
+
+  .testimonial-stars {
+    color: #FBBF24;
+    font-size: 0.9rem;
+    letter-spacing: 0.12em;
+    margin-bottom: 1rem;
+  }
+
+  .testimonial-text {
+    color: var(--cinza);
+    font-size: 0.92rem;
+    line-height: 1.65;
+    margin-bottom: 1.5rem;
+  }
+
+  .testimonial-author { display: flex; align-items: center; gap: 0.8rem; }
+
+  .testimonial-avatar {
+    width: 42px;
+    height: 42px;
+    border-radius: 11px;
+    background: linear-gradient(135deg, var(--azul), var(--azul-claro));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 700;
+    font-size: 0.82rem;
+    flex-shrink: 0;
+  }
+
+  .testimonial-name { font-weight: 600; font-size: 0.9rem; }
+  .testimonial-role { color: var(--cinza); font-size: 0.78rem; }
+
+  .testimonials-dots {
+    display: flex;
+    justify-content: center;
+    gap: 0.5rem;
+    margin-top: 2.4rem;
+  }
+
+  .test-dot {
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    background: rgba(255,255,255,0.18);
+    transition: all 0.3s;
+  }
+
+  .test-dot.active { width: 24px; background: var(--azul-claro); }
+
   /* PRICING */
   .pricing {
     padding: 7rem 4rem;
@@ -1339,6 +1611,11 @@
     .features { padding: 4rem 1.5rem; }
     .features-grid { grid-template-columns: 1fr; }
     .why-section { padding: 4rem 1.5rem; grid-template-columns: 1fr; gap: 2.5rem; }
+    .ia-demo-section { padding: 4rem 1.5rem; grid-template-columns: 1fr; gap: 2.5rem; }
+    .funnel-section { padding: 4rem 1.5rem; }
+    .funnel-board { grid-template-columns: repeat(2, 1fr); }
+    .testimonials { padding: 4rem 1.5rem 5rem; }
+    .testimonial-card { flex: 0 0 100%; }
     .pricing { padding: 4rem 1.5rem; }
     .pricing-grid { grid-template-columns: 1fr; }
     .pricing-grid-4 { grid-template-columns: 1fr; }
@@ -1604,6 +1881,44 @@
   </div>
 </section>
 
+<section class="ia-demo-section" id="ia">
+  <div>
+    <div class="reveal">
+      <div class="section-eyebrow">Inteligência Artificial</div>
+      <h2 class="section-title" style="max-width: 460px;">Uma IA que atende como o seu melhor vendedor</h2>
+      <p class="section-sub" style="margin-bottom: 0;">A IA da Zync entende a intenção do cliente, responde dúvidas, qualifica o lead e agenda reuniões — tudo sozinha, em segundos, mantendo o tom da sua marca.</p>
+    </div>
+    <div class="ia-demo-list">
+      <div class="ia-demo-list-item reveal"><div class="ia-demo-check" data-icon="check" data-icon-size="14"></div>Entende contexto e histórico da conversa</div>
+      <div class="ia-demo-list-item reveal"><div class="ia-demo-check" data-icon="check" data-icon-size="14"></div>Transfere para um humano quando necessário</div>
+      <div class="ia-demo-list-item reveal"><div class="ia-demo-check" data-icon="check" data-icon-size="14"></div>Aprende com cada atendimento da sua equipe</div>
+    </div>
+  </div>
+
+  <div class="chat-widget reveal">
+    <div class="chat-widget-header">
+      <div class="chat-avatar">Z</div>
+      <div>
+        <div class="chat-widget-name">Zync IA</div>
+        <div class="chat-widget-status"><span class="chat-status-dot"></span>online · responde em ~3s</div>
+      </div>
+    </div>
+    <div class="chat-widget-body" id="chatDemoBody"></div>
+  </div>
+</section>
+
+<section class="funnel-section" id="funil">
+  <div class="reveal">
+    <div class="section-eyebrow">CRM &amp; Pipeline</div>
+    <h2 class="section-title">Seu funil de vendas, vivo e em movimento</h2>
+    <p class="section-sub">Cada lead avança de etapa sozinho conforme a conversa evolui — sem você precisar arrastar nenhum card.</p>
+  </div>
+
+  <div class="funnel-board-wrap reveal">
+    <div class="funnel-board" id="funnelBoard"></div>
+  </div>
+</section>
+
 <section class="why-section" id="por-que">
   <div>
     <div class="reveal">
@@ -1650,6 +1965,18 @@
       <div class="why-visual-num">5 min</div>
     </div>
   </div>
+</section>
+
+<section class="testimonials" id="depoimentos">
+  <div class="reveal">
+    <div class="section-eyebrow">Depoimentos</div>
+    <h2 class="section-title">Quem usa, recomenda</h2>
+  </div>
+
+  <div class="testimonials-viewport reveal">
+    <div class="testimonials-track" id="testimonialsTrack"></div>
+  </div>
+  <div class="testimonials-dots" id="testimonialsDots"></div>
 </section>
 
 <section class="pricing" id="pricing">
@@ -1874,6 +2201,189 @@ s0.parentNode.insertBefore(s1,s0);
   }, { threshold: 0.1 });
 
   document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+  // CHAT DEMO (IA digitando)
+  const chatScript = [
+    { who: 'user', text: 'Oi! Vocês têm horário pra amanhã de manhã?' },
+    { who: 'ai', text: 'Olá! 😊 Temos sim. Tenho 9h, 10h30 e 11h disponíveis. Qual prefere?' },
+    { who: 'user', text: 'Pode ser às 10h30.' },
+    { who: 'ai', text: 'Perfeito! Agendei pra amanhã às 10h30. Já enviei a confirmação e vou te lembrar 1h antes. Posso ajudar em mais algo?' },
+  ];
+
+  const chatBody = document.getElementById('chatDemoBody');
+  let chatTimer = null;
+
+  function addChatBubble(msg) {
+    const bubble = document.createElement('div');
+    bubble.className = `chat-bubble ${msg.who}`;
+    bubble.textContent = msg.text;
+    chatBody.appendChild(bubble);
+    requestAnimationFrame(() => bubble.classList.add('show'));
+  }
+
+  function playChat(i) {
+    if (i >= chatScript.length) {
+      chatTimer = setTimeout(() => { chatBody.innerHTML = ''; playChat(0); }, 4500);
+      return;
+    }
+    const msg = chatScript[i];
+    if (msg.who === 'ai') {
+      const typing = document.createElement('div');
+      typing.className = 'chat-typing';
+      typing.innerHTML = '<span></span><span></span><span></span>';
+      chatBody.appendChild(typing);
+      chatTimer = setTimeout(() => {
+        typing.remove();
+        addChatBubble(msg);
+        chatTimer = setTimeout(() => playChat(i + 1), 1400);
+      }, 1100);
+    } else {
+      addChatBubble(msg);
+      chatTimer = setTimeout(() => playChat(i + 1), 1100);
+    }
+  }
+
+  if (chatBody) {
+    const chatObserver = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          playChat(0);
+          chatObserver.disconnect();
+        }
+      });
+    }, { threshold: 0.4 });
+    chatObserver.observe(chatBody);
+  }
+
+  // FUNIL ANIMADO
+  const funnelInitial = [
+    { name: 'Novos leads', color: '#4D8DFF', cards: [
+      { n: 'Marina Costa', t: 'Academia Pulse', tag: 'WhatsApp' },
+      { n: 'Rafael Lima', t: 'Clínica Vida', tag: 'Instagram' },
+    ]},
+    { name: 'Qualificados', color: '#4D8DFF', cards: [
+      { n: 'Bruno Alves', t: 'Studio Fit', tag: 'Site' },
+      { n: 'Carla Souza', t: 'Mendes Adv.', tag: 'WhatsApp' },
+    ]},
+    { name: 'Em negociação', color: '#34D399', cards: [
+      { n: 'Diego Rocha', t: 'TechFlow', tag: 'Indicação' },
+    ]},
+    { name: 'Fechados', color: '#F59E0B', cards: [
+      { n: 'Paula Nunes', t: 'Belle Estética', tag: 'WhatsApp' },
+      { n: 'Igor Mendes', t: 'AutoPeças BR', tag: 'Site' },
+    ]},
+  ];
+
+  let funnelCols = JSON.parse(JSON.stringify(funnelInitial));
+  const funnelBoard = document.getElementById('funnelBoard');
+  let funnelInterval = null;
+
+  function renderFunnel() {
+    funnelBoard.innerHTML = funnelCols.map((col) => `
+      <div class="k-col">
+        <div class="k-header"><div class="k-dot" style="background:${col.color}"></div>${col.name}<span class="k-count">${col.cards.length}</span></div>
+        ${col.cards.map((c) => `<div class="k-card"><strong>${c.n}</strong>${c.t}<div class="k-tag">${c.tag}</div></div>`).join('')}
+      </div>
+    `).join('');
+  }
+
+  function moveFunnelCard() {
+    for (let i = 0; i < funnelCols.length - 1; i++) {
+      if (funnelCols[i].cards.length > 0) {
+        const card = funnelCols[i].cards.shift();
+        funnelCols[i + 1].cards.push(card);
+        renderFunnel();
+        return;
+      }
+    }
+    clearInterval(funnelInterval);
+    setTimeout(() => {
+      funnelCols = JSON.parse(JSON.stringify(funnelInitial));
+      renderFunnel();
+      funnelInterval = setInterval(moveFunnelCard, 2600);
+    }, 2600);
+  }
+
+  if (funnelBoard) {
+    renderFunnel();
+    const funnelObserver = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting && !funnelInterval) {
+          funnelInterval = setInterval(moveFunnelCard, 2600);
+        }
+      });
+    }, { threshold: 0.3 });
+    funnelObserver.observe(funnelBoard);
+  }
+
+  // DEPOIMENTOS
+  const testimonialsData = [
+    { n: 'Larissa Mendes', r: 'CEO · Estúdio Bloom', t: 'A Zync mudou nosso atendimento. A IA responde na hora e nossos vendedores só entram quando o lead já está quente. Triplicamos as conversões em 2 meses.' },
+    { n: 'Fernando Dias', r: 'Diretor · Clínica Vitalle', t: 'Antes a gente perdia mensagem no WhatsApp o tempo todo. Agora cada lead vira um card no CRM automaticamente. Simplesmente não some mais ninguém.' },
+    { n: 'Patrícia Gomes', r: 'Gestora · Academia Pulse', t: 'O setup levou 5 minutos de verdade. Em uma semana já tinha agendamentos automáticos rolando direto pela IA. Recomendo de olhos fechados.' },
+    { n: 'Ricardo Antunes', r: 'Sócio · Antunes Advogados', t: 'O nível de profissionalismo do atendimento subiu absurdamente. Os clientes acham que tem uma equipe enorme respondendo — é só a Zync.' },
+    { n: 'Camila Reis', r: 'Head de Vendas · TechFlow', t: 'O pipeline em tempo real é viciante de acompanhar. Sei exatamente onde cada negócio está e o que fazer pra fechar. Visibilidade total.' },
+  ];
+
+  const testimonialsTrack = document.getElementById('testimonialsTrack');
+  const testimonialsDots = document.getElementById('testimonialsDots');
+  let testimonialIndex = 0;
+  let testimonialInterval = null;
+
+  function testimonialInitials(name) {
+    return name.split(' ').map((w) => w[0]).slice(0, 2).join('');
+  }
+
+  function updateTestimonials() {
+    const card = testimonialsTrack.children[0];
+    const width = card ? card.getBoundingClientRect().width + 24 : 340;
+    testimonialsTrack.style.transform = `translateX(${-testimonialIndex * width}px)`;
+    testimonialsDots.querySelectorAll('[data-dot]').forEach((dot, i) => {
+      dot.classList.toggle('active', i === testimonialIndex);
+    });
+  }
+
+  function restartTestimonialInterval() {
+    clearInterval(testimonialInterval);
+    const pages = Math.max(1, testimonialsData.length - 2);
+    testimonialInterval = setInterval(() => {
+      testimonialIndex = (testimonialIndex + 1) % pages;
+      updateTestimonials();
+    }, 4200);
+  }
+
+  if (testimonialsTrack) {
+    testimonialsTrack.innerHTML = testimonialsData.map((d) => `
+      <div class="testimonial-card">
+        <div class="testimonial-stars">★★★★★</div>
+        <p class="testimonial-text">"${d.t}"</p>
+        <div class="testimonial-author">
+          <div class="testimonial-avatar">${testimonialInitials(d.n)}</div>
+          <div>
+            <div class="testimonial-name">${d.n}</div>
+            <div class="testimonial-role">${d.r}</div>
+          </div>
+        </div>
+      </div>
+    `).join('');
+
+    const pages = Math.max(1, testimonialsData.length - 2);
+    testimonialsDots.innerHTML = Array.from({ length: pages }).map((_, i) =>
+      `<button class="test-dot${i === 0 ? ' active' : ''}" data-dot="${i}"></button>`
+    ).join('');
+
+    testimonialsDots.querySelectorAll('[data-dot]').forEach((dot) => {
+      dot.addEventListener('click', () => {
+        testimonialIndex = Number(dot.dataset.dot);
+        updateTestimonials();
+        restartTestimonialInterval();
+      });
+    });
+
+    updateTestimonials();
+    restartTestimonialInterval();
+    window.addEventListener('resize', updateTestimonials, { passive: true });
+  }
 
   // MOCKUP TABS
   document.querySelectorAll('.mockup-sidebar .sidebar-item').forEach(item => {
