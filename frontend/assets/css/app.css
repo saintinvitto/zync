@@ -473,18 +473,6 @@ a:focus-visible,
   position: relative;
 }
 
-.app-main::before {
-  content: '';
-  position: absolute;
-  top: -4rem;
-  right: -6rem;
-  width: 480px;
-  height: 360px;
-  background: radial-gradient(ellipse, rgba(0,85,254,0.22) 0%, rgba(77,141,255,0.14) 45%, transparent 75%);
-  pointer-events: none;
-  z-index: 0;
-}
-
 .app-main > * { position: relative; z-index: 1; }
 
 .app-topbar {
