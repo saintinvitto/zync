@@ -78,16 +78,14 @@
     mask-image: linear-gradient(to top, #000 0%, transparent 100%);
   }
 
-  /* LINE WAVES BACKGROUND */
-  .line-waves-bg {
+  /* WAVES BACKGROUND */
+  .waves-bg {
     position: fixed;
     inset: 0;
     z-index: 0;
     width: 100%;
     height: 100%;
     pointer-events: none;
-    -webkit-mask-image: radial-gradient(ellipse 90% 80% at 50% 38%, #000 0%, #000 70%, transparent 100%);
-    mask-image: radial-gradient(ellipse 90% 80% at 50% 38%, #000 0%, #000 70%, transparent 100%);
   }
 
   /* NAV */
@@ -1580,7 +1578,7 @@
 
 <div class="scroll-blur-bottom"></div>
 <div class="grain-overlay"></div>
-<canvas class="line-waves-bg" id="lineWavesBg"></canvas>
+<canvas class="waves-bg" id="wavesBg"></canvas>
 
 <nav>
   <div class="nav-logo"><span>Zync</span></div>
@@ -2343,90 +2341,83 @@ s0.parentNode.insertBefore(s1,s0);
     });
   });
 
-  // LINE WAVES BACKGROUND
-  (function initLineWaves() {
-    const canvas = document.getElementById('lineWavesBg');
+  // WAVES BACKGROUND
+  (function initWaves() {
+    const canvas = document.getElementById('wavesBg');
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
 
     const cfg = {
-      speed: 0.5,
-      innerLineCount: 17,
-      outerLineCount: 40,
-      warpIntensity: 0.3,
-      rotation: -40,
-      colorCycleSpeed: 1.7,
-      brightness: 0.2,
-      color1: '#00018c',
-      color2: '#0006c6',
-      color3: '#000c9a',
-      enableMouseInteraction: true,
-      mouseInfluence: 0.3,
+      lineColor: '#0008ff',
+      waveSpeedX: 0.025,
+      waveSpeedY: 0.03,
+      waveAmpX: 80,
+      waveAmpY: 0,
+      friction: 0.5,
+      tension: 0,
+      maxCursorMove: 10,
+      xGap: 4,
+      yGap: 10,
     };
 
-    function hexToRgb(hex) {
-      const n = parseInt(hex.slice(1), 16);
-      return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
-    }
-    const palette = [hexToRgb(cfg.color1), hexToRgb(cfg.color2), hexToRgb(cfg.color3)];
+    // xGap/yGap originais (4/10) foram pensados pra uma caixa de demo
+    // pequena, tipo 1080x1080. Numa tela cheia isso geraria dezenas de
+    // milhares de pontos por frame e seria o mesmo problema de lag de
+    // antes. Aqui a gente usa eles soh como densidade minima e trava um
+    // teto de linhas/pontos por linha, escalando o espacamento real pro
+    // tamanho da viewport.
+    const MAX_ROWS = 46;
+    const MAX_POINTS_PER_ROW = 60;
 
-    function mixColor(t) {
-      const m = ((t % 3) + 3) % 3;
-      const i = Math.floor(m);
-      const j = (i + 1) % 3;
-      const f = m - i;
-      const a = palette[i], b = palette[j];
-      return [a[0] + (b[0] - a[0]) * f, a[1] + (b[1] - a[1]) * f, a[2] + (b[2] - a[2]) * f];
+    // Sem escalar por devicePixelRatio: a maior causa de lag da vez passada.
+    let w, h, rows = [];
+
+    function noise1(v) {
+      return Math.sin(v) * 0.6 + Math.sin(v * 2.13 + 1.3) * 0.3 + Math.sin(v * 4.7 + 2.1) * 0.1;
     }
 
-    // Sem escalar por devicePixelRatio: em telas retina/4K isso multiplica os
-    // pixels a redesenhar por 4x e era a maior causa de lag. Linhas borradas
-    // de fundo nao perdem nada visualmente ficando em resolucao 1x.
-    let w, h;
-    function resize() {
+    function buildGrid() {
       w = window.innerWidth;
       h = window.innerHeight;
       canvas.width = w;
       canvas.height = h;
       canvas.style.width = `${w}px`;
       canvas.style.height = `${h}px`;
+
+      const yGap = Math.max(cfg.yGap, h / MAX_ROWS);
+      const xGap = Math.max(cfg.xGap, w / MAX_POINTS_PER_ROW);
+
+      rows = [];
+      for (let y = 0; y <= h; y += yGap) {
+        const points = [];
+        for (let x = 0; x <= w + xGap; x += xGap) {
+          points.push({ ox: x, oy: y, offX: 0, offY: 0, vx: 0, vy: 0 });
+        }
+        rows.push(points);
+      }
     }
-    resize();
-    window.addEventListener('resize', resize, { passive: true });
+    buildGrid();
+    window.addEventListener('resize', buildGrid, { passive: true });
 
     const mouse = { x: -9999, y: -9999, active: false };
-    if (cfg.enableMouseInteraction) {
-      window.addEventListener('mousemove', (e) => {
-        mouse.x = e.clientX;
-        mouse.y = e.clientY;
-        mouse.active = true;
-      }, { passive: true });
-      window.addEventListener('mouseleave', () => { mouse.active = false; });
-    }
+    window.addEventListener('mousemove', (e) => {
+      mouse.x = e.clientX;
+      mouse.y = e.clientY;
+      mouse.active = true;
+    }, { passive: true });
+    window.addEventListener('mouseleave', () => { mouse.active = false; });
 
-    const totalLines = cfg.innerLineCount + cfg.outerLineCount;
-    const lines = [];
-    for (let i = 0; i < totalLines; i++) {
-      lines.push({
-        isInner: i < cfg.innerLineCount,
-        offset: i / totalLines,
-        phase: Math.random() * Math.PI * 2,
-        freq: 0.6 + Math.random() * 0.6,
-      });
-    }
-
-    const rotRad = cfg.rotation * Math.PI / 180;
-    const cosNegRot = Math.cos(-rotRad);
-    const sinNegRot = Math.sin(-rotRad);
-    const segments = 46;
-    const mouseRadius = 260;
-    const mouseRadius2 = mouseRadius * mouseRadius;
+    const cursorRadius = 140;
+    const cursorRadius2 = cursorRadius * cursorRadius;
+    // tension=0 no componente original significa "sem mola de retorno"; aqui
+    // a gente garante um minimo pra nao deixar os pontos deslocados pra
+    // sempre, mas o deslocamento total ja vem travado por maxCursorMove.
+    const tensionUsed = Math.max(cfg.tension, 0.02);
     const t0 = performance.now();
 
-    // Trava em ~30fps: o canvas roda escondido atras de varios cards com
-    // backdrop-filter (blur), e cada frame novo forca o navegador a
-    // recalcular o blur de tudo que esta por cima. Redesenhar menos vezes
-    // por segundo reduz bastante esse custo sem dar pra notar visualmente.
+    // Trava em ~30fps pelo mesmo motivo de antes: o canvas fica atras de
+    // varios elementos com backdrop-filter (blur), e menos redesenhos por
+    // segundo evita recalcular esse blur toda hora.
     const frameInterval = 1000 / 30;
     let lastDraw = 0;
     let rafId = null;
@@ -2436,62 +2427,50 @@ s0.parentNode.insertBefore(s1,s0);
       if (now - lastDraw < frameInterval) return;
       lastDraw = now;
 
-      const t = Math.max(0, now - t0) / 1000 * cfg.speed;
+      const t = Math.max(0, now - t0) / 1000;
       ctx.clearRect(0, 0, w, h);
-      ctx.save();
-      ctx.translate(w / 2, h / 2);
-      ctx.rotate(rotRad);
+      ctx.strokeStyle = cfg.lineColor;
+      ctx.lineWidth = 1;
+      ctx.globalAlpha = 0.22;
 
-      const diag = Math.sqrt(w * w + h * h);
-      const span = diag * 1.15;
-      const colorT = (t * cfg.colorCycleSpeed) % 3;
-      const baseAlpha = 0.12 + cfg.brightness * 0.9;
+      const mouseOn = mouse.active;
 
-      // Posicao do mouse no espaco local (rotacionado) calculada uma unica
-      // vez por frame, em vez de em todo ponto de toda linha.
-      const mouseOn = cfg.enableMouseInteraction && mouse.active;
-      let lmx = 0, lmy = 0;
-      if (mouseOn) {
-        const mx = mouse.x - w / 2, my = mouse.y - h / 2;
-        lmx = mx * cosNegRot - my * sinNegRot;
-        lmy = mx * sinNegRot + my * cosNegRot;
-      }
-
-      lines.forEach((line, idx) => {
-        const spread = line.isInner ? span * 0.35 : span;
-        const baseY = -spread / 2 + line.offset * spread;
-        const amp = (line.isInner ? span * 0.025 : span * 0.012) * (0.4 + cfg.warpIntensity * 2);
-
+      rows.forEach((points) => {
         ctx.beginPath();
-        for (let s = 0; s <= segments; s++) {
-          const px = -span / 2 + (s / segments) * span;
-          let py = baseY
-            + Math.sin(px * 0.006 * line.freq + t * 1.4 + line.phase) * amp
-            + Math.sin(px * 0.018 + t * 0.8 + line.phase * 1.7) * amp * 0.35;
+        points.forEach((p, i) => {
+          let px = p.ox, py = p.oy;
+
+          if (cfg.waveAmpX) px += noise1(p.ox * 0.01 + t * cfg.waveSpeedX * 10) * cfg.waveAmpX;
+          if (cfg.waveAmpY) py += noise1(p.oy * 0.01 + t * cfg.waveSpeedY * 10 + 50) * cfg.waveAmpY;
 
           if (mouseOn) {
-            const dx = px - lmx, dy = py - lmy;
+            const dx = p.ox - mouse.x, dy = p.oy - mouse.y;
             const dist2 = dx * dx + dy * dy;
-            if (dist2 < mouseRadius2) {
-              const dist = Math.sqrt(dist2);
-              const force = (1 - dist / mouseRadius) * cfg.mouseInfluence * 80;
-              py += (dy / (dist || 1)) * force;
+            if (dist2 < cursorRadius2) {
+              const dist = Math.sqrt(dist2) || 1;
+              const force = 1 - dist / cursorRadius;
+              p.vx += (dx / dist) * force * 2;
+              p.vy += (dy / dist) * force * 2;
             }
           }
 
-          if (s === 0) ctx.moveTo(px, py);
-          else ctx.lineTo(px, py);
-        }
+          p.vx += -p.offX * tensionUsed;
+          p.vy += -p.offY * tensionUsed;
+          p.vx *= cfg.friction;
+          p.vy *= cfg.friction;
+          p.offX = Math.max(-cfg.maxCursorMove, Math.min(cfg.maxCursorMove, p.offX + p.vx));
+          p.offY = Math.max(-cfg.maxCursorMove, Math.min(cfg.maxCursorMove, p.offY + p.vy));
 
-        const colorPhase = (colorT + (idx / totalLines) * 3) % 3;
-        const [r, g, b] = mixColor(colorPhase);
-        const alpha = baseAlpha * (line.isInner ? 1 : 0.55);
-        ctx.strokeStyle = `rgba(${r | 0},${g | 0},${b | 0},${alpha})`;
-        ctx.lineWidth = line.isInner ? 1.4 : 0.8;
+          px += p.offX;
+          py += p.offY;
+
+          if (i === 0) ctx.moveTo(px, py);
+          else ctx.lineTo(px, py);
+        });
         ctx.stroke();
       });
 
-      ctx.restore();
+      ctx.globalAlpha = 1;
     }
 
     rafId = requestAnimationFrame(draw);
