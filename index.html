@@ -2466,8 +2466,21 @@ s0.parentNode.insertBefore(s1,s0);
     let lastDraw = 0;
     let rafId = null;
 
+    // Pausa o redesenho durante o scroll: o canvas fica atras de varios
+    // elementos com backdrop-filter, e scroll + redesenho ao mesmo tempo
+    // e a combinacao que trava mais (o navegador recalcula o blur a cada
+    // frame de scroll). Volta a desenhar pouco depois que o scroll para.
+    let scrolling = false;
+    let scrollTimer = null;
+    window.addEventListener('scroll', () => {
+      scrolling = true;
+      clearTimeout(scrollTimer);
+      scrollTimer = setTimeout(() => { scrolling = false; }, 200);
+    }, { passive: true });
+
     function draw(now) {
       rafId = requestAnimationFrame(draw);
+      if (scrolling) return;
       if (now - lastDraw < frameInterval) return;
       lastDraw = now;
 
