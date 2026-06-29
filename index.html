@@ -2458,10 +2458,11 @@ s0.parentNode.insertBefore(s1,s0);
     const tensionUsed = Math.max(cfg.tension, 0.02);
     const t0 = performance.now();
 
-    // Trava em ~30fps pelo mesmo motivo de antes: o canvas fica atras de
-    // varios elementos com backdrop-filter (blur), e menos redesenhos por
-    // segundo evita recalcular esse blur toda hora.
-    const frameInterval = 1000 / 30;
+    // ~40fps: rapido o suficiente pra nao parecer travado, mas ainda evita
+    // redesenhar a cada frame de tela (o canvas fica atras de varios
+    // elementos com backdrop-filter, e cada redesenho forca recalcular
+    // esse blur).
+    const frameInterval = 1000 / 40;
     let lastDraw = 0;
     let rafId = null;
 
@@ -2477,8 +2478,8 @@ s0.parentNode.insertBefore(s1,s0);
       ctx.globalAlpha = 0.55;
 
       const mouseOn = mouse.active;
-      const tx = t * cfg.waveSpeedX * 10;
-      const ty = t * cfg.waveSpeedY * 10;
+      const tx = t * cfg.waveSpeedX * 3;
+      const ty = t * cfg.waveSpeedY * 3;
 
       strands.forEach((points) => {
         const drawn = [];
