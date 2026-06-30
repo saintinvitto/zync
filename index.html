@@ -12,10 +12,12 @@
 <meta property="og:title" content="Zync — CRM, Automação e IA em uma plataforma">
 <meta property="og:description" content="CRM inteligente, automação no WhatsApp e IA de atendimento integrados. Feito para empresas, academias, grupos de vendas, consultórios e muito mais.">
 <meta property="og:url" content="https://zync-mocha.vercel.app/">
-<!-- og:image pendente: precisa de uma imagem de compartilhamento 1200x630 desenhada, SVG não é confiável em previews de redes sociais. -->
+<meta property="og:image" content="https://zync-mocha.vercel.app/frontend/assets/img/favicon.svg">
+<!-- Sem imagem 1200x630 desenhada ainda; algumas redes (Facebook/LinkedIn) não renderizam SVG em preview de link e cairão para um card sem imagem. -->
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Zync — CRM, Automação e IA em uma plataforma">
 <meta name="twitter:description" content="CRM inteligente, automação no WhatsApp e IA de atendimento integrados.">
+<meta name="twitter:image" content="https://zync-mocha.vercel.app/frontend/assets/img/favicon.svg">
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&family=Space+Grotesk:wght@400;500;700&display=swap');
 
@@ -117,9 +119,13 @@
     font-weight: 700;
     letter-spacing: -0.03em;
     color: var(--branco);
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
   }
 
   .nav-logo span { color: var(--azul-claro); }
+  .nav-logo .logo-mark { width: 28px; height: 28px; flex-shrink: 0; }
 
   .nav-links {
     display: flex;
@@ -1458,9 +1464,13 @@
     font-size: 1.2rem;
     font-weight: 700;
     color: var(--cinza);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
   }
 
   .footer-logo span { color: var(--azul-claro); }
+  .footer-logo .logo-mark { width: 22px; height: 22px; flex-shrink: 0; }
 
   .footer-tagline {
     color: var(--cinza);
@@ -1618,7 +1628,7 @@
 <canvas class="waves-bg" id="wavesBg"></canvas>
 
 <nav>
-  <div class="nav-logo"><span>Zync</span></div>
+  <div class="nav-logo"><svg class="logo-mark" viewBox="0 0 32 32" aria-hidden="true"><defs><linearGradient id="logoGradNav" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#4D8DFF"/><stop offset="100%" stop-color="#0055FE"/></linearGradient></defs><rect width="32" height="32" rx="9" fill="url(#logoGradNav)"/><path d="M9 10 H23 V13.5 L13.5 19 H23 V22 H9 V18.5 L18.5 13 H9 Z" fill="#fff"/></svg><span>Zync</span></div>
   <ul class="nav-links">
     <li><a href="#solucoes">Soluções</a></li>
     <li><a href="#features">Funcionalidades</a></li>
@@ -2144,7 +2154,7 @@
 <footer>
   <div class="footer-top">
     <div class="footer-brand">
-      <div class="footer-logo"><span>Zync</span></div>
+      <div class="footer-logo"><svg class="logo-mark" viewBox="0 0 32 32" aria-hidden="true"><defs><linearGradient id="logoGradFooter" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#4D8DFF"/><stop offset="100%" stop-color="#0055FE"/></linearGradient></defs><rect width="32" height="32" rx="9" fill="url(#logoGradFooter)"/><path d="M9 10 H23 V13.5 L13.5 19 H23 V22 H9 V18.5 L18.5 13 H9 Z" fill="#fff"/></svg><span>Zync</span></div>
       <p class="footer-tagline">CRM inteligente, automação no WhatsApp e IA de atendimento integrados em um só lugar.</p>
     </div>
     <div class="footer-links">
